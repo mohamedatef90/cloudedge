@@ -1,0 +1,59 @@
+<div 
+  role="dialog" 
+  aria-modal="true" 
+  aria-labelledby="app-launcher-title"
+  class="origin-top-right absolute right-0 mt-2 w-96 max-h-[80vh] flex flex-col rounded-md shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none z-20 transition-all ease-in-out duration-150 transform"
+  [class.opacity-100]="isOpen()"
+  [class.scale-100]="isOpen()"
+  [class.opacity-0]="!isOpen()"
+  [class.scale-95]="!isOpen()"
+  [class.pointer-events-none]="!isOpen()"
+>
+  <!-- Sticky Header -->
+  <div class="sticky top-0 z-10 p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-slate-700/50">
+    <div class="flex justify-between items-center">
+      <h3 id="app-launcher-title" class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Applications & Links</h3>
+      <button (click)="onClose()" aria-label="Close" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-slate-700/50 transition-colors">
+        <app-icon name="fas fa-times" className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="overflow-y-auto p-4">
+    <!-- Core Portals -->
+    @if (launcherData().corePortals.length > 0) {
+      <div class="mb-4">
+        <h4 class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider mb-3 px-2">CORE PORTALS</h4>
+        <div class="grid grid-cols-3 gap-3">
+          @for (item of launcherData().corePortals; track item.id) {
+            <a [href]="item.launchUrl" (click)="onClose()" class="group flex flex-col items-center text-center p-2 rounded-lg hover:bg-gray-200/50 dark:hover:bg-slate-700/50 transition-colors duration-200">
+              <div class="w-16 h-16 flex items-center justify-center mb-2">
+                <img [src]="item.iconName" [alt]="item.name" class="max-w-12 max-h-12 object-contain" />
+              </div>
+              <span class="font-medium text-xs text-[#293c51] dark:text-gray-200 group-hover:text-[#679a41] dark:group-hover:text-emerald-500 transition-colors">{{ item.name }}</span>
+            </a>
+          }
+        </div>
+      </div>
+      <hr class="my-4 border-gray-200/50 dark:border-slate-700/50" />
+    }
+
+    <!-- Your Apps & Quick Links -->
+    @if (launcherData().userApps.length > 0) {
+      <div class="mt-4">
+        <h4 class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider mb-3 px-2">YOUR APPS & QUICK LINKS</h4>
+        <div class="grid grid-cols-3 gap-3">
+          @for (item of launcherData().userApps; track item.id) {
+            <a [href]="item.launchUrl" (click)="onClose()" class="group flex flex-col items-center justify-center text-center p-3 rounded-lg hover:bg-gray-200/50 dark:hover:bg-slate-700/50 transition-colors duration-200 aspect-square">
+              <div class="w-10 h-10 flex items-center justify-center mb-2 text-[#679a41] dark:text-emerald-500 text-3xl">
+                 <app-icon [name]="item.iconName" />
+              </div>
+              <span class="font-medium text-xs text-[#293c51] dark:text-gray-200 leading-tight group-hover:text-[#679a41] dark:group-hover:text-emerald-500 transition-colors">{{ item.name }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

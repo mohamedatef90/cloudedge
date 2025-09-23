@@ -1,0 +1,14 @@
+<div class="flex h-screen overflow-hidden">
+  <app-cloud-edge-sidebar [isCollapsed]="isSidebarCollapsed()" />
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <app-cloud-edge-top-bar
+      [launcherData]="appLauncherItems()"
+      [isSidebarCollapsed]="isSidebarCollapsed()"
+      (toggleSidebar)="toggleSidebar()"
+    />
+    <main class="flex-1 overflow-x-hidden overflow-y-auto p-6">
+      <app-breadcrumbs [items]="breadcrumbItems()" />
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

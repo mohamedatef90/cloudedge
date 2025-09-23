@@ -1,0 +1,54 @@
+<aside class="sticky top-0 h-screen flex-shrink-0 bg-[#f8f8f8] dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col transition-all duration-300" [class.w-20]="isCollapsed()" [class.w-64]="!isCollapsed()">
+  <div class="flex items-center p-4 h-16 border-b border-gray-200 dark:border-slate-700" [class.justify-center]="isCollapsed()">
+    <a routerLink="/app/cloud-edge" class="flex items-center">
+      <img [src]="isCollapsed() ? 'https://i.postimg.cc/L5gg2KYJ/Cloud-Edge.png' : 'https://i.postimg.cc/m2JfPxcb/Cloud-Edge.png'" alt="CloudEdge Logo" class="h-7 w-auto" />
+    </a>
+  </div>
+
+  <nav class="flex-grow overflow-y-auto py-4" [class.px-2]="!isCollapsed()" [class.px-3]="isCollapsed()">
+    @for (section of sidebarSections(); track section.title; let first = $first) {
+      <div [class.mt-4]="!first && section.title">
+        @if (!isCollapsed() && section.title) {
+          <h3 class="px-3 pb-2 mb-2 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider border-b"
+              [class.font-bold]="section.title === activeSectionTitle()"
+              [class.text-[#293c51]]="section.title === activeSectionTitle()"
+              [class.dark:text-gray-200]="section.title === activeSectionTitle()"
+              [class.border-[#679a41]]="section.title === activeSectionTitle()"
+              [class.dark:border-[#8cc866]]="section.title === activeSectionTitle()"
+              [class.border-gray-200]="section.title !== activeSectionTitle()"
+              [class.dark:border-slate-700]="section.title !== activeSectionTitle()">
+            {{ section.title }}
+          </h3>
+        } @else if (!first && isCollapsed()) {
+          <div class="my-3 flex justify-center">
+            <span class="w-8 h-px bg-gray-300 dark:bg-slate-600"></span>
+          </div>
+        }
+        <ul class="space-y-1">
+          @for (item of section.items; track item.name) {
+            <li>
+              <a [routerLink]="item.path" routerLinkActive="active-link"
+                 [routerLinkActiveOptions]="{exact: item.path === '/app/cloud-edge'}"
+                 [title]="isCollapsed() ? item.name : undefined"
+                 class="flex items-center py-2.5 rounded-md text-sm font-medium transition-all duration-150 ease-in-out group"
+                 [class.px-3]="!isCollapsed()"
+                 [class.justify-center]="isCollapsed()"
+                 [class.text-[#333333]]="true" [class.dark:text-gray-300]="true"
+                 [class.hover:bg-gray-200]="true" [class.dark:hover:bg-slate-700]="true"
+                 [class.hover:text-[#679a41]]="true" [class.dark:hover:text-[#8cc866]]="true">
+
+                <app-icon [name]="item.icon" [fixedWidth]="true"
+                          className="text-lg transition-colors duration-150 ease-in-out"
+                          [class.mr-3]="!isCollapsed()" />
+
+                @if (!isCollapsed()) {
+                  <span class="text-sm">{{ item.name }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+</aside>

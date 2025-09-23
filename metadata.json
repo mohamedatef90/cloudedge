@@ -1,0 +1,5 @@
+{
+  "name": "CloudEdge",
+  "description": "An Angular implementation of the WorldPosta SSO application layout and design system, featuring a collapsible sidebar, a dynamic top bar with an app launcher, and a focused 'app-within-an-app' experience for services like CloudEdge.",
+  "requestFramePermissions": []
+}

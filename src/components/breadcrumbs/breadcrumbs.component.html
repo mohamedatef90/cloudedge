@@ -1,0 +1,22 @@
+@if (items().length > 1) {
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+      @for (item of items(); track item.label; let i = $index; let last = $last) {
+        <li>
+          <div class="flex items-center">
+            @if (!last && item.path) {
+              <a [routerLink]="item.path" class="hover:text-[#679a41] dark:hover:text-[#8cc866] transition-colors">
+                {{ item.label }}
+              </a>
+            } @else {
+              <span class="font-medium text-[#333333] dark:text-gray-200">{{ item.label }}</span>
+            }
+            @if (!last) {
+              <app-icon name="fas fa-chevron-right" className="w-3 h-3 mx-2 flex-shrink-0" />
+            }
+          </div>
+        </li>
+      }
+    </ol>
+  </nav>
+}

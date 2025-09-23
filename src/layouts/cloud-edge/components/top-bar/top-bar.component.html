@@ -1,0 +1,65 @@
+<header class="bg-white dark:bg-slate-800 px-4 h-16 flex justify-between items-center flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
+  <div class="flex items-center">
+    <button (click)="onToggleSidebar()"
+            class="mr-4 text-gray-500 dark:text-gray-400 hover:text-[#679a41] dark:hover:text-emerald-500 transition-colors duration-200"
+            aria-label="Toggle sidebar">
+      <app-icon [name]="isSidebarCollapsed() ? 'fas fa-angles-right' : 'fas fa-angles-left'" className="text-xl" />
+    </button>
+    <div class="relative flex-1 max-w-sm hidden sm:block">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <app-icon name="fas fa-search" className="text-gray-400" />
+      </div>
+      <input type="text" id="cloud-search" placeholder="Search..."
+             class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-emerald-500 focus:border-[#679a41] dark:focus:border-emerald-500 sm:text-sm" />
+    </div>
+  </div>
+  <div class="flex items-center space-x-2">
+    <button class="hidden sm:inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#679a41] dark:focus:ring-emerald-500 transition-colors duration-200">
+      <app-icon name="fas fa-building" className="mr-2" />
+      Worldposta
+      <app-icon name="fas fa-chevron-down" className="ml-2 text-xs" />
+    </button>
+     <button class="relative text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-800 focus:ring-[#679a41] dark:focus:ring-emerald-500 transition-colors duration-200 ease-in-out" aria-label="Notifications">
+        <app-icon name="fas fa-bell" className="text-xl"></app-icon>
+        <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white ring-2 ring-white dark:ring-slate-800">1</span>
+    </button>
+    <div class="relative">
+      <button #appLauncherButtonRef (click)="toggleAppLauncher()"
+              class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-800 focus:ring-[#679a41] dark:focus:ring-emerald-500 flex flex-col items-center justify-center px-4 py-2 rounded-md border-2 transition-colors duration-200"
+              [class.border-transparent]="!appLauncherOpen()"
+              [class.border-[#679a41]]="appLauncherOpen()"
+              [class.dark:border-emerald-500]="appLauncherOpen()"
+              aria-haspopup="true" [attr.aria-expanded]="appLauncherOpen()">
+        <app-icon name="fa-solid fa-grip" className="text-xl" />
+        <span class="text-xs mt-1">Apps</span>
+      </button>
+      <app-floating-app-launcher #appLauncherRef [isOpen]="appLauncherOpen()" [launcherData]="launcherData()" (close)="closeMenus()" />
+    </div>
+    <div class="relative">
+      <button #userMenuButtonRef (click)="toggleUserMenu()"
+              class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-800 focus:ring-[#679a41] dark:focus:ring-emerald-500 p-1 transition-transform duration-200"
+              aria-haspopup="true" [attr.aria-expanded]="userMenuOpen()">
+        @if (user()?.avatarUrl) {
+          <img class="h-8 w-8 rounded-full" [src]="user()?.avatarUrl" alt="User avatar" />
+        } @else {
+          <app-icon name="fas fa-user-circle" className="h-8 w-8 text-gray-500 dark:text-gray-400 text-3xl" />
+        }
+        <span class="ml-2 hidden md:inline text-[#293c51] dark:text-gray-200">Hello, {{ user()?.displayName || 'User' }}</span>
+        <app-icon name="fas fa-chevron-down"
+                  className="ml-1 text-gray-500 dark:text-gray-400 transform transition-transform duration-200 text-xs"
+                  [class.rotate-180]="userMenuOpen()" [class.rotate-0]="!userMenuOpen()" />
+      </button>
+
+      @if (userMenuOpen()) {
+        <div #userMenuRef class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none text-[#293c51] dark:text-gray-200 z-10">
+          <a routerLink="/app/settings" (click)="closeMenus()" class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-emerald-500">
+            <app-icon name="fas fa-cog" [fixedWidth]="true" className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" /> Settings
+          </a>
+          <a routerLink="/app/dashboard" (click)="closeMenus()" class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-emerald-500">
+            <app-icon name="fas fa-sign-out-alt" [fixedWidth]="true" className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" /> Exit CloudEdge
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</header>
