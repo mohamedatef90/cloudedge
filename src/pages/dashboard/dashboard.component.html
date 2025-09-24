@@ -2,19 +2,44 @@
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>
-      <h1 class="text-2xl lg:text-3xl font-bold text-[#293c51] dark:text-gray-200">CloudEdge</h1>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">CloudEdge Console</h1>
     </div>
     <div class="flex items-center space-x-2">
       <button class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
         <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
         Create VM
       </button>
-      <button class="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-[#293c51] dark:text-gray-200 px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-200 ease-in-out flex items-center shadow-sm">
+      <button class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
         <app-icon name="fas fa-shield-halved" className="mr-2 text-xs"></app-icon>
         Security Scan
       </button>
     </div>
   </div>
+
+  <!-- Welcome Card for New Users -->
+  @if (showWelcomeCard()) {
+    <div class="relative bg-white dark:bg-slate-800 bg-gradient-to-br from-[#679a41]/10 dark:from-[#8cc866]/10 to-transparent rounded-xl shadow p-6 mb-6">
+      <button (click)="dismissWelcomeCard()" class="absolute top-4 right-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <app-icon name="fas fa-times" />
+      </button>
+      <h2 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Welcome to CloudEdge, {{ user()?.displayName || 'User' }}!</h2>
+      <p class="mt-2 text-sm font-medium text-[#293c51] dark:text-gray-300">We're glad to have you here. Here are some quick links to help you get started:</p>
+      
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @for (link of quickStartLinks(); track link.title) {
+          <a [routerLink]="link.path" class="group bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700/80 p-4 rounded-lg shadow-sm border border-transparent hover:border-gray-200 dark:hover:border-slate-600 transition-all duration-200 flex items-start space-x-4">
+            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-[#679a41]/20 text-[#679a41] dark:bg-[#8cc866]/20 dark:text-[#8cc866] rounded-lg">
+              <app-icon [name]="link.icon" className="text-xl" />
+            </div>
+            <div>
+              <h3 class="font-medium text-sm text-[#293c51] dark:text-gray-200 group-hover:text-[#679a41] dark:group-hover:text-[#8cc866] transition-colors">{{ link.title }}</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ link.description }}</p>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  }
 
   <!-- Stats Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
@@ -172,8 +197,8 @@
                     <app-icon [name]="activity.icon" className="h-5 w-5"></app-icon>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm text-[#293c51] dark:text-gray-200">{{ activity.description }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ activity.description }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <span>{{ activity.timestamp }} by </span>
                       <span class="font-medium">{{ activity.user }}</span>
                     </p>
@@ -207,15 +232,15 @@
             </div>
             <div class="w-full mt-4 space-y-2 text-sm">
               <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700 py-2">
-                <span class="text-[#293c51] dark:text-gray-200">Active Threats</span>
+                <span class="font-medium text-[#293c51] dark:text-gray-200">Active Threats</span>
                 <span class="font-semibold text-red-500">{{ securityScore().activeThreats }}</span>
               </div>
                <div class="flex justify-between items-center border-b border-gray-100 dark:border-slate-700 py-2">
-                <span class="text-[#293c51] dark:text-gray-200">Blocked Attempts</span>
-                <span class="font-semibold text-[#293c51] dark:text-gray-200">{{ securityScore().blockedAttempts }}</span>
+                <span class="font-medium text-[#293c51] dark:text-gray-200">Blocked Attempts</span>
+                <span class="font-medium text-[#293c51] dark:text-gray-200">{{ securityScore().blockedAttempts }}</span>
               </div>
                <div class="flex justify-between items-center py-2">
-                <span class="text-[#293c51] dark:text-gray-200">SSL Certificates</span>
+                <span class="font-medium text-[#293c51] dark:text-gray-200">SSL Certificates</span>
                 <span class="font-semibold text-[#679a41] dark:text-[#8cc866]">{{ securityScore().sslCertificates }}</span>
               </div>
             </div>
@@ -232,28 +257,49 @@
         <div class="space-y-4 text-sm">
           <div>
             <div class="flex justify-between mb-1">
-              <span class="text-[#293c51] dark:text-gray-200">Bandwidth Usage</span>
-              <span class="font-semibold text-[#293c51] dark:text-gray-200">{{ networkStatus().bandwidthUsage.used }} / {{ networkStatus().bandwidthUsage.total }} {{ networkStatus().bandwidthUsage.unit }}</span>
+              <span class="font-medium text-[#293c51] dark:text-gray-200">Bandwidth Usage</span>
+              <span class="font-medium text-[#293c51] dark:text-gray-200">{{ networkStatus().bandwidthUsage.used }} / {{ networkStatus().bandwidthUsage.total }} {{ networkStatus().bandwidthUsage.unit }}</span>
             </div>
             <div class="bg-gray-200 dark:bg-slate-700 rounded-full h-1.5 w-full overflow-hidden">
               <div class="bg-[#9C27B0] h-1.5 rounded-full" [style.width.%]="networkStatus().bandwidthUsage.percentage"></div>
             </div>
           </div>
            <div class="flex justify-between items-center">
-            <span class="text-[#293c51] dark:text-gray-200">Latency</span>
+            <span class="font-medium text-[#293c51] dark:text-gray-200">Latency</span>
             <span class="font-semibold text-[#679a41] dark:text-[#8cc866]">{{ networkStatus().latency }}</span>
           </div>
            <div class="flex justify-between items-center">
-            <span class="text-[#293c51] dark:text-gray-200">Active Connections</span>
-            <span class="font-semibold text-[#293c51] dark:text-gray-200">{{ networkStatus().activeConnections }}</span>
+            <span class="font-medium text-[#293c51] dark:text-gray-200">Active Connections</span>
+            <span class="font-medium text-[#293c51] dark:text-gray-200">{{ networkStatus().activeConnections }}</span>
           </div>
            <div class="flex justify-between items-center">
-            <span class="text-[#293c51] dark:text-gray-200">Packet Loss</span>
+            <span class="font-medium text-[#293c51] dark:text-gray-200">Packet Loss</span>
             <span class="font-semibold text-[#679a41] dark:text-[#8cc866]">{{ networkStatus().packetLoss }}</span>
           </div>
         </div>
       </div>
       
+      <!-- Helpful Resources -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Helpful Resources</h3>
+        <hr class="my-4 border-gray-200 dark:border-slate-700">
+        <ul class="-mx-2 -my-1">
+          @for (resource of helpfulResources(); track resource.title) {
+            <li>
+              <a [routerLink]="resource.path" class="group flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700/50 transition-colors">
+                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#679a41]/10 text-[#679a41] dark:bg-[#8cc866]/10 dark:text-[#8cc866] rounded-md mt-0.5">
+                  <app-icon [name]="resource.icon" className="text-base"></app-icon>
+                </div>
+                <div>
+                  <h4 class="font-medium text-sm text-[#293c51] dark:text-gray-200 group-hover:text-[#679a41] dark:group-hover:text-[#8cc866] transition-colors">{{ resource.title }}</h4>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">{{ resource.description }}</p>
+                </div>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
       <!-- System Alerts -->
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
         <div class="flex justify-between items-center">

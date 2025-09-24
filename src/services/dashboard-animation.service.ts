@@ -16,6 +16,12 @@ export class DashboardAnimationService {
   introPlayed = signal(false);
 
   /**
+   * A signal to track if the welcome card has been dismissed by the user.
+   * Reads from localStorage to persist the state across sessions.
+   */
+  welcomeDismissed = signal(localStorage.getItem('welcomeDismissed') === 'true');
+
+  /**
    * Marks the dashboard animations as having been played.
    */
   setAnimated(): void {
@@ -27,5 +33,13 @@ export class DashboardAnimationService {
    */
   setIntroPlayed(): void {
     this.introPlayed.set(true);
+  }
+  
+  /**
+   * Marks the welcome card as dismissed and saves the state to localStorage.
+   */
+  dismissWelcome(): void {
+    this.welcomeDismissed.set(true);
+    localStorage.setItem('welcomeDismissed', 'true');
   }
 }

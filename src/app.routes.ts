@@ -21,6 +21,7 @@ import { ScheduledTasksComponent } from './pages/scheduled-tasks/scheduled-tasks
 import { RunningTasksComponent } from './pages/running-tasks/running-tasks.component';
 import { FirewallGroupsComponent } from './pages/firewall-groups/firewall-groups.component';
 import { FirewallServicesComponent } from './pages/firewall-services/firewall-services.component';
+import { OrganizationProfileComponent } from './pages/organization-profile/organization-profile.component';
 
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'app/cloud-edge', pathMatch: 'full' },
@@ -31,6 +32,7 @@ export const APP_ROUTES: Routes = [
       { path: '', component: DashboardComponent, title: 'CloudEdge Dashboard' },
       // Administration
       { path: 'administration/organizations', component: OrganizationsComponent, title: 'Organizations' },
+      { path: 'administration/organizations/:id', component: OrganizationProfileComponent, title: 'Organization Profile' },
       { path: 'administration/action-logs', component: ActionLogsComponent, title: 'Action Logs' },
       { path: 'administration/tickets', component: TicketsComponent, title: 'Tickets' },
       // Resources
@@ -41,7 +43,7 @@ export const APP_ROUTES: Routes = [
       { path: 'network/gateways', component: GatewaysComponent, title: 'Gateways' },
       { path: 'network/nats', component: NatsComponent, title: 'NATs' },
       { path: 'network/routes', component: RoutesComponent, title: 'Routes' },
-      { path: 'network/firewall-policies', component: FirewallPoliciesComponent, title: 'Firewall Policies' },
+      { path: 'network/applications', component: FirewallPoliciesComponent, title: 'Applications' },
       { path: 'network/firewall-groups', component: FirewallGroupsComponent, title: 'Firewall Groups' },
       { path: 'network/firewall-services', component: FirewallServicesComponent, title: 'Firewall Services' },
       // Security

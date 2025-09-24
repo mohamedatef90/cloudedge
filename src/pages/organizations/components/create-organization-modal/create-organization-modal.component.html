@@ -1,0 +1,72 @@
+@if (isOpen()) {
+  <div 
+    (click)="onBackdropClick()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm modal-backdrop">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      aria-modal="true" 
+      aria-labelledby="modal-title"
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg m-4 modal-dialog">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+        <h2 id="modal-title" class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+          {{ isEditMode() ? 'Edit Organization' : 'Create New Organization' }}
+        </h2>
+        <button 
+          (click)="onClose()" 
+          aria-label="Close" 
+          class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <app-icon name="fas fa-times" className="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+        <div>
+          <label for="org-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Name <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="org-name" 
+            [(ngModel)]="name"
+            placeholder="e.g., WorldPosta Inc."
+            class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+          >
+        </div>
+        <div>
+          <label for="org-description" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Description
+          </label>
+          <textarea 
+            id="org-description" 
+            [(ngModel)]="description"
+            rows="4"
+            placeholder="Provide a brief description of the organization..."
+            class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+        <button 
+          (click)="onClose()"
+          type="button" 
+          class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out mr-2">
+          Cancel
+        </button>
+        <button 
+          (click)="onSave()"
+          [disabled]="!name().trim()"
+          type="button" 
+          class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isEditMode() ? 'Save Changes' : 'Create Organization' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -98,7 +98,7 @@ export class CloudEdgeSidebarComponent {
             { name: 'Gateways', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
             { name: 'NATs', icon: 'fas fa-network-wired', path: '/app/cloud-edge/network/nats' },
             { name: 'Routes', icon: 'fas fa-route', path: '/app/cloud-edge/network/routes' },
-            { name: 'Firewall Policies', icon: 'fas fa-file-contract', path: '/app/cloud-edge/network/firewall-policies' },
+            { name: 'Applications', icon: 'far fa-file-alt', path: '/app/cloud-edge/network/applications' },
             { name: 'Firewall Groups', icon: 'fas fa-layer-group', path: '/app/cloud-edge/network/firewall-groups' },
             { name: 'Firewall Services', icon: 'fas fa-concierge-bell', path: '/app/cloud-edge/network/firewall-services' }
         ]

@@ -1,0 +1,125 @@
+@if (isOpen() && groupData()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" (click)="close.emit()">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-4xl m-4 flex flex-col h-[80vh]" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="p-4 border-b dark:border-slate-700 flex-shrink-0 flex justify-between items-center">
+      <h2 class="text-lg font-semibold">View Members | {{ groupData()?.name }}</h2>
+      <button (click)="close.emit()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+        <app-icon name="fas fa-times" />
+      </button>
+    </div>
+    <!-- Body -->
+    <div class="p-6 space-y-4 flex-grow overflow-y-auto">
+        <div class="border-b border-gray-200 dark:border-slate-700">
+            <nav class="-mb-px flex space-x-6">
+                <button (click)="activeMainTab.set('effective')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm" [class.border-[#679a41]]="activeMainTab() === 'effective'" [class.text-[#679a41]]="activeMainTab() === 'effective'" [class.border-transparent]="activeMainTab() !== 'effective'" [class.text-gray-500]="activeMainTab() !== 'effective'">
+                    Effective Members
+                </button>
+                @if (groupData()?.definitionCategories) {
+                  <button (click)="activeMainTab.set('definition')" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm" [class.border-[#679a41]]="activeMainTab() === 'definition'" [class.text-[#679a41]]="activeMainTab() === 'definition'" [class.border-transparent]="activeMainTab() !== 'definition'" [class.text-gray-500]="activeMainTab() !== 'definition'">
+                      Group Definition
+                  </button>
+                }
+            </nav>
+        </div>
+        
+        @if (activeMainTab() === 'effective') {
+            <div class="flex" style="min-height: 400px;">
+                <div class="w-1/3 border-r border-gray-200 dark:border-slate-700 pr-4">
+                    <ul class="space-y-1">
+                      @for (cat of groupData()?.memberCategories; track cat.id) {
+                        <li>
+                            <button (click)="activeCategory.set(cat)" class="w-full text-left text-sm p-2 rounded-md flex justify-between items-center" [class.bg-[#679a41]/10]="activeCategory()?.id === cat.id" [class.dark:bg-[#8cc866]/10]="activeCategory()?.id === cat.id" [class.text-[#537d34]]="activeCategory()?.id === cat.id" [class.dark:text-[#8cc866]]="activeCategory()?.id === cat.id" [class.font-semibold]="activeCategory()?.id === cat.id" [class.hover:bg-gray-100]="activeCategory()?.id !== cat.id" [class.dark:hover:bg-slate-700/50]="activeCategory()?.id !== cat.id">
+                                <span>{{ cat.name }}</span>
+                                <span>({{ cat.count }})</span>
+                            </button>
+                        </li>
+                      }
+                    </ul>
+                </div>
+                <div class="w-2/3 pl-4">
+                  @if (activeCategory(); as category) {
+                    <div class="overflow-auto border rounded-lg dark:border-slate-700">
+                      <table class="min-w-full">
+                          <thead class="bg-gray-50 dark:bg-slate-700">
+                              <tr>
+                                @for (header of category.headers; track header) {
+                                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">{{ header }}</th>
+                                }
+                              </tr>
+                          </thead>
+                          <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+                            @if (category.members.length > 0) {
+                              @for (member of category.members; track $index) {
+                                <tr>
+                                  @for(header of category.headers; track header) {
+                                    <td class="px-4 py-2 text-sm">{{ member[header] }}</td>
+                                  }
+                                </tr>
+                              }
+                            } @else {
+                              <tr>
+                                <td [attr.colspan]="category.headers.length" class="text-center py-4 text-gray-500">No members in this category.</td>
+                              </tr>
+                            }
+                          </tbody>
+                      </table>
+                    </div>
+                  }
+                </div>
+            </div>
+        }
+        @if (activeMainTab() === 'definition') {
+          <div class="flex" style="min-height: 400px;">
+              <div class="w-1/3 border-r border-gray-200 dark:border-slate-700 pr-4">
+                  <ul class="space-y-1">
+                    @for (cat of groupData()?.definitionCategories; track cat.id) {
+                      <li>
+                          <button (click)="activeDefinitionCategory.set(cat)" class="w-full text-left text-sm p-2 rounded-md flex justify-between items-center" [class.bg-[#679a41]/10]="activeDefinitionCategory()?.id === cat.id" [class.dark:bg-[#8cc866]/10]="activeDefinitionCategory()?.id === cat.id" [class.text-[#537d34]]="activeDefinitionCategory()?.id === cat.id" [class.dark:text-[#8cc866]]="activeDefinitionCategory()?.id === cat.id" [class.font-semibold]="activeDefinitionCategory()?.id === cat.id" [class.hover:bg-gray-100]="activeDefinitionCategory()?.id !== cat.id" [class.dark:hover:bg-slate-700/50]="activeDefinitionCategory()?.id !== cat.id">
+                              <span>{{ cat.name }}</span>
+                              <span>({{ cat.count }})</span>
+                          </button>
+                      </li>
+                    }
+                  </ul>
+              </div>
+              <div class="w-2/3 pl-4">
+                @if (activeDefinitionCategory(); as category) {
+                  <div class="overflow-auto border rounded-lg dark:border-slate-700">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50 dark:bg-slate-700">
+                            <tr>
+                              @for (header of category.headers; track header) {
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">{{ header }}</th>
+                              }
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+                          @if (category.members.length > 0) {
+                            @for(member of category.members; track $index) {
+                              <tr>
+                                @for(header of category.headers; track header) {
+                                  <td class="px-4 py-2 text-sm">{{ member[header] }}</td>
+                                }
+                              </tr>
+                            }
+                          } @else {
+                            <tr>
+                              <td [attr.colspan]="category.headers.length" class="text-center py-4 text-gray-500">No definitions in this category.</td>
+                            </tr>
+                          }
+                        </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+          </div>
+        }
+    </div>
+    <!-- Footer -->
+    <div class="p-4 flex justify-end bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-700 flex-shrink-0">
+      <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Close</button>
+    </div>
+  </div>
+</div>
+}

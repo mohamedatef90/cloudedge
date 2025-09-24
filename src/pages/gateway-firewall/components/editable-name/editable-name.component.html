@@ -1,0 +1,23 @@
+
+@if (!isEditing()) {
+  <div class="group relative flex items-center gap-2 cursor-pointer" (dblclick)="isEditing.set(true)">
+    <span class="text-sm" [class.font-medium]="isPolicy()" [class.text-[#293c51]]="isPolicy()" [class.dark:text-gray-200]="isPolicy()">
+      {{ name() }}
+    </span>
+    <button (click)="isEditing.set(true)" class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-[#679a41]">
+      <app-icon name="fas fa-pencil-alt" className="text-xs" />
+    </button>
+  </div>
+} @else {
+  <div class="flex items-center gap-1">
+    <input
+      #inputEl
+      type="text"
+      [(ngModel)]="editedName"
+      (keydown.enter)="handleSave()"
+      (keydown.escape)="handleCancel()"
+      (blur)="handleSave()"
+      class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md text-sm p-1 w-full focus:ring-1 focus:ring-[#679a41] focus:border-[#679a41]"
+    />
+  </div>
+}

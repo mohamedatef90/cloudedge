@@ -27,19 +27,29 @@
   to { opacity: 0; }
 }
 
-@keyframes gradient-animation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 .splash-container {
-  background: linear-gradient(270deg, #ECE9E6, #ffffff);
-  background-size: 200% 200%;
+  background-image: url('https://media.istockphoto.com/id/1319390959/vector/abstract-dark-blue-mesh-gradient-with-glowing-green-curve-lines-pattern-textured-background.jpg?s=2048x2048&w=is&k=20&c=MpPs1XrCZIHUp1LRMq8FtTs2ZSw0ZoF7zWBqpYx_4f0=');
+  background-size: cover;
+  background-position: center;
+  height: 100%;
   animation: 
     fade-in 0.5s ease-in-out, 
-    fade-out 0.5s ease-in-out 4.5s forwards,
-    gradient-animation 5s ease infinite;
+    fade-out 0.5s ease-in-out 4.5s forwards;
+}
+
+.splash-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: linear-gradient(270deg, rgba(236, 233, 230, 0.85), rgba(255, 255, 255, 0.85));
+  z-index: 1;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 2;
 }
 
 .logo {

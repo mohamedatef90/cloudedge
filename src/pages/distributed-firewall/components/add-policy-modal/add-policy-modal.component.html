@@ -1,0 +1,24 @@
+@if (isOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="handleClose()">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md m-4" (click)="$event.stopPropagation()">
+    <div class="p-4 border-b dark:border-slate-700">
+      <h2 class="text-lg font-semibold">Add New Policy</h2>
+    </div>
+    <div class="p-6">
+      <label for="newPolicyName" class="block text-sm font-medium mb-1">Policy Name</label>
+      <input
+        id="newPolicyName"
+        type="text"
+        [(ngModel)]="policyName"
+        (keydown.enter)="handleSave()"
+        placeholder="Enter policy name"
+        class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+      />
+    </div>
+    <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg">
+      <button (click)="handleClose()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
+      <button (click)="handleSave()" [disabled]="!policyName().trim()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">SAVE & ADD RULE</button>
+    </div>
+  </div>
+</div>
+}

@@ -53,7 +53,7 @@ export class CloudEdgeLayoutComponent {
         'cloud-edge': 'CloudEdge', 'security': 'Security', 'overview': 'Security Overview',
         'ids-ips': 'IDS/IPS', 'suspicious-traffic': 'Suspicious Traffic', 'filtering-analysis': 'Filtering and Analysis',
         'distributed-firewall': 'Distributed Firewall', 'gateway-firewall': 'Gateway Firewall', 'ids-ips-malware-prevention': 'IDS/IPS & Malware Prevention',
-        'administration': 'Administration', 'organizations': 'Organizations'
+        'administration': 'Administration', 'organizations': 'Organizations', 'applications': 'Applications'
     };
 
     const getLabel = (value: string) => BREADCRUMB_LABELS[value] || value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

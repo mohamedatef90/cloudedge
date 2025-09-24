@@ -1,5 +1,6 @@
 
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, computed, inject, input, output, signal, viewChild } from '@angular/core';
+
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../../services/auth.service';
@@ -13,6 +14,10 @@ import { FloatingAppLauncherComponent } from '../floating-app-launcher/floating-
   styleUrls: ['./top-bar.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [IconComponent, RouterLink, FloatingAppLauncherComponent],
+  // FIX: Replaced @HostListener with the host property for better component encapsulation.
+  host: {
+    '(document:mousedown)': 'onGlobalClick($event)',
+  },
 })
 export class CloudEdgeTopBarComponent {
   launcherData = input.required<AppLauncherData>();
@@ -30,7 +35,6 @@ export class CloudEdgeTopBarComponent {
   appLauncherRef = viewChild<FloatingAppLauncherComponent>('appLauncherRef');
   appLauncherButtonRef = viewChild<ElementRef>('appLauncherButtonRef');
 
-  @HostListener('document:mousedown', ['$event'])
   onGlobalClick(event: MouseEvent): void {
     const target = event.target as Node;
 

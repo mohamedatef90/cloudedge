@@ -1,0 +1,14 @@
+<div class="group relative flex items-center gap-2" (dblclick)="onEdit()">
+  <span class="text-gray-500 dark:text-gray-400 font-normal italic text-xs">
+    Applied to: {{ value() }}
+  </span>
+  @if (!isReadOnly()) {
+    <button
+        type="button"
+        (click)="onEdit()"
+        class="opacity-0 group-hover:opacity-100 transition-opacity"
+        [attr.aria-label]="'Edit Applied To for ' + value()">
+        <app-icon name="fas fa-pencil-alt" className="text-xs text-sky-500" />
+    </button>
+  }
+</div>

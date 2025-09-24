@@ -1,5 +1,105 @@
-
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
-  <h1 class="text-3xl font-bold text-[#293c51] dark:text-gray-200">Firewall Policies</h1>
-  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Configure your firewall policies here.</p>
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Applications</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage application context profiles for deep packet inspection.</p>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+    <!-- Create (left) -->
+    <button class="w-full sm:w-auto bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
+      <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+      ADD CONTEXT PROFILE
+    </button>
+    
+    <!-- Search (right) -->
+    <div class="relative w-full sm:max-w-xs">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <app-icon name="fas fa-search" className="text-gray-400" />
+      </div>
+      <input 
+        type="text" 
+        [(ngModel)]="filterTerm"
+        placeholder="Filter by Name or Description..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:focus:ring-[#8cc866] sm:text-sm"
+      />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-300">
+          <tr>
+            <th scope="col" class="px-4 py-3 w-[25%]">Name</th>
+            <th scope="col" class="px-4 py-3 w-[15%]">Attributes</th>
+            <th scope="col" class="px-4 py-3 w-[30%]">Description</th>
+            <th scope="col" class="px-4 py-3">Tags</th>
+            <th scope="col" class="px-4 py-3">Where Used</th>
+            <th scope="col" class="px-4 py-3 w-[15%]">Status</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+          @for (profile of paginatedProfiles(); track profile.id) {
+            <tr>
+              <td class="px-4 py-3 text-sm font-medium text-[#293c51] dark:text-gray-200">
+                <div class="flex items-center gap-3">
+                  <app-icon name="fas fa-ellipsis-v" className="text-gray-400 cursor-pointer" />
+                  <app-icon name="far fa-file-alt" className="text-gray-500" />
+                  @if (profile.isSystemDefined) {
+                    <app-icon name="fas fa-lock" className="text-gray-500" title="System Defined" />
+                  }
+                  <span>{{ profile.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-sm">
+                <button (click)="openAttributesModal(profile)" class="text-sky-600 dark:text-sky-400 hover:underline">{{ profile.attributes }}</button>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.description }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.tags }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.whereUsed }}</td>
+              <td class="px-4 py-3 text-sm">
+                <div class="flex items-center gap-2 text-green-600 dark:text-green-400">
+                  <app-icon name="fas fa-check-circle" />
+                  <span class="font-semibold">Success</span>
+                  <button class="text-sky-600 dark:text-sky-400"><app-icon name="fas fa-sync-alt" /></button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center p-6 text-gray-500 dark:text-gray-400">
+                <app-icon name="fas fa-search" className="text-3xl mb-2"></app-icon>
+                <p>No applications found.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-slate-700">
+    <button (click)="handleRefresh()" [disabled]="isRefreshing()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50">
+        <app-icon name="fas fa-sync-alt" [className]="isRefreshing() ? 'animate-spin' : ''" />
+        REFRESH
+    </button>
+    <app-pagination
+        [currentPage]="currentPage()"
+        [totalItems]="filteredProfiles().length"
+        [itemsPerPage]="rowsPerPage()"
+        (pageChange)="currentPage.set($event)"
+        (itemsPerPageChange)="rowsPerPage.set($event)"
+    />
+  </div>
 </div>
+<app-attributes-modal 
+  [isOpen]="isAttributesModalOpen()" 
+  [profile]="selectedProfile()" 
+  (close)="closeAttributesModal()">
+</app-attributes-modal>

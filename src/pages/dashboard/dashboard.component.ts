@@ -1,3 +1,4 @@
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -5,12 +6,12 @@ import {
   computed,
   AfterViewInit,
   inject,
-  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IconComponent } from '../../components/icon/icon.component';
 import { DashboardAnimationService } from '../../services/dashboard-animation.service';
+import { AuthService } from '../../services/auth.service';
 
 interface StatCard {
   title: string;
@@ -46,17 +47,40 @@ interface RecentActivity {
   user: string;
 }
 
+interface QuickStartLink {
+  title: string;
+  description: string;
+  icon: string;
+  path: string;
+}
+
+interface HelpfulResource {
+  title: string;
+  description: string;
+  icon: string;
+  path: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, IconComponent, RouterModule],
+  // FIX: Replaced @HostListener with the host property for better component encapsulation.
+  host: {
+    '(document:click)': 'onGlobalClick($event.target)',
+  },
 })
 export class DashboardComponent implements AfterViewInit {
   private animationService = inject(DashboardAnimationService);
+  private authService = inject(AuthService);
+
   animationsReady = signal(false);
   openVmMenuId = signal<string | null>(null);
+  user = this.authService.user;
+
+  showWelcomeCard = computed(() => this.user()?.isNewUser && !this.animationService.welcomeDismissed());
 
   constructor() {
     // If animations have already run in this session, set the component to the final state immediately.
@@ -65,7 +89,6 @@ export class DashboardComponent implements AfterViewInit {
     }
   }
 
-  @HostListener('document:click', ['$event.target'])
   onGlobalClick(target: HTMLElement): void {
     if (!target.closest('.vm-menu-container')) {
       this.closeVmMenu();
@@ -83,6 +106,10 @@ export class DashboardComponent implements AfterViewInit {
     }
   }
 
+  dismissWelcomeCard(): void {
+    this.animationService.dismissWelcome();
+  }
+
   toggleVmMenu(vmId: string): void {
     this.openVmMenuId.update(currentId => (currentId === vmId ? null : vmId));
   }
@@ -90,6 +117,40 @@ export class DashboardComponent implements AfterViewInit {
   closeVmMenu(): void {
     this.openVmMenuId.set(null);
   }
+
+  quickStartLinks = signal<QuickStartLink[]>([
+    { title: 'Create a Virtual Machine', description: 'Spin up a new server in minutes.', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines' },
+    { title: 'Set up a Gateway', description: 'Configure your network entry point.', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
+    { title: 'Configure Firewall', description: 'Secure your resources with policies.', icon: 'fas fa-file-contract', path: '/app/cloud-edge/network/firewall-policies' },
+    { title: 'View Documentation', description: 'Find detailed guides and help.', icon: 'fas fa-book', path: '/#' }
+  ]);
+
+  helpfulResources = signal<HelpfulResource[]>([
+    {
+      title: 'Getting Started Guide',
+      description: 'Our step-by-step guide to launch your first VM.',
+      icon: 'fas fa-rocket',
+      path: '/#',
+    },
+    {
+      title: 'API Documentation',
+      description: 'Automate your infrastructure with our powerful API.',
+      icon: 'fas fa-code',
+      path: '/#',
+    },
+    {
+      title: 'Community Forum',
+      description: 'Ask questions and share knowledge with others.',
+      icon: 'fas fa-users',
+      path: '/#',
+    },
+    {
+      title: 'Contact Support',
+      description: 'Get help from our expert support team when you need it.',
+      icon: 'fas fa-headset',
+      path: '/app/cloud-edge/administration/tickets',
+    },
+  ]);
 
   stats = signal<StatCard[]>([
     {

@@ -1,0 +1,25 @@
+
+<div class="relative inline-block text-left">
+  <button #buttonRef type="button" (click)="toggleDropdown()" class="inline-flex items-center justify-center w-full rounded-md px-2 py-1 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700/50 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-800 focus:ring-[#679a41]">
+    <span class="flex items-center" [ngClass]="getActionClasses(currentAction()).text">
+      <span class="w-2 h-2 rounded-full mr-2" [ngClass]="getActionClasses(currentAction()).bg"></span>
+      {{ currentAction() }}
+    </span>
+    <app-icon name="fas fa-chevron-down" className="ml-2 -mr-1 h-4 w-4 text-gray-400" />
+  </button>
+
+  @if (isOpen()) {
+    <div #dropdownRef class="origin-top-left absolute left-0 mt-2 w-32 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-slate-700 z-10">
+      <div class="py-1" role="menu">
+        @for (action of actions; track action) {
+          <button (click)="selectAction(action)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700" role="menuitem">
+            <span class="flex items-center" [ngClass]="getActionClasses(action).text">
+              <span class="w-2 h-2 rounded-full mr-2" [ngClass]="getActionClasses(action).bg"></span>
+              {{ action }}
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

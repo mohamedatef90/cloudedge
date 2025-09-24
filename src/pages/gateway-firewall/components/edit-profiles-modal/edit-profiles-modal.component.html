@@ -1,0 +1,39 @@
+
+@if (isOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" (click)="close.emit()">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl m-4" (click)="$event.stopPropagation()">
+    <div class="p-4 border-b dark:border-slate-700 flex justify-between items-center">
+      <h2 class="text-lg font-semibold">Set Profile for {{ ruleName() }}</h2>
+       <button (click)="close.emit()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+        <app-icon name="fas fa-times" />
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <input 
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Filter profiles..."
+        class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+      />
+      <div class="max-h-80 overflow-y-auto border rounded-md dark:border-slate-600 p-2 space-y-1">
+        @for(profile of filteredProfiles(); track profile) {
+          <label class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded cursor-pointer">
+            <input 
+              type="radio"
+              name="profile-selection"
+              [value]="profile"
+              [(ngModel)]="selected"
+              class="w-4 h-4 text-[#679a41] focus:ring-[#679a41]"
+            />
+            <span class="ml-3 text-sm">{{ profile }}</span>
+          </label>
+        }
+      </div>
+    </div>
+    <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg">
+      <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">CANCEL</button>
+      <button (click)="handleSave()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34]">APPLY</button>
+    </div>
+  </div>
+</div>
+}

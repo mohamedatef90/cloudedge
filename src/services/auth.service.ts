@@ -8,7 +8,7 @@ import { User, ApplicationCardData, AppLauncherData } from '../types';
 export class AuthService {
   // Mock user data. In a real app, this would come from an auth flow.
   private mockUsers: Record<string, User> = {
-      'customer': { id: 'user-001', role: 'customer', displayName: 'Jane Doe', avatarUrl: 'https://i.pravatar.cc/150?u=customer' },
+      'customer': { id: 'user-001', role: 'customer', displayName: 'Jane Doe', avatarUrl: 'https://i.pravatar.cc/150?u=customer', isNewUser: true },
       'admin': { id: 'user-002', role: 'admin', displayName: 'Admin', avatarUrl: 'https://i.pravatar.cc/150?u=admin' },
       'reseller': { id: 'user-003', role: 'reseller', displayName: 'Reseller Inc.', avatarUrl: 'https://i.pravatar.cc/150?u=reseller' }
   };

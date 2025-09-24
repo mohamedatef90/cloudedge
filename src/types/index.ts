@@ -4,6 +4,7 @@ export interface User {
   role: 'customer' | 'admin' | 'reseller';
   displayName: string;
   avatarUrl?: string;
+  isNewUser?: boolean;
 }
 
 export interface NavItem {

@@ -1,0 +1,237 @@
+<div class="space-y-6">
+  <!-- Main Details Card -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+    <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200 mb-4">{{ organizationProfile().name }}</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Info Column 1 -->
+      <div class="space-y-4 text-sm">
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Company Name</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().companyName }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Creation Date</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().creationDate }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Organization</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().parentOrganization }}</p>
+        </div>
+      </div>
+
+      <!-- Info Column 2 -->
+      <div class="space-y-4 text-sm">
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Users</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().usersCount }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Virtual Machines</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().virtualMachinesCount }}</p>
+        </div>
+         <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Gateways</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().gatewaysCount }}</p>
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <div class="md:col-span-2 lg:col-span-1 space-y-4 text-sm">
+        <div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Reservations</p>
+            <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().reservationsCount }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Description</p>
+          <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ organizationProfile().description }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tabs Card -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow">
+    <!-- Tabs Navigation -->
+    <div class="border-b border-gray-200 dark:border-slate-700">
+      <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+        <button (click)="setActiveTab('users')"
+                [class.border-[#679a41]]="activeTab() === 'users'"
+                [class.dark:border-[#8cc866]]="activeTab() === 'users'"
+                [class.text-[#679a41]]="activeTab() === 'users'"
+                [class.dark:text-[#8cc866]]="activeTab() === 'users'"
+                [class.border-transparent]="activeTab() !== 'users'"
+                [class.text-gray-500]="activeTab() !== 'users'"
+                [class.dark:text-gray-400]="activeTab() !== 'users'"
+                [class.hover:text-gray-700]="activeTab() !== 'users'"
+                [class.dark:hover:text-gray-300]="activeTab() !== 'users'"
+                [class.hover:border-gray-300]="activeTab() !== 'users'"
+                [class.dark:hover:border-slate-600]="activeTab() !== 'users'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          Users
+        </button>
+        <button (click)="setActiveTab('reservations')"
+                [class.border-[#679a41]]="activeTab() === 'reservations'"
+                [class.dark:border-[#8cc866]]="activeTab() === 'reservations'"
+                [class.text-[#679a41]]="activeTab() === 'reservations'"
+                [class.dark:text-[#8cc866]]="activeTab() === 'reservations'"
+                [class.border-transparent]="activeTab() !== 'reservations'"
+                [class.text-gray-500]="activeTab() !== 'reservations'"
+                [class.dark:text-gray-400]="activeTab() !== 'reservations'"
+                [class.hover:text-gray-700]="activeTab() !== 'reservations'"
+                [class.dark:hover:text-gray-300]="activeTab() !== 'reservations'"
+                [class.hover:border-gray-300]="activeTab() !== 'reservations'"
+                [class.dark:hover:border-slate-600]="activeTab() !== 'reservations'"
+                class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          Reservation
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div>
+      @if (activeTab() === 'users') {
+        <div class="p-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Users</h3>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage users in this organization.</p>
+            </div>
+            <button class="w-full sm:w-auto bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
+                <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+                Add User
+            </button>
+          </div>
+
+          <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+            <div class="relative overflow-x-auto">
+              <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">Email</th>
+                    <th scope="col" class="px-6 py-3">Display Name</th>
+                    <th scope="col" class="px-6 py-3">Creation Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of organizationProfile().users; track user.email) {
+                    <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        {{ user.email }}
+                      </td>
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        {{ user.displayName }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {{ user.creationDate }}
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr class="bg-white dark:bg-slate-800">
+                      <td colspan="3" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                        <div class="flex flex-col items-center">
+                          <app-icon name="fas fa-users" className="text-4xl mb-3"></app-icon>
+                          <p class="font-semibold">No users found</p>
+                          <p class="text-sm">Add a user to this organization.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <nav class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-slate-700" aria-label="Table navigation">
+              <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                Showing
+                <span class="font-semibold text-gray-900 dark:text-white">1-{{ organizationProfile().users.length }}</span>
+                of
+                <span class="font-semibold text-gray-900 dark:text-white">{{ organizationProfile().users.length }}</span>
+              </span>
+              <div class="inline-flex items-center -space-x-px text-sm">
+                <a href="#" class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400 dark:hover:bg-slate-700 dark:hover:text-white">
+                  Previous
+                </a>
+                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400 dark:hover:bg-slate-700 dark:hover:text-white">
+                  Next
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      }
+      @if (activeTab() === 'reservations') {
+        <div class="p-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div>
+              <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Reservations</h3>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage resource reservations.</p>
+            </div>
+            <button class="w-full sm:w-auto bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
+                <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+                Create Reservation
+            </button>
+          </div>
+          <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+            <div class="relative overflow-x-auto">
+              <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" class="px-6 py-3">Name</th>
+                    <th scope="col" class="px-6 py-3">Plan Name</th>
+                    <th scope="col" class="px-6 py-3">Started Date</th>
+                    <th scope="col" class="px-6 py-3">Ends Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (reservation of organizationProfile().reservations; track reservation.name) {
+                    <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                        {{ reservation.name }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {{ reservation.planName }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {{ reservation.startedDate }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {{ reservation.endsDate }}
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr class="bg-white dark:bg-slate-800">
+                      <td colspan="4" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                        <div class="flex flex-col items-center">
+                          <app-icon name="fas fa-calendar-check" className="text-4xl mb-3"></app-icon>
+                          <p class="font-semibold">No reservations found</p>
+                          <p class="text-sm">Create a reservation for this organization.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <nav class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-slate-700" aria-label="Table navigation">
+              <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                Showing
+                <span class="font-semibold text-gray-900 dark:text-white">1-{{ organizationProfile().reservations.length }}</span>
+                of
+                <span class="font-semibold text-gray-900 dark:text-white">{{ organizationProfile().reservations.length }}</span>
+              </span>
+              <div class="inline-flex items-center -space-x-px text-sm">
+                <a href="#" class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400 dark:hover:bg-slate-700 dark:hover:text-white">
+                  Previous
+                </a>
+                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400 dark:hover:bg-slate-700 dark:hover:text-white">
+                  Next
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
