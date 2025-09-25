@@ -1,5 +1,72 @@
 
-<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
-  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Virtual Machines</h1>
-  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your virtual machines here.</p>
+<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow min-h-full">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Virtual Machines</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your virtual machines.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <a routerLink="/app/cloud-edge/resources/virtual-machines/create" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
+        <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+        ADD VM
+      </a>
+      <button class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2">
+        <app-icon name="fas fa-recycle" />
+        Recycle Bin
+      </button>
+      <button class="relative bg-transparent border border-[#679a41] text-[#679a41] dark:border-emerald-400 dark:text-emerald-400 hover:bg-[#679a41]/10 dark:hover:bg-emerald-400/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
+        <app-icon name="fas fa-filter" className="mr-2" />
+        Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- View Switcher and Search -->
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-1 bg-gray-100 dark:bg-slate-700 p-1 rounded-md">
+      <button (click)="setViewMode('card')"
+              class="px-3 py-1 rounded-md text-sm font-semibold transition-colors"
+              [class.bg-white]="viewMode() === 'card'"
+              [class.dark:bg-slate-600]="viewMode() === 'card'"
+              [class.text-[#293c51]]="viewMode() === 'card'"
+              [class.dark:text-gray-100]="viewMode() === 'card'"
+              [class.text-gray-500]="viewMode() !== 'card'"
+              [class.dark:text-gray-400]="viewMode() !== 'card'"
+              [class.hover:bg-white/60]="viewMode() !== 'card'"
+              [class.dark:hover:bg-slate-600/60]="viewMode() !== 'card'">
+        <app-icon name="fas fa-th-large" className="mr-2" />
+        Card View
+      </button>
+      <button (click)="setViewMode('table')"
+              class="px-3 py-1 rounded-md text-sm font-semibold transition-colors"
+              [class.bg-white]="viewMode() === 'table'"
+              [class.dark:bg-slate-600]="viewMode() === 'table'"
+              [class.text-[#293c51]]="viewMode() === 'table'"
+              [class.dark:text-gray-100]="viewMode() === 'table'"
+              [class.text-gray-500]="viewMode() !== 'table'"
+              [class.dark:text-gray-400]="viewMode() !== 'table'"
+              [class.hover:bg-white/60]="viewMode() !== 'table'"
+              [class.dark:hover:bg-slate-600/60]="viewMode() !== 'table'">
+        <app-icon name="fas fa-list" className="mr-2" />
+        Table View
+      </button>
+    </div>
+    <div class="relative w-full sm:max-w-xs">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <app-icon name="fas fa-search" className="text-gray-400" />
+      </div>
+      <input type="text"
+             placeholder="Search virtual machines..."
+             class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-[#8cc866] sm:text-sm"
+      />
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  @if (viewMode() === 'card') {
+    <app-vm-card-view [virtualMachines]="virtualMachines()"></app-vm-card-view>
+  } @else {
+    <app-vm-table-view [virtualMachines]="virtualMachines()"></app-vm-table-view>
+  }
 </div>

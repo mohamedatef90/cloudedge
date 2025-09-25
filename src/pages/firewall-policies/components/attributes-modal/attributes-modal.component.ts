@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../../components/icon/icon.component';
 
-interface ContextProfile {
+interface Application {
   id: string;
   name: string;
   isSystemDefined: boolean;
@@ -28,18 +28,18 @@ interface Attribute {
 })
 export class AttributesModalComponent {
   isOpen = input.required<boolean>();
-  profile = input<ContextProfile | null>();
+  application = input<Application | null>();
   close = output<void>();
 
   attributes = computed<Attribute[]>(() => {
-    if (!this.profile()) {
+    if (!this.application()) {
       return [];
     }
     // Based on the image, we'll create a single attribute entry.
-    // In a real scenario, this logic might be more complex if `profile.attributes` was an array or object.
+    // In a real scenario, this logic might be more complex if `application.attributes` was an array or object.
     return [{
       type: 'App ID',
-      name: this.profile()!.attributes,
+      name: this.application()!.attributes,
       subAttributes: '',
     }];
   });

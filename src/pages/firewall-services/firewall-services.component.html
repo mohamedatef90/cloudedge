@@ -1,4 +1,135 @@
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
-  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Firewall Services</h1>
-  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your firewall services here.</p>
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Services</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your services here.</p>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div class="flex items-center gap-2">
+      <button (click)="isAddModalOpen.set(true)" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
+        <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+        ADD SERVICE
+      </button>
+      <button (click)="handleToggleExpandAll()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-3 py-1.5 rounded-md text-sm font-semibold">
+        {{ expandedIds().length === filteredServices().length ? 'COLLAPSE ALL' : 'EXPAND ALL' }}
+      </button>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="relative w-72">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <app-icon name="fas fa-search" className="text-gray-400" />
+        </div>
+        <input 
+          type="text"
+          [(ngModel)]="filterTerm"
+          placeholder="Filter by Name, Path and more"
+          class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#679a41]"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto border rounded-lg dark:border-slate-700">
+    <table class="min-w-full w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
+      <thead class="bg-gray-50 dark:bg-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-[10%]">
+            <div class="flex items-center gap-3">
+              <app-icon name="fas fa-ellipsis-v" className="text-gray-400 invisible" />
+              <button class="w-4 invisible"><app-icon name="fas fa-chevron-right" /></button>
+              <input type="checkbox" class="rounded w-4 h-4 text-[#679a41] bg-gray-100 border-gray-300 focus:ring-[#537d34]" [checked]="isAllOnPageSelected()" (change)="handleSelectAllOnPage($event)" />
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-[25%]">Name</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-[30%]">Service Entries</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-[15%]">Where Used</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase w-[20%]">Status</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-gray-700">
+        @for (service of paginatedServices(); track service.id) {
+          <tr class="bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 h-[52px]">
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <app-icon name="fas fa-ellipsis-v" className="text-gray-400 cursor-pointer" />
+                <button (click)="handleToggleExpand(service.id)" class="w-4 text-center">
+                  <app-icon [name]="expandedIds().includes(service.id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" className="text-gray-500" />
+                </button>
+                <input type="checkbox" class="rounded w-4 h-4 text-[#679a41] bg-gray-100 border-gray-300 focus:ring-[#537d34]" [checked]="selectedServices().includes(service.id)" (change)="handleSelect(service.id, $any($event.target).checked)" />
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm font-medium text-[#293c51] dark:text-gray-200">
+              <div class="flex items-center gap-2">
+                <span>{{ service.name }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+              {{ service.protocol }} (Source: Any | Destination: {{ service.destinationPort }})
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <button (click)="handleOpenWhereUsedModal(service)" class="text-sky-600 dark:text-sky-400 hover:underline">Where Used</button>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <div class="flex items-center gap-2 text-green-600 dark:text-green-400">
+                <app-icon name="fas fa-check-circle" />
+                <span class="font-semibold">{{ service.status }}</span>
+                <button class="text-sky-600 dark:text-sky-400"><app-icon name="fas fa-sync-alt" /></button>
+              </div>
+            </td>
+          </tr>
+          @if (expandedIds().includes(service.id)) {
+            <tr class="bg-white dark:bg-slate-800">
+              <td></td>
+              <td colspan="4" class="p-4">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p class="font-semibold text-gray-600 dark:text-gray-300">Description</p>
+                    <p>{{ service.description }}</p>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-600 dark:text-gray-300">Tags</p>
+                    <p>{{ service.tags }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center p-6 text-gray-500 dark:text-gray-400">
+              No services found.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="flex justify-between items-center py-3 px-4">
+    <button (click)="handleRefresh()" [disabled]="isRefreshing()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50">
+      <app-icon name="fas fa-sync-alt" [className]="isRefreshing() ? 'animate-spin' : ''"></app-icon> REFRESH
+    </button>
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalItems]="filteredServices().length"
+      [itemsPerPage]="rowsPerPage()"
+      (pageChange)="currentPage.set($event)"
+      (itemsPerPageChange)="rowsPerPage.set($event)"
+    />
+  </div>
 </div>
+
+<app-add-service-modal 
+  [isOpen]="isAddModalOpen()" 
+  (close)="isAddModalOpen.set(false)"
+  (save)="handleAddService($event)">
+</app-add-service-modal>
+
+<app-where-used-modal 
+  [isOpen]="isWhereUsedModalOpen()" 
+  (close)="isWhereUsedModalOpen.set(false)"
+  [service]="selectedServiceForModal()">
+</app-where-used-modal>

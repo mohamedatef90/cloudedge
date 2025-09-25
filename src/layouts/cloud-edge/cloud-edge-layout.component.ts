@@ -53,8 +53,12 @@ export class CloudEdgeLayoutComponent {
         'cloud-edge': 'CloudEdge', 'security': 'Security', 'overview': 'Security Overview',
         'ids-ips': 'IDS/IPS', 'suspicious-traffic': 'Suspicious Traffic', 'filtering-analysis': 'Filtering and Analysis',
         'distributed-firewall': 'Distributed Firewall', 'gateway-firewall': 'Gateway Firewall', 'ids-ips-malware-prevention': 'IDS/IPS & Malware Prevention',
-        'administration': 'Administration', 'organizations': 'Organizations', 'applications': 'Applications'
+        'administration': 'Administration', 'organizations': 'Organizations', 'applications': 'Applications', 'inventory': 'Inventory',
+        'firewall-groups': 'Groups', 'firewall-services': 'Services', 'virtual-machines': 'Virtual Machines',
+        'create': 'Create Virtual Machine', 'images': 'Select OS Image'
     };
+
+    const SECTION_SEGMENTS = new Set(['administration', 'resources', 'network', 'inventory', 'security', 'operations']);
 
     const getLabel = (value: string) => BREADCRUMB_LABELS[value] || value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
@@ -66,10 +70,16 @@ export class CloudEdgeLayoutComponent {
     const crumbs: BreadcrumbItem[] = [{ label: 'Home', path: '/app/cloud-edge' }];
     const segmentsToProcess = pathnames.slice(1); 
 
-    segmentsToProcess.forEach((value, index) => {
-        const to = `/app/cloud-edge/${segmentsToProcess.slice(0, index + 1).join('/')}`;
-        const label = getLabel(value);
-        crumbs.push({ label, path: to });
+    let fullPathSegments: string[] = [];
+    segmentsToProcess.forEach((value) => {
+      fullPathSegments.push(value);
+      if (SECTION_SEGMENTS.has(value)) {
+        return; // Skip section titles from being displayed in breadcrumbs
+      }
+
+      const to = `/app/cloud-edge/${fullPathSegments.join('/')}`;
+      const label = getLabel(value);
+      crumbs.push({ label, path: to });
     });
 
     if (crumbs.length > 1) {

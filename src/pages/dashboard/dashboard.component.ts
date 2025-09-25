@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { DashboardAnimationService } from '../../services/dashboard-animation.service';
 import { AuthService } from '../../services/auth.service';
@@ -40,11 +41,15 @@ interface VirtualMachine {
   };
 }
 
-interface RecentActivity {
-  icon: string;
-  description: string;
-  timestamp: string;
+interface AuditTrailEntry {
+  id: string;
+  eventName: string;
+  eventSource: 'Compute' | 'Security' | 'Network' | 'Identity';
+  eventTime: string;
   user: string;
+  resourceName: string;
+  ipAddress: string;
+  status: 'Success' | 'Failure';
 }
 
 interface QuickStartLink {
@@ -66,7 +71,7 @@ interface HelpfulResource {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent, RouterModule],
+  imports: [CommonModule, IconComponent, RouterModule, FormsModule],
   // FIX: Replaced @HostListener with the host property for better component encapsulation.
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
@@ -79,6 +84,7 @@ export class DashboardComponent implements AfterViewInit {
   animationsReady = signal(false);
   openVmMenuId = signal<string | null>(null);
   user = this.authService.user;
+  auditTrailSearchTerm = signal('');
 
   showWelcomeCard = computed(() => this.user()?.isNewUser && !this.animationService.welcomeDismissed());
 
@@ -121,7 +127,7 @@ export class DashboardComponent implements AfterViewInit {
   quickStartLinks = signal<QuickStartLink[]>([
     { title: 'Create a Virtual Machine', description: 'Spin up a new server in minutes.', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines' },
     { title: 'Set up a Gateway', description: 'Configure your network entry point.', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
-    { title: 'Configure Firewall', description: 'Secure your resources with policies.', icon: 'fas fa-file-contract', path: '/app/cloud-edge/network/firewall-policies' },
+    { title: 'Configure Applications', description: 'Define applications for your policies.', icon: 'far fa-file-alt', path: '/app/cloud-edge/inventory/applications' },
     { title: 'View Documentation', description: 'Find detailed guides and help.', icon: 'fas fa-book', path: '/#' }
   ]);
 
@@ -249,38 +255,91 @@ export class DashboardComponent implements AfterViewInit {
     packetLoss: '0.01%',
   });
   
-  recentActivities = signal<RecentActivity[]>([
+  auditTrailEntries = signal<AuditTrailEntry[]>([
     {
-      icon: 'fas fa-power-off text-green-500',
-      description: "VM 'Production Web Server' was started.",
-      timestamp: '5 minutes ago',
-      user: 'Admin'
+      id: 'evt-1',
+      eventName: 'StartInstances',
+      eventSource: 'Compute',
+      eventTime: '5 minutes ago',
+      user: 'Admin',
+      resourceName: 'prod-web-server-01',
+      ipAddress: '73.125.88.10',
+      status: 'Success',
     },
     {
-      icon: 'fas fa-plus-circle text-blue-500',
-      description: "New firewall policy 'Allow-HTTP' was created.",
-      timestamp: '1 hour ago',
-      user: 'Admin'
+      id: 'evt-2',
+      eventName: 'CreatePolicy',
+      eventSource: 'Security',
+      eventTime: '1 hour ago',
+      user: 'Admin',
+      resourceName: 'Allow-HTTP-External',
+      ipAddress: '73.125.88.10',
+      status: 'Success',
     },
     {
-      icon: 'fas fa-user-shield text-yellow-500',
-      description: "Security scan completed with 2 vulnerabilities found.",
-      timestamp: '3 hours ago',
-      user: 'System'
+      id: 'evt-3',
+      eventName: 'RunSecurityScan',
+      eventSource: 'Security',
+      eventTime: '3 hours ago',
+      user: 'System',
+      resourceName: 'All Production VMs',
+      ipAddress: 'internal-system',
+      status: 'Success',
     },
     {
-      icon: 'fas fa-hdd text-purple-500',
-      description: "Storage volume 'data-archive-01' attached to 'Database Cluster Node 1'.",
-      timestamp: '6 hours ago',
-      user: 'Admin'
+      id: 'evt-4',
+      eventName: 'AttachVolume',
+      eventSource: 'Compute',
+      eventTime: '6 hours ago',
+      user: 'Admin',
+      resourceName: 'data-archive-01',
+      ipAddress: '73.125.88.10',
+      status: 'Success',
     },
     {
-      icon: 'fas fa-sign-in-alt text-gray-500',
-      description: "User 'Jane Doe' logged in successfully.",
-      timestamp: 'Yesterday',
-      user: 'Jane Doe'
+      id: 'evt-5',
+      eventName: 'ConsoleLogin',
+      eventSource: 'Identity',
+      eventTime: 'Yesterday',
+      user: 'Jane Doe',
+      resourceName: 'user/jane.doe',
+      ipAddress: '104.28.71.118',
+      status: 'Success',
+    },
+    {
+      id: 'evt-6',
+      eventName: 'UpdateGateway',
+      eventSource: 'Network',
+      eventTime: '2 days ago',
+      user: 'Admin',
+      resourceName: 'main-gateway-01',
+      ipAddress: '73.125.88.10',
+      status: 'Failure',
     }
   ]);
+  
+  filteredAuditTrail = computed(() => {
+    const term = this.auditTrailSearchTerm().toLowerCase();
+    if (!term) {
+        return this.auditTrailEntries();
+    }
+    return this.auditTrailEntries().filter(entry => 
+        entry.eventName.toLowerCase().includes(term) ||
+        entry.user.toLowerCase().includes(term) ||
+        entry.resourceName.toLowerCase().includes(term) ||
+        entry.ipAddress.toLowerCase().includes(term) ||
+        entry.eventSource.toLowerCase().includes(term)
+    );
+  });
+
+  getAuditIcon(source: AuditTrailEntry['eventSource']): string {
+    switch (source) {
+        case 'Compute': return 'fas fa-desktop text-blue-500';
+        case 'Security': return 'fas fa-shield-alt text-yellow-500';
+        case 'Network': return 'fas fa-network-wired text-purple-500';
+        case 'Identity': return 'fas fa-user-circle text-green-500';
+    }
+  }
 
   animatedTopVMs = computed(() => {
     const ready = this.animationsReady();

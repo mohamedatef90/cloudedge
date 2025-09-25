@@ -5,7 +5,7 @@ import { IconComponent } from '../../components/icon/icon.component';
 import { PaginationComponent } from '../ids-ips-malware-prevention/components/pagination/pagination.component';
 import { AttributesModalComponent } from './components/attributes-modal/attributes-modal.component';
 
-interface ContextProfile {
+interface Application {
   id: string;
   name: string;
   isSystemDefined: boolean;
@@ -16,8 +16,8 @@ interface ContextProfile {
   status: 'Success';
 }
 
-const generateMockProfiles = (count: number): ContextProfile[] => {
-    const baseProfiles: Omit<ContextProfile, 'id'>[] = [
+const generateMockApplications = (count: number): Application[] => {
+    const baseApplications: Omit<Application, 'id'>[] = [
       { name: '360ANTIV', isSystemDefined: true, attributes: '360ANTIV', description: '360 Safeguard is a program developed by Qihoo 360', tags: 0, whereUsed: 0, status: 'Success' },
       { name: 'ACTIVDIR', isSystemDefined: true, attributes: 'ACTIVDIR', description: 'Microsoft Active Directory', tags: 0, whereUsed: 0, status: 'Success' },
       { name: 'AMQP', isSystemDefined: true, attributes: 'AMQP', description: 'Advanced Message Queueing Protocol (AMQP) is an application layer protocol which supports business message communication between applications or organizations', tags: 0, whereUsed: 0, status: 'Success' },
@@ -32,19 +32,19 @@ const generateMockProfiles = (count: number): ContextProfile[] => {
       { name: 'DROPBOX', isSystemDefined: true, attributes: 'DROPBOX', description: 'Dropbox File Sharing', tags: 0, whereUsed: 0, status: 'Success' },
     ];
     
-    const allProfiles: ContextProfile[] = [];
+    const allApplications: Application[] = [];
     for (let i = 0; i < count; i++) {
-        const base = baseProfiles[i % baseProfiles.length];
-        allProfiles.push({
+        const base = baseApplications[i % baseApplications.length];
+        allApplications.push({
             ...base,
-            id: `profile-${i + 1}`,
-            name: `${base.name}${i >= baseProfiles.length ? `_${Math.floor(i / baseProfiles.length)}` : ''}`,
+            id: `app-${i + 1}`,
+            name: `${base.name}${i >= baseApplications.length ? `_${Math.floor(i / baseApplications.length)}` : ''}`,
         });
     }
-    return allProfiles;
+    return allApplications;
 };
 
-const mockContextProfiles: ContextProfile[] = generateMockProfiles(70);
+const mockApplications: Application[] = generateMockApplications(70);
 
 @Component({
   selector: 'app-firewall-policies',
@@ -54,27 +54,27 @@ const mockContextProfiles: ContextProfile[] = generateMockProfiles(70);
   imports: [CommonModule, FormsModule, IconComponent, PaginationComponent, AttributesModalComponent]
 })
 export class FirewallPoliciesComponent {
-  profiles = signal<ContextProfile[]>(mockContextProfiles);
+  applications = signal<Application[]>(mockApplications);
   filterTerm = signal('');
   currentPage = signal(1);
   rowsPerPage = signal(50);
   isRefreshing = signal(false);
 
   isAttributesModalOpen = signal(false);
-  selectedProfile = signal<ContextProfile | null>(null);
+  selectedApplication = signal<Application | null>(null);
 
-  filteredProfiles = computed(() => {
+  filteredApplications = computed(() => {
     const term = this.filterTerm().toLowerCase();
-    if (!term) return this.profiles();
-    return this.profiles().filter(p => 
+    if (!term) return this.applications();
+    return this.applications().filter(p => 
       p.name.toLowerCase().includes(term) ||
       p.description.toLowerCase().includes(term)
     );
   });
   
-  paginatedProfiles = computed(() => {
+  paginatedApplications = computed(() => {
     const startIndex = (this.currentPage() - 1) * this.rowsPerPage();
-    return this.filteredProfiles().slice(startIndex, startIndex + this.rowsPerPage());
+    return this.filteredApplications().slice(startIndex, startIndex + this.rowsPerPage());
   });
 
   handleRefresh(): void {
@@ -82,13 +82,13 @@ export class FirewallPoliciesComponent {
       setTimeout(() => this.isRefreshing.set(false), 1000);
   };
 
-  openAttributesModal(profile: ContextProfile): void {
-    this.selectedProfile.set(profile);
+  openAttributesModal(application: Application): void {
+    this.selectedApplication.set(application);
     this.isAttributesModalOpen.set(true);
   }
 
   closeAttributesModal(): void {
     this.isAttributesModalOpen.set(false);
-    this.selectedProfile.set(null);
+    this.selectedApplication.set(null);
   }
 }

@@ -1,4 +1,5 @@
-@if (isOpen() && profile()) {
+
+@if (isOpen() && application()) {
   <div 
     (click)="onClose()"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -18,8 +19,8 @@
         </div>
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-4 text-sm">
-                <span class="text-gray-500 dark:text-gray-400">Context Profile</span>
-                <span class="font-semibold text-[#293c51] dark:text-gray-200">{{ profile()?.name }}</span>
+                <span class="text-gray-500 dark:text-gray-400">Application</span>
+                <span class="font-semibold text-[#293c51] dark:text-gray-200">{{ application()?.name }}</span>
                 <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">#Attributes {{ attributeCount() }}</span>
             </div>
             <div class="relative w-full sm:max-w-xs">

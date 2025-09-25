@@ -1,0 +1,44 @@
+
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b pb-4 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Choose an OS Image</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a base operating system for your new virtual machine.</p>
+    </div>
+    <a routerLink="/app/cloud-edge/resources/virtual-machines/create" class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
+      <app-icon name="fas fa-arrow-left" className="mr-2 text-xs"></app-icon>
+      Back to Create VM
+    </a>
+  </div>
+
+  <!-- OS Image Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    @for(image of osImages(); track image.id) {
+      <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
+        <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
+          <app-icon [name]="image.icon" [className]="(image.iconClasses || '') + ' text-6xl'"></app-icon>
+        </div>
+        <div class="p-4 flex-grow flex flex-col">
+          <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200">{{ image.name }}</h3>
+          <div class="mt-4 flex-grow">
+            <label [for]="image.id + '-version'" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Version</label>
+            <select [id]="image.id + '-version'" 
+                    [ngModel]="image.selectedVersion" 
+                    (change)="onVersionChange(image.id, $event)"
+                    class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-1.5 px-2 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 text-sm">
+              @for(version of image.versions; track version) {
+                <option [value]="version">{{ version }}</option>
+              }
+            </select>
+          </div>
+          <div class="mt-4">
+            <button (click)="selectImage(image)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
+              Select
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

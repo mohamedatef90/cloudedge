@@ -1,0 +1,146 @@
+
+@if (vm(); as vmData) {
+<div class="space-y-6">
+  <!-- Main Details Card -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">{{ vmData.name }}</h1>
+        @if (!isEditing()) {
+            <button (click)="startEditing()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
+                <app-icon name="fas fa-pencil-alt" className="mr-2"></app-icon>
+                Edit
+            </button>
+        }
+    </div>
+    
+    @if (!isEditing()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="space-y-4 text-sm">
+            <div><p class="text-gray-500 dark:text-gray-400">Name</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.name }}</p></div>
+            <div><p class="text-gray-500 dark:text-gray-400">OS</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.os }}</p></div>
+            <div><p class="text-gray-500 dark:text-gray-400">Status</p><p class="font-medium text-[#293c51] dark:text-gray-200 capitalize">{{ vmData.status }}</p></div>
+          </div>
+          <div class="space-y-4 text-sm">
+            <div><p class="text-gray-500 dark:text-gray-400">Cores</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.cores }}</p></div>
+            <div><p class="text-gray-500 dark:text-gray-400">Memory</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.memory }} GB</p></div>
+            <div><p class="text-gray-500 dark:text-gray-400">IP Address</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.ipAddress }}</p></div>
+          </div>
+          <div class="md:col-span-2 lg:col-span-1 space-y-4 text-sm">
+            <div><p class="text-gray-500 dark:text-gray-400">Reservation</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.reservationName ?? 'None' }}</p></div>
+            <div><p class="text-gray-500 dark:text-gray-400">Description</p><p class="font-medium text-[#293c51] dark:text-gray-200">{{ vmData.description }}</p></div>
+          </div>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="space-y-4 text-sm">
+                <div><label class="text-gray-500 dark:text-gray-400">Name</label><input type="text" [(ngModel)]="editedVm().name" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"></div>
+                <div><label class="text-gray-500 dark:text-gray-400">Cores</label><input type="number" [(ngModel)]="editedVm().cores" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"></div>
+                 <div><label class="text-gray-500 dark:text-gray-400">Memory (GB)</label><input type="number" [(ngModel)]="editedVm().memory" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"></div>
+            </div>
+             <div class="md:col-span-2 lg:col-span-2 space-y-4 text-sm">
+                <div><label class="text-gray-500 dark:text-gray-400">Description</label><textarea rows="5" [(ngModel)]="editedVm().description" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"></textarea></div>
+            </div>
+        </div>
+        <div class="flex justify-end items-center gap-3 mt-6">
+            <button (click)="cancelEditing()" class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
+            <button (click)="saveChanges()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34]">Save Changes</button>
+        </div>
+    }
+  </div>
+
+  <!-- Tabs Card -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow">
+    <div class="border-b border-gray-200 dark:border-slate-700">
+      <nav class="-mb-px flex space-x-6 px-6">
+        <button (click)="setActiveTab('disk')" [class]="activeTab() === 'disk' ? 'border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Disks</button>
+        <button (click)="setActiveTab('gateway')" [class]="activeTab() === 'gateway' ? 'border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Gateway</button>
+        <button (click)="setActiveTab('snapshot')" [class]="activeTab() === 'snapshot' ? 'border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">Snapshots</button>
+      </nav>
+    </div>
+    <div class="p-6">
+        @switch (activeTab()) {
+            @case ('disk') {
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Attached Disks</h3>
+                    <button (click)="openAddDiskModal()" class="bg-[#679a41] text-white px-3 py-1.5 rounded-md text-sm font-semibold hover:bg-[#537d34] flex items-center gap-2">
+                        <app-icon name="fas fa-plus"></app-icon> Add Disk
+                    </button>
+                </div>
+                <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">Size (GB)</th><th class="px-6 py-3">Type</th><th class="px-6 py-3">Actions</th></tr></thead>
+                        <tbody>
+                            @for(disk of disks(); track disk.id) {<tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700"><td class="px-6 py-4 font-medium">{{disk.name}}</td><td class="px-6 py-4">{{disk.sizeGB}}</td><td class="px-6 py-4">{{disk.type}}</td><td class="px-6 py-4"><button (click)="openEditDiskModal(disk)" class="text-sky-600 dark:text-sky-400 hover:underline">Edit</button></td></tr>}
+                        </tbody>
+                    </table>
+                </div>
+            }
+            @case ('gateway') {
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Network Gateway</h3>
+                    <button (click)="openAddGatewayModal()" class="bg-[#679a41] text-white px-3 py-1.5 rounded-md text-sm font-semibold hover:bg-[#537d34] flex items-center gap-2">
+                        <app-icon name="fas fa-plus"></app-icon> Add Gateway
+                    </button>
+                </div>
+                <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">IP Address</th><th class="px-6 py-3">Status</th><th class="px-6 py-3">Actions</th></tr></thead>
+                        <tbody>
+                             @for(gw of gateways(); track gw.id) {
+                                <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                                    <td class="px-6 py-4 font-medium">{{gw.name}}</td>
+                                    <td class="px-6 py-4">{{gw.ipAddress}}</td>
+                                    <td class="px-6 py-4">{{gw.status}}</td>
+                                    <td class="px-6 py-4"><button (click)="openEditGatewayModal(gw)" class="text-sky-600 dark:text-sky-400 hover:underline">Edit</button></td>
+                                </tr>
+                             } @empty {
+                                <tr><td colspan="4" class="text-center p-6 text-gray-500 dark:text-gray-400">No gateway configured.</td></tr>
+                             }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            @case ('snapshot') {
+                 <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">Created</th><th class="px-6 py-3">Description</th><th class="px-6 py-3">Actions</th></tr></thead>
+                        <tbody>
+                            @for(snap of snapshots(); track snap.id) {
+                                <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                                    <td class="px-6 py-4 font-medium">{{snap.name}}</td>
+                                    <td class="px-6 py-4">{{snap.creationDate}}</td>
+                                    <td class="px-6 py-4">{{snap.description}}</td>
+                                    <td class="px-6 py-4 space-x-2">
+                                        <button class="text-sky-600 dark:text-sky-400 hover:underline">Revert</button>
+                                        <button class="text-red-600 dark:text-red-400 hover:underline">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+  </div>
+</div>
+} @else {
+    <div class="text-center p-10">
+        <p class="text-gray-500 dark:text-gray-400">Virtual Machine not found.</p>
+    </div>
+}
+
+<app-add-edit-disk-modal 
+    [isOpen]="isAddEditDiskModalOpen()"
+    [diskToEdit]="diskToEdit()"
+    [availableStorage]="availableStorage()"
+    (close)="isAddEditDiskModalOpen.set(false)"
+    (save)="handleDiskSave($event)"
+/>
+
+<app-add-edit-gateway-modal
+    [isOpen]="isAddEditGatewayModalOpen()"
+    [gatewayToEdit]="gatewayToEdit()"
+    (close)="isAddEditGatewayModalOpen.set(false)"
+    (save)="handleGatewaySave($event)"
+/>

@@ -1,3 +1,6 @@
+
+
+
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -98,16 +101,19 @@ export class CloudEdgeSidebarComponent {
             { name: 'Gateways', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
             { name: 'NATs', icon: 'fas fa-network-wired', path: '/app/cloud-edge/network/nats' },
             { name: 'Routes', icon: 'fas fa-route', path: '/app/cloud-edge/network/routes' },
-            { name: 'Applications', icon: 'far fa-file-alt', path: '/app/cloud-edge/network/applications' },
-            { name: 'Firewall Groups', icon: 'fas fa-layer-group', path: '/app/cloud-edge/network/firewall-groups' },
-            { name: 'Firewall Services', icon: 'fas fa-concierge-bell', path: '/app/cloud-edge/network/firewall-services' }
+        ]
+      },
+      {
+        title: 'Inventory',
+        items: [
+            { name: 'Applications', icon: 'far fa-file-alt', path: '/app/cloud-edge/inventory/applications' },
+            { name: 'Groups', icon: 'fas fa-layer-group', path: '/app/cloud-edge/inventory/firewall-groups' },
+            { name: 'Services', icon: 'fas fa-concierge-bell', path: '/app/cloud-edge/inventory/firewall-services' }
         ]
       },
       { 
         title: 'Security',
         items: [
-            { name: 'IDS/IPS', icon: 'fas fa-shield-virus', path: '/app/cloud-edge/security/ids-ips' },
-            { name: 'Suspicious Traffic', icon: 'fas fa-exclamation-triangle', path: '/app/cloud-edge/security/suspicious-traffic' },
             { name: 'Filtering and Analysis', icon: 'fas fa-filter', path: '/app/cloud-edge/security/filtering-analysis' },
             { name: 'Distributed Firewall', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall' },
             { name: 'Gateway Firewall', icon: 'fas fa-dungeon', path: '/app/cloud-edge/security/gateway-firewall' },

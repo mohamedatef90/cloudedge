@@ -1,3 +1,4 @@
+
 <div class="bg-[#f7f8fa] dark:bg-slate-900 -m-6 p-6 min-h-full">
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
@@ -5,10 +6,10 @@
       <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">CloudEdge Console</h1>
     </div>
     <div class="flex items-center space-x-2">
-      <button class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
+      <a routerLink="/app/cloud-edge/resources/virtual-machines/create" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
         <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
         Create VM
-      </button>
+      </a>
       <button class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
         <app-icon name="fas fa-shield-halved" className="mr-2 text-xs"></app-icon>
         Security Scan
@@ -181,30 +182,64 @@
         </div>
       </div>
       
-      <!-- Recent Activity -->
+      <!-- Audit Trail -->
       <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
         <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Recent Activity</h3>
-          <button class="text-sm text-[#679a41] dark:text-[#8cc866] hover:underline">View All</button>
+          <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Audit Trail</h3>
+          <a routerLink="/app/cloud-edge/administration/action-logs" class="text-sm text-[#679a41] dark:text-[#8cc866] hover:underline">View All Logs</a>
         </div>
-        <hr class="my-4 border-gray-200 dark:border-slate-700">
+        <div class="my-4">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="fas fa-search" className="text-gray-400" />
+            </div>
+            <input 
+              [(ngModel)]="auditTrailSearchTerm"
+              type="text" 
+              placeholder="Search user, event, resource..."
+              class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-700 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-emerald-500 focus:border-[#679a41] dark:focus:border-emerald-500 sm:text-sm" />
+          </div>
+        </div>
         <div class="flow-root">
           <ul role="list" class="-my-4 divide-y divide-gray-200 dark:divide-slate-700">
-            @for (activity of recentActivities(); track $index) {
+            @for (entry of filteredAuditTrail(); track entry.id) {
               <li class="py-4">
                 <div class="flex items-start space-x-4">
                   <div class="flex-shrink-0 pt-0.5">
-                    <app-icon [name]="activity.icon" className="h-5 w-5"></app-icon>
+                    <app-icon [name]="getAuditIcon(entry.eventSource)" className="h-5 w-5"></app-icon>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-[#293c51] dark:text-gray-200">{{ activity.description }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      <span>{{ activity.timestamp }} by </span>
-                      <span class="font-medium">{{ activity.user }}</span>
+                    <p class="text-sm font-medium text-[#293c51] dark:text-gray-200 truncate">
+                      {{ entry.eventName }}
+                      @if (entry.status === 'Failure') {
+                        <span class="ml-2 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-full">Failed</span>
+                      }
                     </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Resource: <span class="font-medium text-[#293c51] dark:text-gray-300">{{ entry.resourceName }}</span>
+                    </p>
+                    <div class="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-500 dark:text-gray-400">
+                      <span class="truncate">
+                        <app-icon name="fas fa-user" className="mr-1" />
+                        {{ entry.user }}
+                      </span>
+                      <span class="font-mono truncate">
+                        <app-icon name="fas fa-network-wired" className="mr-1" />
+                        {{ entry.ipAddress }}
+                      </span>
+                      <span class="text-right truncate">
+                         <app-icon name="fas fa-clock" className="mr-1" />
+                        {{ entry.eventTime }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </li>
+            } @empty {
+              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <app-icon name="fas fa-search" className="text-3xl mb-2"></app-icon>
+                  <p>No audit trail entries found for your search.</p>
+              </div>
             }
           </ul>
         </div>

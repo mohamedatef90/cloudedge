@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { CloudEdgeLayoutComponent } from './layouts/cloud-edge/cloud-edge-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -12,6 +13,7 @@ import { IdsIpsMalwarePreventionComponent } from './pages/ids-ips-malware-preven
 import { ActionLogsComponent } from './pages/action-logs/action-logs.component';
 import { TicketsComponent } from './pages/tickets/tickets.component';
 import { VirtualMachinesComponent } from './pages/virtual-machines/virtual-machines.component';
+import { CreateVmComponent } from './pages/virtual-machines/pages/create-vm/create-vm.component';
 import { StorageComponent } from './pages/storage/storage.component';
 import { ReservationsComponent } from './pages/reservations/reservations.component';
 import { GatewaysComponent } from './pages/gateways/gateways.component';
@@ -22,6 +24,8 @@ import { RunningTasksComponent } from './pages/running-tasks/running-tasks.compo
 import { FirewallGroupsComponent } from './pages/firewall-groups/firewall-groups.component';
 import { FirewallServicesComponent } from './pages/firewall-services/firewall-services.component';
 import { OrganizationProfileComponent } from './pages/organization-profile/organization-profile.component';
+import { OsImagesComponent } from './pages/virtual-machines/pages/os-images/os-images.component';
+import { VmProfileComponent } from './pages/virtual-machines/pages/vm-profile/vm-profile.component';
 
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'app/cloud-edge', pathMatch: 'full' },
@@ -37,15 +41,19 @@ export const APP_ROUTES: Routes = [
       { path: 'administration/tickets', component: TicketsComponent, title: 'Tickets' },
       // Resources
       { path: 'resources/virtual-machines', component: VirtualMachinesComponent, title: 'Virtual Machines' },
+      { path: 'resources/virtual-machines/create', component: CreateVmComponent, title: 'Create Virtual Machine' },
+      { path: 'resources/virtual-machines/images', component: OsImagesComponent, title: 'Select OS Image' },
+      { path: 'resources/virtual-machines/:id', component: VmProfileComponent, title: 'Virtual Machine Profile' },
       { path: 'resources/storage', component: StorageComponent, title: 'Storage' },
       { path: 'resources/reservations', component: ReservationsComponent, title: 'Reservations' },
       // Network
       { path: 'network/gateways', component: GatewaysComponent, title: 'Gateways' },
       { path: 'network/nats', component: NatsComponent, title: 'NATs' },
       { path: 'network/routes', component: RoutesComponent, title: 'Routes' },
-      { path: 'network/applications', component: FirewallPoliciesComponent, title: 'Applications' },
-      { path: 'network/firewall-groups', component: FirewallGroupsComponent, title: 'Firewall Groups' },
-      { path: 'network/firewall-services', component: FirewallServicesComponent, title: 'Firewall Services' },
+      // Inventory
+      { path: 'inventory/applications', component: FirewallPoliciesComponent, title: 'Applications' },
+      { path: 'inventory/firewall-groups', component: FirewallGroupsComponent, title: 'Groups' },
+      { path: 'inventory/firewall-services', component: FirewallServicesComponent, title: 'Services' },
       // Security
       { path: 'security/ids-ips', component: SecurityOverviewComponent, title: 'Security IDS/IPS' },
       { path: 'security/suspicious-traffic', component: SuspiciousTrafficComponent, title: 'Suspicious Traffic' },

@@ -1,9 +1,10 @@
+
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Applications</h1>
-      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage application context profiles for deep packet inspection.</p>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage applications for deep packet inspection.</p>
     </div>
   </div>
 
@@ -12,7 +13,7 @@
     <!-- Create (left) -->
     <button class="w-full sm:w-auto bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
       <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
-      ADD CONTEXT PROFILE
+      ADD APPLICATION
     </button>
     
     <!-- Search (right) -->
@@ -44,24 +45,24 @@
           </tr>
         </thead>
         <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-          @for (profile of paginatedProfiles(); track profile.id) {
+          @for (application of paginatedApplications(); track application.id) {
             <tr>
               <td class="px-4 py-3 text-sm font-medium text-[#293c51] dark:text-gray-200">
                 <div class="flex items-center gap-3">
                   <app-icon name="fas fa-ellipsis-v" className="text-gray-400 cursor-pointer" />
                   <app-icon name="far fa-file-alt" className="text-gray-500" />
-                  @if (profile.isSystemDefined) {
+                  @if (application.isSystemDefined) {
                     <app-icon name="fas fa-lock" className="text-gray-500" title="System Defined" />
                   }
-                  <span>{{ profile.name }}</span>
+                  <span>{{ application.name }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-sm">
-                <button (click)="openAttributesModal(profile)" class="text-sky-600 dark:text-sky-400 hover:underline">{{ profile.attributes }}</button>
+                <button (click)="openAttributesModal(application)" class="text-sky-600 dark:text-sky-400 hover:underline">{{ application.attributes }}</button>
               </td>
-              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.description }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.tags }}</td>
-              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ profile.whereUsed }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ application.description }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ application.tags }}</td>
+              <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ application.whereUsed }}</td>
               <td class="px-4 py-3 text-sm">
                 <div class="flex items-center gap-2 text-green-600 dark:text-green-400">
                   <app-icon name="fas fa-check-circle" />
@@ -91,7 +92,7 @@
     </button>
     <app-pagination
         [currentPage]="currentPage()"
-        [totalItems]="filteredProfiles().length"
+        [totalItems]="filteredApplications().length"
         [itemsPerPage]="rowsPerPage()"
         (pageChange)="currentPage.set($event)"
         (itemsPerPageChange)="rowsPerPage.set($event)"
@@ -100,6 +101,6 @@
 </div>
 <app-attributes-modal 
   [isOpen]="isAttributesModalOpen()" 
-  [profile]="selectedProfile()" 
+  [application]="selectedApplication()" 
   (close)="closeAttributesModal()">
 </app-attributes-modal>
