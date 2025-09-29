@@ -1,0 +1,133 @@
+
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200 mb-6 border-b pb-4 dark:border-slate-700">
+    {{ isEditMode() ? 'Edit NAT Rule' : 'Create NAT Rule' }}
+  </h1>
+
+  <form [formGroup]="natForm" (ngSubmit)="onSave()" novalidate class="space-y-8">
+
+    <!-- Section 1: NAT Rule Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <div class="md:col-span-2">
+        <div class="flex justify-between items-baseline">
+          <label for="nat-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+            Name <span class="text-red-500">*</span>
+          </label>
+          <span class="text-xs text-gray-400">{{ natForm.get('name')?.value?.length || 0 }}/50</span>
+        </div>
+        <input
+          type="text"
+          id="nat-name"
+          formControlName="name"
+          placeholder="Name"
+          class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+        >
+      </div>
+
+      <div>
+        <label for="nat-type" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+          Select Type
+        </label>
+        <select formControlName="type" id="nat-type" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm">
+          @for(type of natTypes; track type) { <option [value]="type">{{type}}</option> }
+        </select>
+      </div>
+
+      <div>
+        <label for="nat-gateway" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+          Select Gateway <span class="text-red-500">*</span>
+        </label>
+        <select formControlName="gateway" id="nat-gateway" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm">
+          <option value="" disabled>Select a gateway</option>
+          @for(gw of gateways(); track gw.id) { <option [value]="gw.name">{{gw.name}}</option> }
+           <option value="Atef_192">Atef_192</option>
+        </select>
+      </div>
+      
+      <div class="md:col-span-2" formGroupName="gatewayAddress">
+        <label class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+          Selected Gateway Address <span class="text-red-500">*</span>
+        </label>
+        <div class="mt-1 flex items-center space-x-2">
+          <input type="text" formControlName="octet1" class="w-full text-center border border-gray-200 dark:border-slate-700 rounded-md py-2 px-1 bg-gray-100 dark:bg-slate-700/50">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet2" class="w-full text-center border border-gray-200 dark:border-slate-700 rounded-md py-2 px-1 bg-gray-100 dark:bg-slate-700/50">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet3" class="w-full text-center border border-gray-200 dark:border-slate-700 rounded-md py-2 px-1 bg-gray-100 dark:bg-slate-700/50">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet4" class="w-full text-center border border-gray-200 dark:border-slate-700 rounded-md py-2 px-1 bg-gray-100 dark:bg-slate-700/50">
+          <span class="text-gray-400">/</span>
+          <select formControlName="cidr" class="w-32 border border-gray-200 dark:border-slate-700 rounded-md py-2 px-1 bg-gray-100 dark:bg-slate-700/50">
+            @for(prefix of cidrPrefixes; track prefix) { <option [value]="prefix">{{ prefix }}</option> }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Translation Details -->
+    <div class="pt-6 border-t dark:border-slate-700">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div>
+          <label for="elastic-ip" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+            Elastic Ip <span class="text-red-500">*</span>
+          </label>
+          <select formControlName="elasticIp" id="elastic-ip" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm">
+            <option value="" disabled>Select an Elastic IP</option>
+            @for(ip of elasticIps; track ip) { <option [value]="ip">{{ip}}</option> }
+          </select>
+        </div>
+        <div>
+          <label for="nat-port" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+            Port
+          </label>
+          <input
+            type="text"
+            id="nat-port"
+            formControlName="port"
+            placeholder="e.g. 80, 443"
+            class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+          >
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section 3: Description -->
+    <div class="pt-6 border-t dark:border-slate-700">
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="md:col-span-2">
+                <label for="nat-description" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+                    Description
+                </label>
+                <textarea
+                    id="nat-description"
+                    formControlName="description"
+                    rows="4"
+                    placeholder="Enter an optional description for the NAT rule..."
+                    class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+                ></textarea>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <div class="pt-5 border-t border-gray-200 dark:border-slate-700">
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="natForm.invalid"
+          class="bg-[#679a41] text-white px-6 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ isEditMode() ? 'Save Changes' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

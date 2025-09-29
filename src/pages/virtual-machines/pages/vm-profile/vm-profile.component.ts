@@ -7,6 +7,7 @@ import { IconComponent } from '../../../../components/icon/icon.component';
 import { VirtualMachine, VIRTUAL_MACHINES_DATA } from '../../mock-data';
 import { AddEditDiskModalComponent, Disk } from './components/add-edit-disk-modal/add-edit-disk-modal.component';
 import { AddEditGatewayModalComponent, GatewayInfo } from './components/add-edit-gateway-modal/add-edit-gateway-modal.component';
+import { ConfirmationModalComponent } from '../../../../components/confirmation-modal/confirmation-modal.component';
 
 
 // Define local interfaces for the tabs
@@ -24,16 +25,21 @@ interface Snapshot {
   templateUrl: './vm-profile.component.html',
   styleUrls: ['./vm-profile.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, IconComponent, FormsModule, AddEditDiskModalComponent, AddEditGatewayModalComponent],
+  imports: [CommonModule, RouterModule, IconComponent, FormsModule, AddEditDiskModalComponent, AddEditGatewayModalComponent, ConfirmationModalComponent],
   standalone: true,
+  host: {
+    '(document:click)': 'onGlobalClick($event.target)',
+  },
 })
 export class VmProfileComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+  // FIX: Explicitly type `ActivatedRoute` to prevent it from being inferred as `unknown`.
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
   vm = signal<VirtualMachine | null>(null);
   isEditing = signal(false);
   editedVm = signal<Partial<VirtualMachine>>({});
   activeTab = signal<'disk' | 'gateway' | 'snapshot'>('disk');
+  openMenuId = signal<string | null>(null);
   
   // Tab data
   disks = signal<Disk[]>([]);
@@ -46,6 +52,17 @@ export class VmProfileComponent implements OnInit {
   isAddEditGatewayModalOpen = signal(false);
   gatewayToEdit = signal<GatewayInfo | null>(null);
   
+  // Confirmation Modal State
+  isConfirmModalOpen = signal(false);
+  confirmModalConfig = signal({
+      title: '',
+      message: '',
+      confirmButtonText: '',
+      confirmButtonClass: '',
+      iconName: '',
+      iconClass: ''
+  });
+
   totalStorageCapacity = 2048; // Mock total capacity in GB
   
   usedStorage = computed(() => this.disks().reduce((acc, disk) => acc + disk.sizeGB, 0));
@@ -57,6 +74,13 @@ export class VmProfileComponent implements OnInit {
     if (foundVm) {
       this.vm.set(foundVm);
       this.loadTabData(foundVm.id);
+    }
+  }
+
+  onGlobalClick(target: EventTarget | null): void {
+    const clickedInside = (target as HTMLElement)?.closest('.vm-menu-container');
+    if (!clickedInside) {
+      this.openMenuId.set(null);
     }
   }
 
@@ -134,5 +158,72 @@ export class VmProfileComponent implements OnInit {
           this.gateways.update(gws => [...gws, gatewayToSave]);
       }
       this.isAddEditGatewayModalOpen.set(false);
+  }
+
+  // VM Action Methods
+  handleVmAction(action: 'connect' | 'powerOff' | 'restart' | 'delete'): void {
+    const vm = this.vm();
+    if (!vm) return;
+
+    let config;
+    switch (action) {
+        case 'connect':
+            config = {
+                title: `Connect to ${vm.name}`,
+                message: `You are about to connect to the web console for <strong>${vm.name}</strong>. Proceed?`,
+                confirmButtonText: 'Connect',
+                confirmButtonClass: 'bg-[#679a41] hover:bg-[#537d34]',
+                iconName: 'fas fa-terminal',
+                iconClass: 'text-gray-500'
+            };
+            break;
+        case 'powerOff':
+            config = {
+                title: `Power Off ${vm.name}`,
+                message: `Are you sure you want to power off <strong>${vm.name}</strong>? This is equivalent to pulling the power cord.`,
+                confirmButtonText: 'Power Off',
+                confirmButtonClass: 'bg-red-600 hover:bg-red-700',
+                iconName: 'fas fa-power-off',
+                iconClass: 'text-red-500'
+            };
+            break;
+        case 'restart':
+             config = {
+                title: `Restart ${vm.name}`,
+                message: `Are you sure you want to restart <strong>${vm.name}</strong>? This will abruptly stop and then start the virtual machine.`,
+                confirmButtonText: 'Restart',
+                confirmButtonClass: 'bg-orange-500 hover:bg-orange-600',
+                iconName: 'fas fa-sync-alt',
+                iconClass: 'text-orange-500'
+            };
+            break;
+        case 'delete':
+             config = {
+                title: `Delete ${vm.name}`,
+                message: `Are you sure you want to permanently delete <strong>${vm.name}</strong>? This action cannot be undone.`,
+                confirmButtonText: 'Delete',
+                confirmButtonClass: 'bg-red-600 hover:bg-red-700',
+                iconName: 'fas fa-trash-alt',
+                iconClass: 'text-red-500'
+            };
+            break;
+    }
+    this.confirmModalConfig.set(config);
+    this.isConfirmModalOpen.set(true);
+    this.openMenuId.set(null);
+  }
+
+  onConfirmAction(): void {
+      const vm = this.vm();
+      if (vm) {
+          console.log(`Action confirmed for VM: ${vm.name}`);
+          // Here you would call a service to perform the action.
+          // For now, just logging it.
+      }
+      this.onCloseConfirmModal();
+  }
+
+  onCloseConfirmModal(): void {
+      this.isConfirmModalOpen.set(false);
   }
 }

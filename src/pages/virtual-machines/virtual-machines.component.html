@@ -1,7 +1,7 @@
 
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow min-h-full">
   <!-- Header -->
-  <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
     <div>
       <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Virtual Machines</h1>
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your virtual machines.</p>
@@ -11,13 +11,38 @@
         <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
         ADD VM
       </a>
-      <button class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2">
-        <app-icon name="fas fa-recycle" />
-        Recycle Bin
-      </button>
-      <button class="relative bg-transparent border border-[#679a41] text-[#679a41] dark:border-emerald-400 dark:text-emerald-400 hover:bg-[#679a41]/10 dark:hover:bg-emerald-400/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
+      <a routerLink="/app/cloud-edge/resources/marketplace" class="bg-slate-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-600 transition-all duration-200 ease-in-out flex items-center shadow-sm">
+        <app-icon name="fas fa-shopping-cart" className="mr-2 text-xs"></app-icon>
+        Marketplace
+      </a>
+      <div class="relative">
+        <button #exportButtonRef (click)="toggleExportMenu()" class="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
+          <app-icon name="fas fa-file-export" className="mr-2"></app-icon>
+          Export
+        </button>
+        @if (isExportMenuOpen()) {
+          <div #exportMenuRef class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-700 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none z-10">
+            <button (click)="exportAsCsv()" class="w-full text-left flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600">
+              <app-icon name="fas fa-file-csv" className="w-4 h-4 mr-3" />
+              <span>Export as CSV</span>
+            </button>
+            <button (click)="exportAsJson()" class="w-full text-left flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600">
+              <app-icon name="fas fa-file-code" className="w-4 h-4 mr-3" />
+              <span>Export as JSON</span>
+            </button>
+          </div>
+        }
+      </div>
+      <button (click)="openFilterPanel()" class="relative bg-transparent border border-[#679a41] text-[#679a41] dark:border-emerald-400 dark:text-emerald-400 hover:bg-[#679a41]/10 dark:hover:bg-emerald-400/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
         <app-icon name="fas fa-filter" className="mr-2" />
         Filters
+        @if (activeFilterCount() > 0) {
+          <span class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white ring-2 ring-white dark:ring-slate-800">{{ activeFilterCount() }}</span>
+        }
+      </button>
+       <button class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2">
+        <app-icon name="fas fa-recycle" />
+        Recycle Bin
       </button>
     </div>
   </div>
@@ -57,6 +82,7 @@
         <app-icon name="fas fa-search" className="text-gray-400" />
       </div>
       <input type="text"
+             [(ngModel)]="searchTerm"
              placeholder="Search virtual machines..."
              class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-[#8cc866] sm:text-sm"
       />
@@ -64,9 +90,70 @@
   </div>
 
   <!-- Content Area -->
-  @if (viewMode() === 'card') {
-    <app-vm-card-view [virtualMachines]="virtualMachines()"></app-vm-card-view>
+  @if (filteredVirtualMachines().length > 0) {
+    @if (viewMode() === 'card') {
+      <app-vm-card-view [virtualMachines]="filteredVirtualMachines()" (vmAction)="handleVmAction($event)"></app-vm-card-view>
+    } @else {
+      <app-vm-table-view [virtualMachines]="filteredVirtualMachines()" (vmAction)="handleVmAction($event)"></app-vm-table-view>
+    }
   } @else {
-    <app-vm-table-view [virtualMachines]="virtualMachines()"></app-vm-table-view>
+    <div class="text-center py-16 px-6 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg">
+      <app-icon name="fas fa-search-minus" className="text-5xl text-gray-400 dark:text-gray-500 mb-4"></app-icon>
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">No Virtual Machines Found</h3>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Your search and filter combination did not return any results.</p>
+    </div>
   }
 </div>
+
+<!-- Filter Panel -->
+<app-filter-panel [isOpen]="isFilterPanelOpen()" (close)="closeFilterPanel()" (apply)="applyFilters()" (clear)="clearFilters()">
+  <div class="space-y-6">
+    <!-- Status Filter -->
+    <div>
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Status</h3>
+      <div class="mt-2 space-y-2">
+        @for(status of vmStatuses; track status) {
+          <label class="flex items-center">
+            <input type="radio" name="vm-status" [value]="status" [(ngModel)]="tempFilters().status" class="h-4 w-4 text-[#679a41] border-gray-300 focus:ring-[#537d34]">
+            <span class="ml-3 text-sm text-gray-600 dark:text-gray-400 capitalize">{{ status }}</span>
+          </label>
+        }
+      </div>
+    </div>
+    <!-- OS Filter -->
+    <div>
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Operating System</h3>
+      <div class="mt-2 space-y-2">
+        @for(os of vmOses; track os) {
+          <label class="flex items-center">
+            <input type="radio" name="vm-os" [value]="os" [(ngModel)]="tempFilters().os" class="h-4 w-4 text-[#679a41] border-gray-300 focus:ring-[#537d34]">
+            <span class="ml-3 text-sm text-gray-600 dark:text-gray-400 capitalize">{{ os }}</span>
+          </label>
+        }
+      </div>
+    </div>
+    <!-- Properties Filter -->
+    <div>
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Properties</h3>
+      <div class="mt-2 space-y-2">
+        <label class="flex items-center">
+          <input type="checkbox" [(ngModel)]="tempFilters().hasReservation" class="h-4 w-4 rounded text-[#679a41] border-gray-300 focus:ring-[#537d34]">
+          <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">Has Reservation</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</app-filter-panel>
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal 
+  [isOpen]="isConfirmModalOpen()"
+  [title]="confirmModalConfig().title"
+  [message]="confirmModalConfig().message"
+  [confirmButtonText]="confirmModalConfig().confirmButtonText"
+  [confirmButtonClass]="confirmModalConfig().confirmButtonClass"
+  [iconName]="confirmModalConfig().iconName"
+  [iconClass]="confirmModalConfig().iconClass"
+  (close)="onCloseConfirmModal()"
+  (confirm)="onConfirmAction()">
+</app-confirmation-modal>

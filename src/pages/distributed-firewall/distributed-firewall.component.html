@@ -1,3 +1,4 @@
+
 <div class="bg-white dark:bg-slate-900/50 text-[#293c51] dark:text-gray-200 font-sans rounded-xl shadow-sm">
   <div class="p-6">
     <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-200 dark:border-slate-700">
@@ -141,7 +142,7 @@
                                 <span class="w-2 h-2 rounded-full mr-2" [class.bg-green-500]="rule.action === 'Allow'" [class.bg-red-500]="rule.action !== 'Allow'"></span>
                                 {{ rule.action }}
                             </span>
-                            <app-toggle-switch size="sm" [checked]="rule.enabled" (change)="handleRuleUpdate(policy.id, rule.id, 'enabled', $event)" />
+                            <app-toggle-switch size="sm" [ngModel]="rule.enabled" (ngModelChange)="handleRuleUpdate(policy.id, rule.id, 'enabled', $event)" />
                         </div>
                     </td>
                      <td class="px-4 py-3 text-sm">
@@ -187,7 +188,7 @@
                             <option value="Deny">Deny</option>
                             <option value="Drop">Drop</option>
                         </select>
-                        <app-toggle-switch size="sm" [checked]="newRuleForm().enabled" (change)="handleNewRuleEnabledChange($event)" />
+                        <app-toggle-switch size="sm" [ngModel]="newRuleForm().enabled" (ngModelChange)="handleNewRuleEnabledChange($event)" />
                     </div>
                   </td>
                   <td></td>

@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,66 +12,31 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { DashboardAnimationService } from '../../services/dashboard-animation.service';
 import { AuthService } from '../../services/auth.service';
+import { StatCard, VirtualMachine, AuditTrailEntry, QuickStartLink, HelpfulResource } from './dashboard.types';
+import { StatChartModalComponent } from './components/stat-chart-modal/stat-chart-modal.component';
 
-interface StatCard {
-  title: string;
-  icon: string;
-  value: number;
-  total: number;
-  unit: string;
-  percentage: number;
-  label: string;
-  uptime?: string;
-}
+// Helper function to generate mock historical data
+const generateHistoricalData = (days: number, pointsPerHour: number, max: number, startPercent: number = 0.6, noise: number = 0.2, sineFactor: number = 0.1) => {
+  const data: { time: Date; value: number }[] = [];
+  const now = new Date();
+  const totalPoints = days * 24 * pointsPerHour;
+  for (let i = totalPoints; i > 0; i--) {
+    const time = new Date(now.getTime() - i * (3600 * 1000 / pointsPerHour));
+    // some randomness
+    let value = max * startPercent + (Math.random() - 0.5) * max * noise + Math.sin(i / (pointsPerHour * 3)) * max * sineFactor;
+    value = Math.max(0, Math.min(max, value));
+    data.push({ time, value });
+  }
+  return data;
+};
 
-interface VirtualMachine {
-  id: string;
-  name: string;
-  os: 'windows' | 'ubuntu' | 'linux';
-  status: 'running' | 'stopped' | 'suspended';
-  cpu: {
-    usage: number; // percentage
-  };
-  memory: {
-    usage: number; // percentage
-  };
-  storage: {
-    usage: number; // percentage
-  };
-}
-
-interface AuditTrailEntry {
-  id: string;
-  eventName: string;
-  eventSource: 'Compute' | 'Security' | 'Network' | 'Identity';
-  eventTime: string;
-  user: string;
-  resourceName: string;
-  ipAddress: string;
-  status: 'Success' | 'Failure';
-}
-
-interface QuickStartLink {
-  title: string;
-  description: string;
-  icon: string;
-  path: string;
-}
-
-interface HelpfulResource {
-  title: string;
-  description: string;
-  icon: string;
-  path: string;
-}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent, RouterModule, FormsModule],
-  // FIX: Replaced @HostListener with the host property for better component encapsulation.
+  imports: [CommonModule, IconComponent, RouterModule, FormsModule, StatChartModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
@@ -85,6 +49,10 @@ export class DashboardComponent implements AfterViewInit {
   openVmMenuId = signal<string | null>(null);
   user = this.authService.user;
   auditTrailSearchTerm = signal('');
+
+  // Chart Modal State
+  isChartModalOpen = signal(false);
+  selectedStatForChart = signal<StatCard | null>(null);
 
   showWelcomeCard = computed(() => this.user()?.isNewUser && !this.animationService.welcomeDismissed());
 
@@ -123,6 +91,20 @@ export class DashboardComponent implements AfterViewInit {
   closeVmMenu(): void {
     this.openVmMenuId.set(null);
   }
+  
+  openChartModal(stat: StatCard): void {
+    this.selectedStatForChart.set(stat);
+    this.isChartModalOpen.set(true);
+  }
+
+  closeChartModal(): void {
+    this.isChartModalOpen.set(false);
+  }
+
+  runSpeedTest(): void {
+    // In a real app, this would trigger a network test. For now, it's a placeholder.
+    alert('Running network speed test...');
+  }
 
   quickStartLinks = signal<QuickStartLink[]>([
     { title: 'Create a Virtual Machine', description: 'Spin up a new server in minutes.', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines' },
@@ -160,41 +142,20 @@ export class DashboardComponent implements AfterViewInit {
 
   stats = signal<StatCard[]>([
     {
-      title: 'CPU Cores',
-      icon: 'fa-solid fa-microchip',
-      value: 45,
-      total: 64,
-      unit: 'cores',
-      percentage: 70,
-      label: 'utilized',
+      title: 'CPU Cores', icon: 'fa-solid fa-microchip', value: 45, total: 64, unit: 'cores', percentage: 70, label: 'utilized',
+      historicalData: generateHistoricalData(7, 4, 100, 0.65),
     },
     {
-      title: 'Memory',
-      icon: 'fa-solid fa-chart-simple',
-      value: 182,
-      total: 256,
-      unit: 'GB',
-      percentage: 71,
-      label: 'utilized',
+      title: 'Memory', icon: 'fa-solid fa-chart-simple', value: 182, total: 256, unit: 'GB', percentage: 71, label: 'utilized',
+      historicalData: generateHistoricalData(7, 4, 100, 0.7),
     },
     {
-      title: 'Storage',
-      icon: 'fa-solid fa-database',
-      value: 1456,
-      total: 2048,
-      unit: 'GB',
-      percentage: 71,
-      label: 'utilized',
+      title: 'Storage', icon: 'fa-solid fa-database', value: 1456, total: 2048, unit: 'GB', percentage: 71, label: 'utilized',
+      historicalData: generateHistoricalData(7, 4, 100, 0.7, 0.05, 0.02),
     },
     {
-      title: 'Active VMs',
-      icon: 'fa-solid fa-layer-group',
-      value: 12,
-      total: 18,
-      unit: 'total',
-      percentage: Math.round((12 / 18) * 100),
-      label: '',
-      uptime: 'Uptime: 99.8%',
+      title: 'Active VMs', icon: 'fa-solid fa-layer-group', value: 12, total: 18, unit: 'total', percentage: Math.round((12 / 18) * 100), label: '', uptime: 'Uptime: 99.8%',
+      historicalData: generateHistoricalData(7, 1, 18, 0.6, 0.3).map(d => ({...d, value: Math.round(d.value)})),
     },
   ]);
 
@@ -207,122 +168,30 @@ export class DashboardComponent implements AfterViewInit {
   });
 
   topVMs = signal<VirtualMachine[]>([
-    {
-      id: 'vm-01',
-      name: 'Production Web Server',
-      os: 'linux',
-      status: 'running',
-      cpu: { usage: 85 },
-      memory: { usage: 76 },
-      storage: { usage: 60 },
-    },
-    {
-      id: 'vm-02',
-      name: 'Database Cluster Node 1',
-      os: 'ubuntu',
-      status: 'running',
-      cpu: { usage: 72 },
-      memory: { usage: 88 },
-      storage: { usage: 45 },
-    },
-    {
-      id: 'vm-03',
-      name: 'Development Environment',
-      os: 'windows',
-      status: 'stopped',
-      cpu: { usage: 0 },
-      memory: { usage: 0 },
-      storage: { usage: 80 },
-    },
+    { id: 'vm-01', name: 'Production Web Server', os: 'linux', status: 'running', cpu: { usage: 85 }, memory: { usage: 76 }, storage: { usage: 60 } },
+    { id: 'vm-02', name: 'Database Cluster Node 1', os: 'ubuntu', status: 'running', cpu: { usage: 72 }, memory: { usage: 88 }, storage: { usage: 45 } },
+    { id: 'vm-03', name: 'Development Environment', os: 'windows', status: 'stopped', cpu: { usage: 0 }, memory: { usage: 0 }, storage: { usage: 80 } },
   ]);
 
-  securityScore = signal({
-    score: 87,
-    activeThreats: 2,
-    blockedAttempts: 156,
-    sslCertificates: '8 valid',
-  });
+  securityScore = signal({ score: 87, activeThreats: 2, blockedAttempts: 156, sslCertificates: '8 valid' });
 
   networkStatus = signal({
-    bandwidthUsage: {
-      used: 3.2,
-      total: 10,
-      unit: 'Gbps',
-      percentage: 32,
-    },
-    latency: '12ms',
-    activeConnections: '2,847',
-    packetLoss: '0.01%',
+    bandwidthUsage: { used: 3.2, total: 10, unit: 'Gbps', percentage: 32 },
+    latency: '12ms', activeConnections: '2,847', packetLoss: '0.01%',
   });
   
   auditTrailEntries = signal<AuditTrailEntry[]>([
-    {
-      id: 'evt-1',
-      eventName: 'StartInstances',
-      eventSource: 'Compute',
-      eventTime: '5 minutes ago',
-      user: 'Admin',
-      resourceName: 'prod-web-server-01',
-      ipAddress: '73.125.88.10',
-      status: 'Success',
-    },
-    {
-      id: 'evt-2',
-      eventName: 'CreatePolicy',
-      eventSource: 'Security',
-      eventTime: '1 hour ago',
-      user: 'Admin',
-      resourceName: 'Allow-HTTP-External',
-      ipAddress: '73.125.88.10',
-      status: 'Success',
-    },
-    {
-      id: 'evt-3',
-      eventName: 'RunSecurityScan',
-      eventSource: 'Security',
-      eventTime: '3 hours ago',
-      user: 'System',
-      resourceName: 'All Production VMs',
-      ipAddress: 'internal-system',
-      status: 'Success',
-    },
-    {
-      id: 'evt-4',
-      eventName: 'AttachVolume',
-      eventSource: 'Compute',
-      eventTime: '6 hours ago',
-      user: 'Admin',
-      resourceName: 'data-archive-01',
-      ipAddress: '73.125.88.10',
-      status: 'Success',
-    },
-    {
-      id: 'evt-5',
-      eventName: 'ConsoleLogin',
-      eventSource: 'Identity',
-      eventTime: 'Yesterday',
-      user: 'Jane Doe',
-      resourceName: 'user/jane.doe',
-      ipAddress: '104.28.71.118',
-      status: 'Success',
-    },
-    {
-      id: 'evt-6',
-      eventName: 'UpdateGateway',
-      eventSource: 'Network',
-      eventTime: '2 days ago',
-      user: 'Admin',
-      resourceName: 'main-gateway-01',
-      ipAddress: '73.125.88.10',
-      status: 'Failure',
-    }
+    { id: 'evt-1', eventName: 'StartInstances', eventSource: 'Compute', eventTime: '5 minutes ago', user: 'Admin', resourceName: 'prod-web-server-01', ipAddress: '73.125.88.10', status: 'Success' },
+    { id: 'evt-2', eventName: 'CreatePolicy', eventSource: 'Security', eventTime: '1 hour ago', user: 'Admin', resourceName: 'Allow-HTTP-External', ipAddress: '73.125.88.10', status: 'Success' },
+    { id: 'evt-3', eventName: 'RunSecurityScan', eventSource: 'Security', eventTime: '3 hours ago', user: 'System', resourceName: 'All Production VMs', ipAddress: 'internal-system', status: 'Success' },
+    { id: 'evt-4', eventName: 'AttachVolume', eventSource: 'Compute', eventTime: '6 hours ago', user: 'Admin', resourceName: 'data-archive-01', ipAddress: '73.125.88.10', status: 'Success' },
+    { id: 'evt-5', eventName: 'ConsoleLogin', eventSource: 'Identity', eventTime: 'Yesterday', user: 'Jane Doe', resourceName: 'user/jane.doe', ipAddress: '104.28.71.118', status: 'Success' },
+    { id: 'evt-6', eventName: 'UpdateGateway', eventSource: 'Network', eventTime: '2 days ago', user: 'Admin', resourceName: 'main-gateway-01', ipAddress: '73.125.88.10', status: 'Failure' }
   ]);
   
   filteredAuditTrail = computed(() => {
     const term = this.auditTrailSearchTerm().toLowerCase();
-    if (!term) {
-        return this.auditTrailEntries();
-    }
+    if (!term) return this.auditTrailEntries();
     return this.auditTrailEntries().filter(entry => 
         entry.eventName.toLowerCase().includes(term) ||
         entry.user.toLowerCase().includes(term) ||
@@ -354,9 +223,7 @@ export class DashboardComponent implements AfterViewInit {
   });
 
   animatedSecurityScore = computed(() => {
-    if (!this.animationsReady()) {
-      return 5;
-    }
+    if (!this.animationsReady()) return 5;
     return this.securityScore().score;
   });
 
@@ -364,9 +231,6 @@ export class DashboardComponent implements AfterViewInit {
   readonly securityScoreCircumference = 2 * Math.PI * this.securityScoreRadius;
   securityScoreOffset = computed(() => {
     const percent = this.animatedSecurityScore();
-    return (
-      this.securityScoreCircumference -
-      (percent / 100) * this.securityScoreCircumference
-    );
+    return this.securityScoreCircumference - (percent / 100) * this.securityScoreCircumference;
   });
 }

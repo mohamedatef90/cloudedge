@@ -1,0 +1,166 @@
+
+@if (isOpen()) {
+  <div 
+    (click)="onClose()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm modal-backdrop">
+    <form [formGroup]="gatewayForm" (ngSubmit)="onSave()" novalidate>
+      <div 
+        (click)="onDialogClick($event)"
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="modal-title"
+        class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl m-4 modal-dialog">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+          <h2 id="modal-title" class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+            {{ isEditMode() ? 'Edit Gateway' : 'Create Gateway' }}
+          </h2>
+          <button 
+            type="button"
+            (click)="onClose()" 
+            aria-label="Close" 
+            class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+            <app-icon name="fas fa-times" className="w-4 h-4" />
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          <!-- Name -->
+          <div>
+            <div class="flex justify-between items-baseline">
+              <label for="gw-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+                Name <span class="text-red-500">*</span>
+              </label>
+              <span class="text-xs text-gray-400">{{ gatewayForm.get('name')?.value?.length || 0 }}/61</span>
+            </div>
+            <input 
+              type="text" 
+              id="gw-name" 
+              formControlName="name"
+              placeholder="Name"
+              class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+            >
+          </div>
+          
+          <!-- Reservation -->
+          <div>
+            <label for="gw-reservation" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+              Reservation <span class="text-red-500">*</span>
+            </label>
+            <select formControlName="reservation" id="gw-reservation" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm">
+              <option [ngValue]="null" disabled>Select Reservation</option>
+              @for(res of reservations(); track res) { <option [value]="res">{{res}}</option> }
+            </select>
+          </div>
+
+          <!-- Gateway Address -->
+          <div formGroupName="gatewayAddress">
+            <label class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+              Gateway Address <span class="text-red-500">*</span>
+            </label>
+            <div class="flex items-center space-x-2">
+              <input type="text" formControlName="octet1" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet2" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet3" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet4" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">/</span>
+              <select formControlName="cidr" class="w-24 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+                @for(prefix of cidrPrefixes; track prefix) { <option [value]="prefix">{{ prefix }}</option> }
+              </select>
+            </div>
+          </div>
+          
+          <!-- Create DHCP Toggle -->
+          <div class="flex items-center space-x-3">
+            <app-toggle-switch formControlName="createDhcp"></app-toggle-switch>
+            <label class="text-sm font-medium text-[#293c51] dark:text-gray-300">Create DHCP</label>
+          </div>
+
+          <!-- DHCP Section -->
+          @if (gatewayForm.get('createDhcp')?.value) {
+            <div class="pl-8 mt-4 space-y-4 border-l-2 border-gray-200 dark:border-slate-600 ml-3">
+              <!-- DHCP Address -->
+              <div formGroupName="dhcpAddress">
+                <label class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+                  DHCP Address <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                  <input type="text" formControlName="octet1" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+                  <span class="text-gray-400">.</span>
+                  <input type="text" formControlName="octet2" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+                  <span class="text-gray-400">.</span>
+                  <input type="text" formControlName="octet3" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+                  <span class="text-gray-400">.</span>
+                  <input type="text" formControlName="octet4" class="w-1/4 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+                  <span class="text-gray-400">/</span>
+                  <input type="text" formControlName="cidr" class="w-24 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700 bg-gray-100 dark:bg-slate-700/50">
+                </div>
+              </div>
+
+              <!-- Range -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="rangeFrom" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">Range From <span class="text-red-500">*</span></label>
+                  <input type="text" id="rangeFrom" formControlName="rangeFrom" placeholder="172.20.1.1" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+                </div>
+                <div>
+                  <label for="rangeTo" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">Range To <span class="text-red-500">*</span></label>
+                  <input type="text" id="rangeTo" formControlName="rangeTo" placeholder="172.20.1.252" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+                </div>
+              </div>
+
+              <!-- DNS & Lease Time -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="dnsAddress" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">DNS Address <span class="text-red-500">*</span></label>
+                  <input type="text" id="dnsAddress" formControlName="dnsAddress" placeholder="8.8.8.8" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+                  <p class="text-xs text-gray-400 mt-1">Example: 8.8.8.8,1.1.1.1</p>
+                </div>
+                <div>
+                  <label for="leaseTime" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">Lease time <span class="text-red-500">*</span></label>
+                  <input type="text" id="leaseTime" formControlName="leaseTime" placeholder="86400" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+                   <p class="text-xs text-gray-400 mt-1">Time to reclaim IP addresses in seconds</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Description -->
+          <div>
+            <label for="gw-description" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+              Description
+            </label>
+            <textarea 
+              id="gw-description" 
+              formControlName="description"
+              rows="3"
+              placeholder="Description"
+              class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+          <button 
+            type="button"
+            (click)="onClose()"
+            class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out mr-2">
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            [disabled]="gatewayForm.invalid"
+            class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}

@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { VirtualMachine } from '../../mock-data';
@@ -18,6 +18,7 @@ import { IconComponent } from '../../../../components/icon/icon.component';
 })
 export class VmTableViewComponent {
   virtualMachines = input.required<VirtualMachine[]>();
+  vmAction = output<{ action: 'connect' | 'powerOff' | 'restart' | 'delete'; vm: VirtualMachine }>();
 
   openMenuId = signal<string | null>(null);
 
@@ -31,6 +32,11 @@ export class VmTableViewComponent {
   toggleMenu(event: MouseEvent, vmId: string): void {
     event.stopPropagation();
     this.openMenuId.update(currentId => (currentId === vmId ? null : vmId));
+  }
+  
+  handleAction(action: 'connect' | 'powerOff' | 'restart' | 'delete', vm: VirtualMachine): void {
+    this.vmAction.emit({ action, vm });
+    this.openMenuId.set(null);
   }
 
   getStatusClass(status: VirtualMachine['status']): string {

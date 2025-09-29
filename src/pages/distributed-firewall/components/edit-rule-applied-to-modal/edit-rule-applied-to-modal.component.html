@@ -1,3 +1,4 @@
+
 @if (isOpen() && rule()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" (click)="close.emit()">
   <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-5xl m-4 flex flex-col h-[90vh]" (click)="$event.stopPropagation()">
@@ -121,7 +122,7 @@
     <!-- Footer -->
     <div class="p-4 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-700 flex-shrink-0">
         <div class="flex items-center gap-2">
-            <app-toggle-switch [checked]="showSelectedOnly()" (change)="showSelectedOnly.set($event)"/>
+            <app-toggle-switch [(ngModel)]="showSelectedOnly"/>
             <label class="text-sm">Show Only Selected</label>
         </div>
         <div class="flex items-center gap-2">

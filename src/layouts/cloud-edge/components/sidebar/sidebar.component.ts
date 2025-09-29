@@ -1,6 +1,3 @@
-
-
-
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -29,7 +26,7 @@ export class CloudEdgeSidebarComponent {
   isCollapsed = input.required<boolean>();
   
   private authService = inject(AuthService);
-  // Explicitly type router to fix a type inference issue where it was being inferred as 'unknown'.
+  // FIX: Explicitly type router to fix a type inference issue where it was being inferred as 'unknown'.
   private router: Router = inject(Router);
   user = this.authService.user;
   activeSectionTitle = signal<string>('');
@@ -100,6 +97,7 @@ export class CloudEdgeSidebarComponent {
         items: [
             { name: 'Gateways', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
             { name: 'NATs', icon: 'fas fa-network-wired', path: '/app/cloud-edge/network/nats' },
+            { name: 'Reserved IP', icon: 'fas fa-location-dot', path: '/app/cloud-edge/network/reserved-ip' },
             { name: 'Routes', icon: 'fas fa-route', path: '/app/cloud-edge/network/routes' },
         ]
       },
@@ -114,6 +112,7 @@ export class CloudEdgeSidebarComponent {
       { 
         title: 'Security',
         items: [
+            { name: 'IDS/IPS', icon: 'fas fa-shield-alt', path: '/app/cloud-edge/security/ids-ips' },
             { name: 'Filtering and Analysis', icon: 'fas fa-filter', path: '/app/cloud-edge/security/filtering-analysis' },
             { name: 'Distributed Firewall', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall' },
             { name: 'Gateway Firewall', icon: 'fas fa-dungeon', path: '/app/cloud-edge/security/gateway-firewall' },

@@ -1,0 +1,140 @@
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200 mb-6 border-b pb-4 dark:border-slate-700">
+    {{ isEditMode() ? 'Edit Gateway' : 'Create Gateway' }}
+  </h1>
+
+  <form [formGroup]="gatewayForm" (ngSubmit)="onSave()" novalidate class="space-y-8">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <div class="md:col-span-2">
+        <div class="flex justify-between items-baseline">
+          <label for="gw-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+            Name <span class="text-red-500">*</span>
+          </label>
+          <span class="text-xs text-gray-400">{{ gatewayForm.get('name')?.value?.length || 0 }}/61</span>
+        </div>
+        <input 
+          type="text" 
+          id="gw-name" 
+          formControlName="name"
+          placeholder="Name"
+          class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+        >
+      </div>
+      
+      <div class="md:col-span-2">
+        <label for="gw-reservation" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+          Reservation <span class="text-red-500">*</span>
+        </label>
+        <select formControlName="reservation" id="gw-reservation" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm">
+          <option [ngValue]="null" disabled>Select Reservation</option>
+          @for(res of reservations; track res) { <option [value]="res">{{res}}</option> }
+        </select>
+      </div>
+
+      <div class="md:col-span-2" formGroupName="gatewayAddress">
+        <label class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+          Gateway Address <span class="text-red-500">*</span>
+        </label>
+        <div class="mt-1 flex items-center space-x-2">
+          <input type="text" formControlName="octet1" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet2" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet3" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+          <span class="text-gray-400">.</span>
+          <input type="text" formControlName="octet4" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+          <span class="text-gray-400">/</span>
+          <select formControlName="cidr" class="w-32 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+            @for(prefix of cidrPrefixes; track prefix) { <option [value]="prefix">{{ prefix }}</option> }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- DHCP Section -->
+    <div class="pt-6 border-t dark:border-slate-700">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div class="md:col-span-2 flex items-center space-x-3">
+          <app-toggle-switch formControlName="createDhcp"></app-toggle-switch>
+          <label class="text-sm font-medium text-[#293c51] dark:text-gray-300">Create DHCP</label>
+        </div>
+
+        @if (gatewayForm.get('createDhcp')?.value) {
+          <div class="md:col-span-2" formGroupName="dhcpAddress">
+            <label class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+              DHCP Address <span class="text-red-500">*</span>
+            </label>
+            <div class="mt-1 flex items-center space-x-2">
+              <input type="text" formControlName="octet1" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet2" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet3" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">.</span>
+              <input type="text" formControlName="octet4" class="w-full text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700">
+              <span class="text-gray-400">/</span>
+              <input type="text" formControlName="cidr" class="w-32 text-center border border-gray-300 dark:border-slate-600 rounded-md py-2 px-1 dark:bg-slate-700 bg-gray-100 dark:bg-slate-700/50">
+            </div>
+          </div>
+
+          <div>
+            <label for="rangeFrom" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">Range From <span class="text-red-500">*</span></label>
+            <input type="text" id="rangeFrom" formControlName="rangeFrom" placeholder="172.20.1.1" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+          </div>
+          <div>
+            <label for="rangeTo" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">Range To <span class="text-red-500">*</span></label>
+            <input type="text" id="rangeTo" formControlName="rangeTo" placeholder="172.20.1.252" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+          </div>
+        
+          <div>
+            <label for="dnsAddress" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">DNS Address <span class="text-red-500">*</span></label>
+            <input type="text" id="dnsAddress" formControlName="dnsAddress" placeholder="8.8.8.8" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+            <p class="mt-2 text-xs text-gray-400">Example: 8.8.8.8,1.1.1.1</p>
+          </div>
+          <div>
+            <label for="leaseTime" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">Lease time <span class="text-red-500">*</span></label>
+            <input type="text" id="leaseTime" formControlName="leaseTime" placeholder="86400" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3 dark:bg-slate-700">
+             <p class="mt-2 text-xs text-gray-400">Time to reclaim IP addresses in seconds</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="pt-6 border-t dark:border-slate-700">
+      <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="md:col-span-2">
+          <label for="gw-description" class="block text-sm font-medium text-[#293c51] dark:text-gray-300">
+            Description
+          </label>
+          <textarea 
+            id="gw-description" 
+            formControlName="description"
+            rows="4"
+            placeholder="Enter an optional description for the gateway..."
+            class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="pt-5 border-t border-gray-200 dark:border-slate-700">
+      <div class="flex justify-end gap-3">
+        <button 
+          type="button"
+          (click)="onCancel()"
+          class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">
+          Cancel
+        </button>
+        <button 
+          type="submit"
+          [disabled]="gatewayForm.invalid"
+          class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isEditMode() ? 'Save Changes' : 'Create' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

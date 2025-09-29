@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { CloudEdgeLayoutComponent } from './layouts/cloud-edge/cloud-edge-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -26,6 +25,12 @@ import { FirewallServicesComponent } from './pages/firewall-services/firewall-se
 import { OrganizationProfileComponent } from './pages/organization-profile/organization-profile.component';
 import { OsImagesComponent } from './pages/virtual-machines/pages/os-images/os-images.component';
 import { VmProfileComponent } from './pages/virtual-machines/pages/vm-profile/vm-profile.component';
+import { MarketplacePageComponent } from './pages/marketplace/marketplace-page/marketplace-page.component';
+import { ConfigureAppPageComponent } from './pages/marketplace/configure-app-page/configure-app-page.component';
+import { AddReservationComponent } from './pages/reservations/pages/add-reservation/add-reservation.component';
+import { CreateEditGatewayComponent } from './pages/gateways/pages/create-edit-gateway/create-edit-gateway.component';
+import { CreateEditNatComponent } from './pages/nats/pages/create-edit-nat/create-edit-nat.component';
+import { ReservedIpComponent } from './pages/reserved-ip/reserved-ip.component';
 
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'app/cloud-edge', pathMatch: 'full' },
@@ -44,11 +49,20 @@ export const APP_ROUTES: Routes = [
       { path: 'resources/virtual-machines/create', component: CreateVmComponent, title: 'Create Virtual Machine' },
       { path: 'resources/virtual-machines/images', component: OsImagesComponent, title: 'Select OS Image' },
       { path: 'resources/virtual-machines/:id', component: VmProfileComponent, title: 'Virtual Machine Profile' },
+      { path: 'resources/marketplace', redirectTo: 'resources/marketplace/category/cms-publishing', pathMatch: 'full' },
+      { path: 'resources/marketplace/category/:id', component: MarketplacePageComponent, title: 'Marketplace' },
+      { path: 'resources/marketplace/configure/:id', component: ConfigureAppPageComponent, title: 'Configure Marketplace App' },
       { path: 'resources/storage', component: StorageComponent, title: 'Storage' },
       { path: 'resources/reservations', component: ReservationsComponent, title: 'Reservations' },
+      { path: 'resources/reservations/add', component: AddReservationComponent, title: 'Add Reservation' },
       // Network
       { path: 'network/gateways', component: GatewaysComponent, title: 'Gateways' },
+      { path: 'network/gateways/create', component: CreateEditGatewayComponent, title: 'Create Gateway' },
+      { path: 'network/gateways/edit/:id', component: CreateEditGatewayComponent, title: 'Edit Gateway' },
       { path: 'network/nats', component: NatsComponent, title: 'NATs' },
+      { path: 'network/nats/create', component: CreateEditNatComponent, title: 'Create NAT Rule' },
+      { path: 'network/nats/edit/:id', component: CreateEditNatComponent, title: 'Edit NAT Rule' },
+      { path: 'network/reserved-ip', component: ReservedIpComponent, title: 'Reserved IP' },
       { path: 'network/routes', component: RoutesComponent, title: 'Routes' },
       // Inventory
       { path: 'inventory/applications', component: FirewallPoliciesComponent, title: 'Applications' },

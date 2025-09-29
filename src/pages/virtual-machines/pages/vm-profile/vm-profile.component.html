@@ -6,10 +6,36 @@
     <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">{{ vmData.name }}</h1>
         @if (!isEditing()) {
-            <button (click)="startEditing()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
-                <app-icon name="fas fa-pencil-alt" className="mr-2"></app-icon>
-                Edit
-            </button>
+            <div class="flex items-center gap-2">
+                <button (click)="startEditing()" class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out flex items-center shadow-sm">
+                    <app-icon name="fas fa-pencil-alt" className="mr-2"></app-icon>
+                    Edit
+                </button>
+                <div class="relative inline-block text-left vm-menu-container">
+                    <button (click)="openMenuId.set(openMenuId() ? null : vmData.id)" class="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center border dark:border-slate-600">
+                        <app-icon name="fas fa-ellipsis-v" />
+                    </button>
+                    @if (openMenuId() === vmData.id) {
+                        <div class="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 z-10 text-sm">
+                            <div class="py-1">
+                                <button (click)="$event.preventDefault(); handleVmAction('connect')" class="w-full text-left flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                <app-icon name="fas fa-terminal" className="w-5 mr-3" /> Web Console
+                                </button>
+                                <button (click)="$event.preventDefault(); handleVmAction('powerOff')" [disabled]="vmData.status !== 'running'" class="w-full text-left flex items-center px-4 py-2 disabled:text-gray-400 disabled:dark:text-gray-500 disabled:pointer-events-none text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                <app-icon name="fas fa-stop-circle" className="w-5 mr-3 text-red-500" /> Power Off
+                                </button>
+                                <button (click)="$event.preventDefault(); handleVmAction('restart')" [disabled]="vmData.status !== 'running'" class="w-full text-left flex items-center px-4 py-2 disabled:text-gray-400 disabled:dark:text-gray-500 disabled:pointer-events-none text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                <app-icon name="fas fa-redo" className="w-5 mr-3 text-orange-500" /> Restart
+                                </button>
+                                <div class="border-t border-gray-200 dark:border-slate-700 my-1"></div>
+                                <button (click)="$event.preventDefault(); handleVmAction('delete')" class="w-full text-left flex items-center px-4 py-2 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                <app-icon name="fas fa-trash-alt" className="w-5 mr-3" /> Delete VM
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         }
     </div>
     
@@ -144,3 +170,15 @@
     (close)="isAddEditGatewayModalOpen.set(false)"
     (save)="handleGatewaySave($event)"
 />
+
+<app-confirmation-modal 
+  [isOpen]="isConfirmModalOpen()"
+  [title]="confirmModalConfig().title"
+  [message]="confirmModalConfig().message"
+  [confirmButtonText]="confirmModalConfig().confirmButtonText"
+  [confirmButtonClass]="confirmModalConfig().confirmButtonClass"
+  [iconName]="confirmModalConfig().iconName"
+  [iconClass]="confirmModalConfig().iconClass"
+  (close)="onCloseConfirmModal()"
+  (confirm)="onConfirmAction()">
+</app-confirmation-modal>

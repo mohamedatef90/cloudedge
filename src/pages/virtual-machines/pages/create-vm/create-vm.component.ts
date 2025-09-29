@@ -14,7 +14,8 @@ import { VmCreationService } from '../../services/vm-creation.service';
   imports: [CommonModule, FormsModule, IconComponent, RouterModule],
 })
 export class CreateVmComponent {
-  private router = inject(Router);
+  // FIX: Explicitly type `Router` to prevent it from being inferred as `unknown`.
+  private router: Router = inject(Router);
   vmCreationService = inject(VmCreationService);
 
   reservations = ['Default Reservation', 'High-Performance Reservation', 'Storage-Optimized Reservation'];

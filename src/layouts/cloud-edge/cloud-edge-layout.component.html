@@ -6,9 +6,17 @@
       [isSidebarCollapsed]="isSidebarCollapsed()"
       (toggleSidebar)="toggleSidebar()"
     />
-    <main class="flex-1 overflow-y-auto overflow-x-auto p-6">
-      <app-breadcrumbs [items]="breadcrumbItems()" />
-      <router-outlet></router-outlet>
+    <!-- The main area is the scroll container. Added a consistent background color. -->
+    <main class="flex-1 overflow-y-auto overflow-x-hidden bg-[#f7f8fa] dark:bg-slate-900">
+      <!-- Sticky Breadcrumbs Header -->
+      <div class="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 px-6 pt-6 pb-4">
+          <app-breadcrumbs [items]="breadcrumbItems()" />
+      </div>
+      
+      <!-- Scrollable Content -->
+      <div class="p-6">
+          <router-outlet></router-outlet>
+      </div>
     </main>
   </div>
 </div>

@@ -1,0 +1,127 @@
+
+<div class="bg-gray-50 dark:bg-slate-900 min-h-full p-6 sm:p-10">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="text-center">
+      <h1 class="text-3xl font-bold tracking-tight text-[#293c51] dark:text-gray-100 sm:text-4xl">Choose your plan</h1>
+      <p class="mt-3 text-lg text-gray-600 dark:text-gray-400">Simple, transparent pricing. No hidden fees.</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <section class="py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          <!-- Fixed Plans -->
+          @for(plan of FIXED_PLANS; track plan.id) {
+            <div 
+              class="relative group flex flex-col rounded-2xl border-2 p-8 transition-all duration-300 ease-in-out bg-white dark:bg-slate-800"
+              [class]="plan.name === 'Memory Optimized' ? 'border-[#679a41] dark:border-[#8cc866]' : 'border-gray-200 dark:border-slate-700'"
+            >
+              @if(plan.name === 'Memory Optimized') {
+                <div class="absolute top-0 right-6 -translate-y-1/2">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-[#679a41] dark:bg-[#8cc866] text-white">Recommended</span>
+                </div>
+              }
+              <h3 class="text-2xl font-bold text-[#293c51] dark:text-gray-100">{{ plan.name }}</h3>
+              <p class="mt-4 text-gray-600 dark:text-gray-400 text-sm h-16">
+                  @switch (plan.name) {
+                    @case ('General Purpose') { A balanced plan for a variety of workloads like web servers and development environments. }
+                    @case ('Compute Optimized') { Ideal for compute-intensive applications like batch processing and high-performance computing. }
+                    @case ('Memory Optimized') { Perfect for memory-intensive applications such as large databases and in-memory caches. }
+                  }
+              </p>
+              <div class="mt-6">
+                <span class="text-4xl font-bold text-[#293c51] dark:text-gray-100">${{ plan.price }}</span>
+                <span class="text-base font-medium text-gray-500 dark:text-gray-400">/ 1 Month</span>
+              </div>
+              <button (click)="selectPlan(plan.name)" 
+                      class="mt-6 block w-full rounded-lg px-6 py-3 text-center text-sm font-semibold transition-colors"
+                      [class]="plan.name === 'Memory Optimized' ? 'bg-[#679a41] dark:bg-[#8cc866] text-white hover:bg-[#537d34]' : 'border border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866] hover:bg-[#679a41]/10'">
+                  Subscribe
+              </button>
+               @if (plan.featureList && plan.supportList) {
+                <ul class="mt-8 space-y-3 text-sm flex-grow text-gray-700 dark:text-gray-300">
+                  @for(feature of plan.featureList; track feature) {
+                    <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>{{ feature }}</span></li>
+                  }
+                </ul>
+                <hr class="my-6 border-gray-200 dark:border-slate-600">
+                <ul class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                  @for(feature of plan.supportList; track feature) {
+                    <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>{{ feature }}</span></li>
+                  }
+                </ul>
+              } @else {
+                <ul class="mt-8 space-y-3 text-sm flex-grow text-gray-700 dark:text-gray-300">
+                    <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>{{ plan.cores }} Cores</span></li>
+                    <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>{{ plan.ram }} GB RAM</span></li>
+                    <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>{{ plan.storage }} GB Storage</span></li>
+                </ul>
+              }
+            </div>
+          }
+    
+          <!-- Custom Plan -->
+          <div class="relative group flex flex-col rounded-2xl border-2 p-8 transition-all duration-300 ease-in-out bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+            <h3 class="text-2xl font-bold text-[#293c51] dark:text-gray-100">Custom</h3>
+            <p class="mt-4 text-gray-600 dark:text-gray-400 text-sm h-16">Build a plan that fits your exact needs.</p>
+            <div class="mt-6">
+              <span class="text-4xl font-bold text-[#293c51] dark:text-gray-100">Flexible</span>
+            </div>
+            <button (click)="selectPlan('Custom')" class="mt-6 block w-full rounded-lg border border-[#679a41] dark:border-[#8cc866] px-6 py-3 text-center text-sm font-semibold text-[#679a41] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10">
+                Subscribe
+            </button>
+            <ul class="mt-8 space-y-3 text-sm flex-grow text-gray-700 dark:text-gray-300">
+                <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>Configurable Cores</span></li>
+                <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>Configurable RAM</span></li>
+                <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>Configurable Storage</span></li>
+                <li class="flex items-center"><app-icon name="fas fa-check" className="text-[#679a41] dark:text-[#8cc866] w-5 h-5 mr-2"></app-icon><span>Optional Add-ons</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    @if (isConfigVisible()) {
+      <div class="mt-12 pt-8 border-t dark:border-slate-700 space-y-6">
+          @if (activePlanTab() === 'Custom') {
+            <div class="p-6 bg-white dark:bg-slate-800 rounded-lg space-y-6 border dark:border-slate-700">
+                <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Configure Your Custom Plan</h3>
+                <div>
+                  <label class="block text-sm font-medium">Cores: <span class="font-bold text-[#679a41]">{{ customPlanCores() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanCores" min="1" max="64" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41] dark:accent-[#8cc866]">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium">RAM (GB): <span class="font-bold text-[#679a41]">{{ customPlanRam() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanRam" min="1" max="256" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41] dark:accent-[#8cc866]">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium">Storage (GB): <span class="font-bold text-[#679a41]">{{ customPlanStorage() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanStorage" min="10" max="2048" step="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41] dark:accent-[#8cc866]">
+                </div>
+                <div>
+                  <h4 class="font-semibold text-sm mt-4 mb-2">Select Add-ons:</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                      @for(addon of customPlanAddons(); track addon.name) {
+                          <label class="flex items-center p-2 bg-white dark:bg-slate-700/50 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700">
+                              <input type="checkbox" [checked]="addon.included" (change)="toggleCustomAddon(addon.name)" class="w-4 h-4 text-[#679a41] rounded focus:ring-[#537d34]">
+                              <app-icon [name]="getAddonIcon(addon.name)" className="mx-2 fa-fw text-[#679a41]"></app-icon>
+                              <span class="text-gray-700 dark:text-gray-300">{{ addon.name }}</span>
+                          </label>
+                      }
+                  </div>
+                </div>
+            </div>
+          }
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white dark:bg-slate-800 rounded-lg border dark:border-slate-700">
+          <div>
+              <label for="reservationName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reservation Name <span class="text-red-500">*</span></label>
+              <input type="text" id="reservationName" [(ngModel)]="reservationName" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+          </div>
+          <div class="flex items-end">
+            <button (click)="handleCreate()" [disabled]="!reservationName().trim()" class="bg-[#679a41] text-white px-6 py-2.5 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50 w-full md:w-auto">Create Reservation</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

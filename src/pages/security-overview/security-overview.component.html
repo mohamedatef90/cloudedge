@@ -1,5 +1,114 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Security - IDS/IPS</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Intrusion Detection and Prevention System</p>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors flex items-center shadow-sm">
+        <app-icon [name]="isIdsEnabled() ? 'fas fa-toggle-on' : 'fas fa-toggle-off'" className="mr-2"></app-icon>
+        {{ isIdsEnabled() ? 'IDS/IPS Enabled' : 'Enable Intrusion Detection' }}
+      </button>
+    </div>
+  </div>
 
-<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
-  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Security - IDS/IPS</h1>
-  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">View Intrusion Detection and Prevention System information here.</p>
+  <!-- Info Section -->
+  @if (isInfoVisible()) {
+    <div class="relative bg-blue-50 dark:bg-sky-900/30 border border-blue-200 dark:border-sky-700/50 text-blue-800 dark:text-sky-200 p-4 rounded-lg flex items-start gap-4">
+      <app-icon name="fas fa-info-circle" className="text-xl mt-1 flex-shrink-0 text-blue-500 dark:text-sky-400" />
+      <div class="flex-grow">
+        <h3 class="font-bold">Welcome to your Security Command Center.</h3>
+        <p class="text-sm mt-1">
+          This Intrusion Detection & Prevention System (IDS/IPS) dashboard is your first line of defense against network threats. It actively monitors your traffic for suspicious activity, malicious patterns, and known attack signatures. Here, you can get a high-level security overview, dive deep into event logs to investigate incidents, and manage the system's protective signatures to tailor your security posture. Use this page to gain peace of mind and ensure your cloud environment is secure.
+        </p>
+      </div>
+      <button (click)="dismissInfo()" aria-label="Dismiss" class="absolute top-2 right-2 p-1 rounded-full hover:bg-blue-200/50 dark:hover:bg-sky-800/50 transition-colors">
+        <app-icon name="fas fa-times" className="text-sm" />
+      </button>
+    </div>
+  }
+
+  <!-- Tabs -->
+  <div class="border-b border-gray-200 dark:border-slate-700">
+    <nav class="-mb-px flex space-x-6">
+      @for (tab of tabs; track tab.id) {
+        <button
+          (click)="setActiveTab(tab.id)"
+          class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors"
+          [class.border-[#679a41]]="activeTab() === tab.id"
+          [class.dark:border-[#8cc866]]="activeTab() === tab.id"
+          [class.text-[#679a41]]="activeTab() === tab.id"
+          [class.dark:text-[#8cc866]]="activeTab() === tab.id"
+          [class.border-transparent]="activeTab() !== tab.id"
+          [class.text-gray-500]="activeTab() !== tab.id"
+          [class.dark:text-gray-400]="activeTab() !== tab.id"
+          [class.hover:text-gray-700]="activeTab() !== tab.id"
+          [class.dark:hover:text-gray-300]="activeTab() !== tab.id"
+          [class.hover:border-gray-300]="activeTab() !== tab.id"
+          [class.dark:hover:border-slate-600]="activeTab() !== tab.id"
+          >
+          {{ tab.name }}
+        </button>
+      }
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  @switch (activeTab()) {
+    @case ('overview') {
+      <div class="space-y-6">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          @for(stat of stats(); track stat.title) {
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6 flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-slate-700 rounded-full" [class.text-green-500]="stat.color === 'text-green-500'">
+                  <app-icon [name]="stat.icon" [className]="stat.color + ' text-2xl'"></app-icon>
+              </div>
+              <div>
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ stat.title }}</p>
+                  <p class="text-3xl font-bold text-[#293c51] dark:text-gray-200">{{ stat.value }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Column -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Threats Over Time -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+              <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Threats Over Time (7d)</h3>
+              <div #lineChartContainer class="w-full h-[250px]"></div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Threats by Severity -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+              <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Threats by Severity</h3>
+              <div #donutChartContainer class="w-full h-[250px] flex items-center justify-center"></div>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                  <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>Critical</div>
+                  <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>High</div>
+                  <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>Medium</div>
+                  <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>Low</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    @case ('logs') {
+      <app-event-logs-view></app-event-logs-view>
+    }
+    @case ('signatures') {
+      <app-signatures-view></app-signatures-view>
+    }
+    @case ('settings') {
+      <app-settings-view></app-settings-view>
+    }
+  }
 </div>

@@ -1,4 +1,3 @@
-
 import { Injectable, signal } from '@angular/core';
 import { User, ApplicationCardData, AppLauncherData } from '../types';
 
@@ -15,6 +14,10 @@ export class AuthService {
 
   // For this demo, we'll default to the 'customer' role.
   user = signal<User | null>(this.mockUsers['customer']);
+
+  isLoggedIn(): boolean {
+    return !!this.user();
+  }
 
   getAppLauncherItems(role: User['role'] | undefined): AppLauncherData {
     const corePortals: ApplicationCardData[] = [

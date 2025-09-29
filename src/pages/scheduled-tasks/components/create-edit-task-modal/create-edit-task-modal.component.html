@@ -1,0 +1,97 @@
+
+@if (isOpen()) {
+  <div 
+    (click)="close.emit()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm modal-backdrop">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      aria-modal="true" 
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg m-4 modal-dialog">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+          {{ isEditMode() ? 'Edit Scheduled Task' : 'Create Scheduled Task' }}
+        </h2>
+        <button 
+          (click)="close.emit()" 
+          aria-label="Close" 
+          class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <app-icon name="fas fa-times" className="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+        <div>
+          <label for="task-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Task Name <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="task-name" 
+            [(ngModel)]="taskData().name"
+            class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+          >
+        </div>
+        
+        <div>
+          <label for="task-target" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Target Resource <span class="text-red-500">*</span>
+          </label>
+          <select id="task-target" [(ngModel)]="taskData().targetResource" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+            <option value="" disabled>Select a resource</option>
+            @for(res of targetResources; track res) { <option [value]="res">{{res}}</option> }
+          </select>
+        </div>
+        
+        <div>
+          <label for="task-action" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Action <span class="text-red-500">*</span>
+          </label>
+          <select id="task-action" [(ngModel)]="taskData().action" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+            @for(action of actions; track action) { <option [value]="action">{{action}}</option> }
+          </select>
+        </div>
+        
+        <div>
+          <label for="task-schedule" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+            Schedule (Cron or text) <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="task-schedule" 
+            [(ngModel)]="taskData().schedule"
+            placeholder="e.g., '0 2 * * *' or 'Daily at 2 AM UTC'"
+            class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+          >
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+            <label class="text-sm font-medium text-[#293c51] dark:text-gray-300">
+                Enabled
+            </label>
+            <app-toggle-switch [ngModel]="taskData().status === 'Enabled'" (ngModelChange)="handleStatusChange($event)" />
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+        <button 
+          (click)="close.emit()"
+          type="button" 
+          class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold mr-2">
+          Cancel
+        </button>
+        <button 
+          (click)="onSave()"
+          [disabled]="!taskData().name.trim() || !taskData().targetResource.trim() || !taskData().schedule.trim()"
+          type="button" 
+          class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">
+          {{ isEditMode() ? 'Save Changes' : 'Create Task' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

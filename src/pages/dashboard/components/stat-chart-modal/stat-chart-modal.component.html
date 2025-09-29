@@ -1,0 +1,34 @@
+@if (isOpen() && statData(); as stat) {
+  <div 
+    (click)="close.emit()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-3xl m-4 flex flex-col max-h-[80vh]">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
+        <h2 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+          Historical Data: {{ stat.title }}
+        </h2>
+        <button (click)="close.emit()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <app-icon name="fas fa-times" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 flex-grow overflow-y-auto">
+        <div class="flex justify-end mb-4">
+          <div class="inline-flex rounded-md shadow-sm">
+            <button (click)="setTimeframe('1H')" [class.bg-gray-200]="activeTimeframe() === '1H'" [class.dark:bg-slate-700]="activeTimeframe() === '1H'" class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-l-md hover:bg-gray-50 dark:hover:bg-slate-700">1H</button>
+            <button (click)="setTimeframe('24H')" [class.bg-gray-200]="activeTimeframe() === '24H'" [class.dark:bg-slate-700]="activeTimeframe() === '24H'" class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 border-t border-b border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700">24H</button>
+            <button (click)="setTimeframe('7D')" [class.bg-gray-200]="activeTimeframe() === '7D'" [class.dark:bg-slate-700]="activeTimeframe() === '7D'" class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-r-md hover:bg-gray-50 dark:hover:bg-slate-700">7D</button>
+          </div>
+        </div>
+        <div #chartContainer class="w-full h-[300px]"></div>
+      </div>
+      
+    </div>
+  </div>
+}

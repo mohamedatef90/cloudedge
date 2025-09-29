@@ -1,0 +1,101 @@
+
+<div>
+  <div class="flex items-center space-x-2 py-2 mb-4">
+    <button (click)="handleAddRouteClick()" [disabled]="isAddingRoute()" class="bg-[#679a41] text-white px-3 py-1.5 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 flex items-center gap-2 disabled:opacity-50">
+      <app-icon name="fas fa-plus"></app-icon> ADD ROUTE
+    </button>
+    <button (click)="handleDeleteClick()" [disabled]="isSelectionEmpty()" class="bg-transparent border border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded-md text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+      <app-icon name="fas fa-trash-alt"></app-icon> DELETE
+    </button>
+  </div>
+
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="p-4 w-12"><input type="checkbox" class="rounded text-[#679a41] focus:ring-[#679a41]" /></th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('name')">Name @if(sortColumn() === 'name'){<app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"/>}</th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('destination')">Destination @if(sortColumn() === 'destination'){<app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"/>}</th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('nextHop')">Next Hop @if(sortColumn() === 'nextHop'){<app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"/>}</th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('firewallRuleId')">Applied Firewall Rule @if(sortColumn() === 'firewallRuleId'){<app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"/>}</th>
+            <th scope="col" class="px-6 py-3 text-center cursor-pointer select-none" (click)="setSort('enabled')">Enabled @if(sortColumn() === 'enabled'){<app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"/>}</th>
+            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isAddingRoute()) {
+            <tr class="bg-green-50/50 dark:bg-green-900/10">
+              <td class="p-4"></td>
+              <td class="px-6 py-2"><input [(ngModel)]="newRouteForm().name" class="w-full bg-transparent border-b border-gray-300 dark:border-slate-600 focus:ring-0 focus:border-[#679a41]" placeholder="Route Name"></td>
+              <td class="px-6 py-2"><input [(ngModel)]="newRouteForm().destination" class="w-full bg-transparent border-b border-gray-300 dark:border-slate-600 focus:ring-0 focus:border-[#679a41]" placeholder="e.g. 10.0.0.0/8"></td>
+              <td class="px-6 py-2"><input [(ngModel)]="newRouteForm().nextHop" class="w-full bg-transparent border-b border-gray-300 dark:border-slate-600 focus:ring-0 focus:border-[#679a41]" placeholder="e.g. 192.168.1.254"></td>
+              <td class="px-6 py-2">
+                <select [(ngModel)]="newRouteForm().firewallRuleId" class="w-full bg-transparent border-b border-gray-300 dark:border-slate-600 focus:ring-0 focus:border-[#679a41] dark:bg-slate-800">
+                  <option [ngValue]="null">None</option>
+                  @for (rule of firewallRules(); track rule.id) {
+                    <option [value]="rule.id">{{ rule.name }}</option>
+                  }
+                </select>
+              </td>
+              <td class="px-6 py-2 text-center">
+                <div class="flex justify-center">
+                    <app-toggle-switch [(ngModel)]="newRouteForm().enabled" size="sm" />
+                </div>
+              </td>
+              <td class="px-6 py-2">
+                  <div class="flex items-center justify-end gap-2">
+                      <button (click)="handleSaveNewRoute()" class="p-2 rounded-full hover:bg-green-100 dark:hover:bg-green-900/50"><app-icon name="fas fa-check" className="text-green-500" /></button>
+                      <button (click)="handleCancelNewRoute()" class="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"><app-icon name="fas fa-times" className="text-red-500" /></button>
+                  </div>
+              </td>
+            </tr>
+          }
+          @for (route of sortedRoutes(); track route.id; let i = $index; let count = $count) {
+            <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+              <td class="w-4 p-4"><input type="checkbox" [checked]="selectedRouteIds().includes(route.id)" (change)="handleSelect(route.id, $event)" class="w-4 h-4 rounded text-[#679a41] focus:ring-[#679a41]" /></td>
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">{{ route.name }}</td>
+              <td class="px-6 py-4 font-mono">{{ route.destination }}</td>
+              <td class="px-6 py-4 font-mono">{{ route.nextHop }}</td>
+              <td class="px-6 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium" [class.bg-gray-100]="!route.firewallRuleId" [class.dark:bg-slate-700]="!route.firewallRuleId" [class.text-gray-800]="!route.firewallRuleId" [class.dark:text-gray-300]="!route.firewallRuleId" [class.bg-blue-100]="!!route.firewallRuleId" [class.dark:bg-blue-900/50]="!!route.firewallRuleId" [class.text-blue-800]="!!route.firewallRuleId" [class.dark:text-blue-300]="!!route.firewallRuleId">{{ getFirewallRuleName(route.firewallRuleId) }}</span>
+              </td>
+              <td class="px-6 py-4 text-center"><app-toggle-switch [ngModel]="route.enabled" (ngModelChange)="handleRouteToggle(route, $event)" size="sm" /></td>
+               <td class="px-6 py-4 text-right">
+                <div class="relative inline-block action-menu-container">
+                    <button (click)="toggleActionMenu(route.id)" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+                        <app-icon name="fas fa-ellipsis-v"></app-icon>
+                    </button>
+                    @if (openActionMenuId() === route.id) {
+                        <div class="absolute right-0 w-32 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 z-10 text-left"
+                             [class.origin-top-right]="i < count - 2" [class.mt-2]="i < count - 2"
+                             [class.origin-bottom-right]="i >= count - 2" [class.bottom-full]="i >= count - 2" [class.mb-2]="i >= count - 2">
+                            <a href="#" (click)="$event.preventDefault(); closeActionMenu()" class="flex items-center px-4 py-2 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                                <app-icon name="fas fa-pencil-alt" className="w-4 h-4 mr-3" /><span>Edit</span>
+                            </a>
+                            <a href="#" (click)="$event.preventDefault(); deleteRoute(route.id)" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                <app-icon name="fas fa-trash-alt" className="w-4 h-4 mr-3" /><span>Delete</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+              @if (!isAddingRoute()) {
+                <tr>
+                    <td colspan="7" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                        <div class="flex flex-col items-center">
+                            <app-icon name="fas fa-route" class="text-4xl mb-3"></app-icon>
+                            <p class="font-semibold">No static routes defined.</p>
+                            <p class="text-sm">Click "ADD ROUTE" to create one.</p>
+                        </div>
+                    </td>
+                </tr>
+              }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

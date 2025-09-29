@@ -1,0 +1,19 @@
+
+a.active-category-link {
+    background-color: #679a41;
+    color: white;
+    font-weight: 600;
+}
+
+a.active-category-link:hover {
+    color: white;
+}
+
+:host-context(.dark) a.active-category-link {
+    background-color: #679a41;
+    color: white;
+}
+
+:host-context(.dark) a.active-category-link:hover {
+    color: white;
+}

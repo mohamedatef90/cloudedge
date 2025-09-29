@@ -97,7 +97,7 @@
                 <td class="px-4 py-2 text-sm font-semibold">
                   <div class="flex items-center space-x-2">
                     <app-action-dropdown [currentAction]="rule.action" (actionChange)="handleRuleActionChange(policy.id, rule.id, $event)"></app-action-dropdown>
-                    <app-toggle-switch [checked]="rule.enabled" (change)="handleRuleUpdate(policy.id, rule.id, 'enabled', $event)" size="sm" />
+                    <app-toggle-switch [ngModel]="rule.enabled" (ngModelChange)="handleRuleUpdate(policy.id, rule.id, 'enabled', $event)" size="sm" />
                   </div>
                 </td>
                  <td class="px-4 py-3 text-sm">
@@ -142,7 +142,7 @@
                 <td class="px-4 py-2">
                   <div class="flex items-center gap-2">
                     <app-action-dropdown [currentAction]="newRuleForm().action" (actionChange)="handleNewRuleActionChange($event)" />
-                    <app-toggle-switch size="sm" [checked]="newRuleForm().enabled" (change)="handleNewRuleEnabledChange($event)" />
+                    <app-toggle-switch size="sm" [ngModel]="newRuleForm().enabled" (ngModelChange)="handleNewRuleEnabledChange($event)" />
                   </div>
                 </td>
                 <td></td>

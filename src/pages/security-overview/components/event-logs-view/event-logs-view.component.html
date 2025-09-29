@@ -1,0 +1,66 @@
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+  <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+    <h3 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">Detailed Event Logs</h3>
+    <div class="relative w-full sm:max-w-xs">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <app-icon name="fas fa-search" className="text-gray-400" />
+      </div>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        placeholder="Filter events..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#679a41] sm:text-sm"
+      />
+    </div>
+  </div>
+
+  <div class="overflow-x-auto border border-gray-200 dark:border-slate-700 rounded-lg">
+    <table class="w-full text-sm text-left">
+      <thead class="text-xs text-gray-500 uppercase bg-gray-50 dark:bg-slate-700/50">
+        <tr>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('timestamp')">
+            Time
+            @if(sortColumn() === 'timestamp') { <app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-1"/> }
+          </th>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('threatName')">Threat</th>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('severity')">Severity</th>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('sourceIp')">Source IP</th>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('destination')">Destination</th>
+          <th scope="col" class="px-4 py-3 cursor-pointer select-none" (click)="setSort('action')">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+        @for(event of paginatedEvents(); track event.id) {
+          <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+            <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ event.timestamp | date:'short' }}</td>
+            <td class="px-4 py-3 font-medium text-[#293c51] dark:text-gray-200">{{ event.threatName }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border" [class]="getSeverityClass(event.severity)">
+                {{ event.severity }}
+              </span>
+            </td>
+            <td class="px-4 py-3 font-mono">{{ event.sourceIp }}</td>
+            <td class="px-4 py-3">{{ event.destination }}</td>
+            <td class="px-4 py-3">
+              <span class="font-semibold" [class]="getActionClass(event.action)">{{ event.action }}</span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="text-center p-6 text-gray-500 dark:text-gray-400">No events found for your criteria.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="mt-4">
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalItems]="filteredEvents().length"
+      [itemsPerPage]="itemsPerPage()"
+      (pageChange)="currentPage.set($event)"
+      (itemsPerPageChange)="itemsPerPage.set($event)"
+    />
+  </div>
+</div>

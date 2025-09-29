@@ -1,0 +1,126 @@
+
+<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Reserved IP</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your public reserved IP addresses.</p>
+    </div>
+  </div>
+
+  <!-- Actions Bar -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+    <!-- Create (left) -->
+    <div class="flex items-center gap-4 w-full sm:w-auto">
+      <button class="w-full sm:w-auto bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
+        <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+        Add Reserved IP
+      </button>
+    </div>
+
+    <!-- Search (right) -->
+    <div class="relative w-full sm:max-w-xs">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <app-icon name="fas fa-search" className="text-gray-400" />
+      </div>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        placeholder="Search IP addresses..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-[#8cc866] sm:text-sm"
+      />
+    </div>
+  </div>
+
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('ipAddress')">
+              IP Address
+              @if (sortColumn() === 'ipAddress') {
+                <app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"></app-icon>
+              }
+            </th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('description')">
+              Description
+              @if (sortColumn() === 'description') {
+                <app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"></app-icon>
+              }
+            </th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('attachedTo')">
+              Attached To
+              @if (sortColumn() === 'attachedTo') {
+                <app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"></app-icon>
+              }
+            </th>
+            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('creationDate')">
+              Creation Date
+              @if (sortColumn() === 'creationDate') {
+                <app-icon [name]="sortDirection() === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" className="ml-2 w-3 h-3"></app-icon>
+              }
+            </th>
+            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ip of filteredReservedIps(); track ip.id; let i = $index; let count = $count) {
+            <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+              <td class="px-6 py-4 font-mono text-gray-900 dark:text-white whitespace-nowrap">
+                {{ ip.ipAddress }}
+              </td>
+              <td class="px-6 py-4">
+                {{ ip.description }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                @if (ip.attachedTo) {
+                  <span class="font-medium text-sky-600 dark:text-sky-400">{{ ip.attachedTo }}</span>
+                } @else {
+                  <span class="text-gray-400 italic">Unattached</span>
+                }
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {{ ip.creationDate }}
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="relative inline-block action-menu-container">
+                  <button (click)="toggleActionMenu(ip.id)" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors" aria-haspopup="true" [attr.aria-expanded]="openActionMenuId() === ip.id">
+                    <app-icon name="fas fa-ellipsis-v"></app-icon>
+                  </button>
+                  @if (openActionMenuId() === ip.id) {
+                    <div class="absolute right-0 w-32 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none z-10 text-left"
+                         [class.origin-top-right]="i < count - 2"
+                         [class.mt-2]="i < count - 2"
+                         [class.origin-bottom-right]="i >= count - 2"
+                         [class.bottom-full]="i >= count - 2"
+                         [class.mb-2]="i >= count - 2">
+                      <a href="#" (click)="$event.preventDefault(); closeActionMenu()" class="flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-[#8cc866] transition-colors">
+                        <app-icon name="fas fa-pencil-alt" className="w-4 h-4 mr-3" />
+                        <span>Edit</span>
+                      </a>
+                      <a href="#" (click)="$event.preventDefault(); closeActionMenu()" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                        <app-icon name="fas fa-trash-alt" className="w-4 h-4 mr-3" />
+                        <span>Delete</span>
+                      </a>
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr class="bg-white dark:bg-slate-800">
+              <td colspan="5" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                <div class="flex flex-col items-center">
+                  <app-icon name="fas fa-map-marker-alt" className="text-4xl mb-3"></app-icon>
+                  <p class="font-semibold">No reserved IPs found</p>
+                  <p class="text-sm">Click "Add Reserved IP" to create one.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

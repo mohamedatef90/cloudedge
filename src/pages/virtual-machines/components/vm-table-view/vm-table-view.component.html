@@ -1,4 +1,5 @@
 
+
 <div class="shadow-sm sm:rounded-lg border border-gray-200 dark:border-slate-700">
   <div class="relative">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -47,10 +48,10 @@
             <td class="px-6 py-4">{{ vm.creationDate }}</td>
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
-                <button title="Profile" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center border border-gray-300 dark:border-slate-600">
+                <a [routerLink]="['/app/cloud-edge/resources/virtual-machines', vm.id]" title="Profile" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center border border-gray-300 dark:border-slate-600">
                   <app-icon name="fas fa-desktop" />
-                </button>
-                <button title="Web Console" class="bg-[#679a41] text-white hover:bg-[#537d34] w-8 h-8 rounded-full flex items-center justify-center">
+                </a>
+                <button (click)="handleAction('connect', vm)" title="Web Console" class="bg-[#679a41] text-white hover:bg-[#537d34] w-8 h-8 rounded-full flex items-center justify-center">
                   <app-icon name="fas fa-terminal" />
                 </button>
                 <div class="relative vm-menu-container inline-block text-left">
@@ -65,22 +66,22 @@
                          [class.bottom-full]="i >= count - 3"
                          [class.mb-2]="i >= count - 3">
                       <div class="py-1">
-                        <a href="#" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                        <a [routerLink]="['/app/cloud-edge/resources/virtual-machines', vm.id]" class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
                           <app-icon name="fas fa-cog" className="w-5 mr-3" /> Settings
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
+                        <a href="#" (click)="$event.preventDefault(); handleAction('powerOff', vm)" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
                           <app-icon name="fas fa-power-off" className="w-5 mr-3 text-orange-500" /> Guest ShutDown
                         </a>
-                        <a href="#" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
+                        <a href="#" (click)="$event.preventDefault(); handleAction('restart', vm)" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
                           <app-icon name="fas fa-sync-alt" className="w-5 mr-3 text-orange-500" /> Guest Restart
                         </a>
                          <div class="border-t border-gray-200 dark:border-slate-700 my-1"></div>
-                        <a href="#" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
+                        <button (click)="$event.preventDefault(); handleAction('powerOff', vm)" [disabled]="vm.status !== 'running'" class="w-full text-left flex items-center px-4 py-2 disabled:text-gray-400 disabled:dark:text-gray-500 disabled:pointer-events-none text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
                           <app-icon name="fas fa-stop-circle" className="w-5 mr-3 text-red-500" /> Power Off
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
+                        </button>
+                        <button (click)="$event.preventDefault(); handleAction('restart', vm)" [disabled]="vm.status !== 'running'" class="w-full text-left flex items-center px-4 py-2 disabled:text-gray-400 disabled:dark:text-gray-500 disabled:pointer-events-none text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
                           <app-icon name="fas fa-redo" className="w-5 mr-3 text-red-500" /> Restart
-                        </a>
+                        </button>
                         <a href="#" class="flex items-center px-4 py-2" [class.text-gray-400]="vm.status !== 'running'" [class.dark:text-gray-500]="vm.status !== 'running'" [class.pointer-events-none]="vm.status !== 'running'" [class.text-gray-700]="vm.status === 'running'" [class.dark:text-gray-200]="vm.status === 'running'" [class.hover:bg-gray-100]="vm.status === 'running'" [class.dark:hover:bg-slate-700]="vm.status === 'running'">
                           <app-icon name="fas fa-pause-circle" className="w-5 mr-3 text-yellow-500" /> Suspend
                         </a>
@@ -92,9 +93,9 @@
                           <app-icon name="fas fa-clone" className="w-5 mr-3" /> Clone VM
                         </a>
                          <div class="border-t border-gray-200 dark:border-slate-700 my-1"></div>
-                        <a href="#" class="flex items-center px-4 py-2 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                        <button (click)="$event.preventDefault(); handleAction('delete', vm)" class="w-full text-left flex items-center px-4 py-2 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
                           <app-icon name="fas fa-trash-alt" className="w-5 mr-3" /> Delete VM
-                        </a>
+                        </button>
                       </div>
                     </div>
                   }

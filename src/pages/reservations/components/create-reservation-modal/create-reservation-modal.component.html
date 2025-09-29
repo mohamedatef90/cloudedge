@@ -1,0 +1,111 @@
+
+@if(isOpen()) {
+  <div (click)="close.emit()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-fast">
+    <div (click)="$event.stopPropagation()" role="dialog" aria-modal="true" class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-4xl m-4 flex flex-col max-h-[90vh] animate-slide-up-fast">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
+        <h2 class="text-xl font-semibold text-[#293c51] dark:text-gray-200">Create Reservation</h2>
+        <button (click)="close.emit()" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <app-icon name="fas fa-times" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-grow p-6 overflow-y-auto space-y-6">
+        <!-- Plan Selection Tabs -->
+        <div class="border-b border-gray-200 dark:border-slate-700">
+          <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+            <button (click)="activePlanTab.set('Standard')" [class]="activePlanTab() === 'Standard' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Standard Plan</button>
+            <button (click)="activePlanTab.set('Performance')" [class]="activePlanTab() === 'Performance' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Performance Plan</button>
+            <button (click)="activePlanTab.set('Custom')" [class]="activePlanTab() === 'Custom' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Custom Plan</button>
+          </nav>
+        </div>
+
+        <!-- Plan Details -->
+        <div class="mt-4">
+          @for(plan of FIXED_PLANS; track plan.id) {
+            @if (activePlanTab() === plan.name) {
+              <div class="p-6 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                <h3 class="text-lg font-bold text-[#293c51] dark:text-gray-200">{{ plan.name }} Plan</h3>
+                <div class="grid grid-cols-3 gap-4 mt-4 text-center">
+                    <div class="bg-white dark:bg-slate-800 p-3 rounded-md shadow-sm"><p class="text-xs text-gray-500">Cores</p><p class="font-semibold">{{plan.cores}}</p></div>
+                    <div class="bg-white dark:bg-slate-800 p-3 rounded-md shadow-sm"><p class="text-xs text-gray-500">RAM</p><p class="font-semibold">{{plan.ram}} GB</p></div>
+                    <div class="bg-white dark:bg-slate-800 p-3 rounded-md shadow-sm"><p class="text-xs text-gray-500">Storage</p><p class="font-semibold">{{plan.storage}} GB</p></div>
+                </div>
+                <h4 class="font-semibold text-sm mt-4 mb-2">Included Add-ons:</h4>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    @for(addon of plan.addons; track addon.name) {
+                        @if (addon.included) {
+                          <div class="flex items-center p-2 bg-white dark:bg-slate-800 rounded-md"><app-icon [name]="getAddonIcon(addon.name)" className="mr-2 fa-fw text-[#679a41]"></app-icon>{{ addon.name }} {{ addon.quantity ? '('+addon.quantity+')' : '' }}</div>
+                        }
+                    }
+                </div>
+              </div>
+            }
+          }
+
+          @if (activePlanTab() === 'Custom') {
+            <div class="p-6 bg-gray-50 dark:bg-slate-700/50 rounded-lg space-y-6">
+                <div>
+                  <label class="block text-sm font-medium">Cores: <span class="font-bold text-[#679a41]">{{ customPlanCores() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanCores" min="1" max="64" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41]">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium">RAM (GB): <span class="font-bold text-[#679a41]">{{ customPlanRam() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanRam" min="1" max="256" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41]">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium">Storage (GB): <span class="font-bold text-[#679a41]">{{ customPlanStorage() }}</span></label>
+                  <input type="range" [(ngModel)]="customPlanStorage" min="10" max="2048" step="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2 accent-[#679a41]">
+                </div>
+                <div>
+                  <h4 class="font-semibold text-sm mt-4 mb-2">Select Add-ons:</h4>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                      @for(addon of customPlanAddons(); track addon.name) {
+                          <label class="flex items-center p-2 bg-white dark:bg-slate-800 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700">
+                              <input type="checkbox" [checked]="addon.included" (change)="toggleCustomAddon(addon.name)" class="w-4 h-4 text-[#679a41] rounded focus:ring-[#537d34]">
+                              <app-icon [name]="getAddonIcon(addon.name)" className="mx-2 fa-fw text-[#679a41]"></app-icon>
+                              <span class="text-gray-700 dark:text-gray-300">{{ addon.name }}</span>
+                          </label>
+                      }
+                  </div>
+                </div>
+            </div>
+          }
+        </div>
+
+        <!-- Common Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200 dark:border-slate-700">
+            <div>
+                <label for="reservationName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Reservation Name <span class="text-red-500">*</span></label>
+                <input type="text" id="reservationName" [(ngModel)]="reservationName" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+            </div>
+            <div>
+                <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration</label>
+                <select id="duration" [(ngModel)]="durationInYears" class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+                    <option [value]="1">1 Year</option>
+                    <option [value]="2">2 Years</option>
+                    <option [value]="3">3 Years</option>
+                </select>
+            </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex-shrink-0 flex justify-between items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700">
+        <div class="text-sm">
+            <span class="text-gray-500">Estimated Price:</span>
+            @if (activePlanTab() === 'Custom') {
+              <span class="text-2xl font-bold text-[#293c51] dark:text-gray-200 ml-2">${{ customPlanPrice().toFixed(2) }}/mo</span>
+            } @else {
+              <span class="text-2xl font-bold text-[#293c51] dark:text-gray-200 ml-2">${{ fixedPlanPrice().toFixed(2) }}/mo</span>
+            }
+        </div>
+        <div class="flex items-center gap-3">
+          <button (click)="close.emit()" class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
+          <button (click)="handleCreate()" [disabled]="!reservationName().trim()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">Create Reservation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

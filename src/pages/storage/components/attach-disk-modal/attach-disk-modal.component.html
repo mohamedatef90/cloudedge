@@ -1,0 +1,39 @@
+@if (isOpen() && diskToAttach()) {
+  <div (click)="close.emit()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div (click)="$event.stopPropagation()" role="dialog" aria-modal="true" class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col max-h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b dark:border-slate-700 flex-shrink-0">
+        <h2 class="text-lg font-semibold">Attach Disk to VM</h2>
+        <button (click)="close.emit()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700"><app-icon name="fas fa-times" /></button>
+      </div>
+      <div class="p-6 space-y-4 overflow-y-auto">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          Select a Virtual Machine to attach the disk <span class="font-bold text-[#293c51] dark:text-gray-200">{{ diskToAttach()?.name }}</span> to.
+        </p>
+        
+        <div class="border rounded-md dark:border-slate-600 max-h-80 overflow-y-auto">
+          @if (availableVms().length > 0) {
+            <ul class="divide-y dark:divide-slate-600">
+              @for (vm of availableVms(); track vm.id) {
+                <li class="p-2">
+                  <label class="flex items-center cursor-pointer p-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-md">
+                    <input type="radio" name="vm-selection" [value]="vm.name" [(ngModel)]="selectedVmName" class="w-4 h-4 text-[#679a41] focus:ring-[#679a41] bg-gray-100 border-gray-300 dark:bg-slate-700 dark:border-slate-600">
+                    <span class="ml-3 font-medium text-sm text-[#293c51] dark:text-gray-200">{{ vm.name }}</span>
+                    <span class="ml-auto text-xs text-gray-500 dark:text-gray-400">{{ vm.os }} | {{ vm.ipAddress }}</span>
+                  </label>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="p-6 text-center text-gray-500 dark:text-gray-400">No available Virtual Machines found.</p>
+          }
+        </div>
+      </div>
+      <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg flex-shrink-0">
+        <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
+        <button (click)="onConfirm()" [disabled]="!selectedVmName()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">
+          Attach Disk
+        </button>
+      </div>
+    </div>
+  </div>
+}

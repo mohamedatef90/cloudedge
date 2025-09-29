@@ -1,3 +1,4 @@
+
 @if (isOpen()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" (click)="close.emit()">
   <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-5xl m-4 flex flex-col h-[90vh]" (click)="$event.stopPropagation()">
@@ -121,7 +122,10 @@
     </div>
     <!-- Footer -->
     <div class="p-4 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-700 flex-shrink-0">
-        <app-toggle-switch label="Show Only Selected" [checked]="showSelectedOnly()" (change)="showSelectedOnly.set($event)"/>
+        <div class="flex items-center gap-2">
+            <app-toggle-switch [(ngModel)]="showSelectedOnly" />
+            <label class="text-sm">Show Only Selected</label>
+        </div>
         <div class="flex items-center gap-2">
           <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">CANCEL</button>
           <button (click)="handleSave()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34]">APPLY</button>

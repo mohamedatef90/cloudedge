@@ -3,8 +3,8 @@
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b pb-4 dark:border-slate-700">
     <div>
-      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Choose an OS Image</h1>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a base operating system for your new virtual machine.</p>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Choose an Image</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a base image for your new virtual machine.</p>
     </div>
     <a routerLink="/app/cloud-edge/resources/virtual-machines/create" class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
       <app-icon name="fas fa-arrow-left" className="mr-2 text-xs"></app-icon>
@@ -12,33 +12,131 @@
     </a>
   </div>
 
-  <!-- OS Image Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-    @for(image of osImages(); track image.id) {
-      <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
-        <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
-          <app-icon [name]="image.icon" [className]="(image.iconClasses || '') + ' text-6xl'"></app-icon>
-        </div>
-        <div class="p-4 flex-grow flex flex-col">
-          <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200">{{ image.name }}</h3>
-          <div class="mt-4 flex-grow">
-            <label [for]="image.id + '-version'" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Version</label>
-            <select [id]="image.id + '-version'" 
-                    [ngModel]="image.selectedVersion" 
-                    (change)="onVersionChange(image.id, $event)"
-                    class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-1.5 px-2 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 text-sm">
-              @for(version of image.versions; track version) {
-                <option [value]="version">{{ version }}</option>
-              }
-            </select>
-          </div>
-          <div class="mt-4">
-            <button (click)="selectImage(image)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
-              Select
-            </button>
-          </div>
-        </div>
-      </div>
-    }
+  <!-- Tabs -->
+  <div class="mb-6 border-b border-gray-200 dark:border-slate-700">
+    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+      <button (click)="setActiveTab('os')"
+              [class]="activeTab() === 'os' ? 'border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+        OS Images
+      </button>
+      <button (click)="setActiveTab('marketplace')"
+              [class]="activeTab() === 'marketplace' ? 'border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+        WP Marketplace
+      </button>
+    </nav>
   </div>
+
+  <!-- Tab Content -->
+  @if (activeTab() === 'os') {
+    <!-- OS Image Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      @for(image of osImages(); track image.id) {
+        <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
+          <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
+            <app-icon [name]="image.icon" [className]="(image.iconClasses || '') + ' text-6xl'"></app-icon>
+          </div>
+          <div class="p-4 flex-grow flex flex-col">
+            <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200">{{ image.name }}</h3>
+            <div class="mt-4 flex-grow">
+              <label [for]="image.id + '-version'" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Version</label>
+              <select [id]="image.id + '-version'" 
+                      [ngModel]="image.selectedVersion" 
+                      (change)="onVersionChange(image.id, $event)"
+                      class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-1.5 px-2 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 text-sm">
+                @for(version of image.versions; track version) {
+                  <option [value]="version">{{ version }}</option>
+                }
+              </select>
+            </div>
+            <div class="mt-4">
+              <button (click)="selectImage(image)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
+                Select
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  
+  @if (activeTab() === 'marketplace') {
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- Categories Sidebar -->
+      <aside class="w-full md:w-60 lg:w-72 flex-shrink-0">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 px-2">Categories</h3>
+        <nav class="flex flex-col space-y-1">
+          <button
+            (click)="selectCategory(null)"
+            [class.bg-gray-100]="selectedCategoryId() === null"
+            [class.dark:bg-slate-700]="selectedCategoryId() === null"
+            [class.text-gray-800]="selectedCategoryId() === null"
+            [class.dark:text-gray-200]="selectedCategoryId() === null"
+            class="w-full px-4 py-2 rounded-md text-sm font-medium text-left text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex items-center gap-2">
+            <span class="w-6 h-6 flex items-center justify-center">
+              <app-icon name="fas fa-globe" className="text-lg"></app-icon>
+            </span>
+            <span>All Categories</span>
+          </button>
+          @for (category of categories(); track category.id) {
+            <button
+              (click)="selectCategory(category.id)"
+              [class.bg-gray-100]="selectedCategoryId() === category.id"
+              [class.dark:bg-slate-700]="selectedCategoryId() === category.id"
+              [class.text-gray-800]="selectedCategoryId() === category.id"
+              [class.dark:text-gray-200]="selectedCategoryId() === category.id"
+              class="w-full px-4 py-2 rounded-md text-sm font-medium text-left text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex items-center gap-2">
+              <span [innerHTML]="sanitizeIcon(category.icon)" class="w-6 h-6 flex items-center justify-center"></span>
+              <span class="truncate">{{ category.name }}</span>
+            </button>
+          }
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-grow min-w-0">
+        <div class="relative mb-6">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="fas fa-search" className="text-gray-400" />
+          </div>
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search applications by name or description..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md leading-5 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-[#679a41] dark:focus:ring-[#8cc866] sm:text-sm"
+          />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          @for(item of filteredMarketplaceItems(); track item.id) {
+            <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
+              <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
+                @if (item.icon) {
+                  <div [innerHTML]="sanitizeIcon(item.icon)" class="h-16 w-16 text-gray-800 dark:text-gray-200"></div>
+                } @else {
+                  <app-icon name="fas fa-cube" className="text-6xl text-gray-400 dark:text-gray-500"></app-icon>
+                }
+              </div>
+              <div class="p-4 flex-grow flex flex-col">
+                <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200 flex-grow">{{ item.name }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4 h-10 line-clamp-3">{{ item.description }}</p>
+                <div class="mt-auto">
+                  <button (click)="selectMarketplaceItem(item)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
+                    Select
+                  </button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 text-center py-16 px-6 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg">
+                <app-icon name="fas fa-search-minus" className="text-5xl text-gray-400 dark:text-gray-500 mb-4"></app-icon>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">No Applications Found</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Your search and filter combination did not return any results.</p>
+            </div>
+          }
+        </div>
+      </main>
+    </div>
+  }
+
 </div>
