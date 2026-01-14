@@ -161,7 +161,8 @@ export class DistributedFirewallComponent {
     const newRule: FirewallRule = {
       id: `rule-${Date.now()}`,
       ruleId: String(Math.floor(Math.random() * 100) + 10),
-      ...formState
+      ...formState,
+      status: 'Success'
     };
 
     this.policies.update(prev => prev.map(p => 
@@ -253,7 +254,7 @@ export class DistributedFirewallComponent {
     const policyId = this.addingRuleToPolicyId();
     if (!policyId) return;
     const formState = this.newRuleForm();
-    const tempRule: FirewallRule = { id: 'new-rule', ruleId: 'new', ...formState };
+    const tempRule: FirewallRule = { id: 'new-rule', ruleId: 'new', ...formState, status: 'Success' };
     this.editSourceDestModalState.set({ isOpen: true, rule: tempRule, policyId, field, isNewRule: true });
   }
 
