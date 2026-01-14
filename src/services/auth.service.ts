@@ -5,18 +5,27 @@ import { User, ApplicationCardData, AppLauncherData } from '../types';
   providedIn: 'root',
 })
 export class AuthService {
-  // Mock user data. In a real app, this would come from an auth flow.
+  // Mock user data.
   private mockUsers: Record<string, User> = {
       'customer': { id: 'user-001', role: 'customer', displayName: 'Jane Doe', avatarUrl: 'https://i.pravatar.cc/150?u=customer', isNewUser: true },
       'admin': { id: 'user-002', role: 'admin', displayName: 'Admin', avatarUrl: 'https://i.pravatar.cc/150?u=admin' },
-      'reseller': { id: 'user-003', role: 'reseller', displayName: 'Reseller Inc.', avatarUrl: 'https://i.pravatar.cc/150?u=reseller' }
+      'reseller': { id: 'user-003', role: 'reseller', displayName: 'Reseller Inc.', avatarUrl: 'https://i.pravatar.cc/150?u=reseller' },
+      'micro': { id: 'user-004', role: 'micro', displayName: 'Micro', avatarUrl: 'https://i.pravatar.cc/150?u=micro' },
   };
 
-  // For this demo, we'll default to the 'customer' role.
-  user = signal<User | null>(this.mockUsers['customer']);
+  user = signal<User | null>(this.mockUsers['admin']);
+  isLoggedIn = signal<boolean>(true);
 
-  isLoggedIn(): boolean {
-    return !!this.user();
+  constructor() {
+    // Set admin user as the default logged in user.
+    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
+  }
+
+  logout(): void {
+    // Logout is disabled in this context, but if called, it will just re-log as admin.
+    this.user.set(this.mockUsers['admin']);
+    this.isLoggedIn.set(true);
+    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
   }
 
   getAppLauncherItems(role: User['role'] | undefined): AppLauncherData {

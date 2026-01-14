@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
-import { DeleteConfirmationModalComponent } from './components/delete-confirmation-modal/delete-confirmation-modal.component';
 import { ViewMembersModalComponent } from './components/view-members-modal/view-members-modal.component';
 import { EditSourceDestModalComponent } from './components/edit-source-dest-modal/edit-source-dest-modal.component';
 import { EditAppliedToModalComponent } from './components/edit-applied-to-modal/edit-applied-to-modal.component';
@@ -16,6 +15,7 @@ import { EditRuleAppliedToModalComponent } from './components/edit-rule-applied-
 import { AppliedToDisplayComponent } from './components/applied-to-display/applied-to-display.component';
 import { FirewallPolicy, FirewallRule, GroupData, SelectableGroup, Service } from './types';
 import { mockPoliciesData, mockGroupData, mockAvailableGroupsForSelection, mockAvailableServices } from './mock-data';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 @Component({
   selector: 'app-distributed-firewall',
@@ -27,7 +27,7 @@ import { mockPoliciesData, mockGroupData, mockAvailableGroupsForSelection, mockA
     FormsModule,
     IconComponent,
     ToggleSwitchComponent,
-    DeleteConfirmationModalComponent,
+    AdvancedDeleteConfirmationModalComponent,
     ViewMembersModalComponent,
     EditSourceDestModalComponent,
     EditAppliedToModalComponent,

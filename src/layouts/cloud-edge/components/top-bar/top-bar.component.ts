@@ -1,5 +1,6 @@
 
 
+
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -66,5 +67,9 @@ export class CloudEdgeTopBarComponent {
   closeMenus(): void {
     this.userMenuOpen.set(false);
     this.appLauncherOpen.set(false);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

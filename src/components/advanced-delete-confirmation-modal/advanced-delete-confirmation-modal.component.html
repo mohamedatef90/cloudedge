@@ -1,0 +1,64 @@
+@if (isOpen()) {
+  <div 
+    (click)="onClose()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      aria-modal="true" 
+      aria-labelledby="modal-title"
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg m-4">
+      
+      <div class="p-6">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
+            <app-icon name="fas fa-exclamation-triangle" className="h-6 w-6 text-red-600 dark:text-red-400" />
+          </div>
+          <div class="ml-4 text-left flex-grow">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-200" id="modal-title">
+              Delete {{ isSingleItem() ? itemType() : pluralizedItemType() }}
+            </h3>
+            <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              @if(customMessage()) {
+                <div [innerHTML]="customMessage()"></div>
+              } @else {
+                @if (isSingleItem()) {
+                  <p>This action is irreversible and will permanently delete the {{ itemType() }} <span class="font-bold text-gray-800 dark:text-gray-200">{{ itemName() }}</span>.</p>
+                  <p class="mt-2">To confirm, please type the name of the {{ itemType() }} below.</p>
+                } @else {
+                  <p>This action is irreversible and will permanently delete the selected <span class="font-bold text-gray-800 dark:text-gray-200">{{ itemCount() }} {{ pluralizedItemType() }}</span>.</p>
+                  <p class="mt-2">To confirm, please type <strong class="text-red-500">DELETE</strong> below.</p>
+                }
+              }
+            </div>
+            <div class="mt-4">
+              <input 
+                type="text" 
+                [(ngModel)]="confirmationText"
+                [placeholder]="isSingleItem() ? itemName() : 'DELETE'"
+                class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-slate-700 sm:text-sm"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+        <button 
+          (click)="onClose()"
+          type="button" 
+          class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out mr-2">
+          Cancel
+        </button>
+        <button 
+          (click)="onConfirm()"
+          [disabled]="!isConfirmed()"
+          type="button" 
+          class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700 transition-all duration-200 ease-in-out flex items-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

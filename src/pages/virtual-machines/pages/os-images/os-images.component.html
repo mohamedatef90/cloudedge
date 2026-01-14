@@ -1,47 +1,41 @@
-
-<div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6">
+<div class="space-y-6">
   <!-- Header -->
-  <div class="flex flex-wrap justify-between items-center gap-4 mb-6 border-b pb-4 dark:border-slate-700">
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-gray-200 dark:border-slate-700">
     <div>
-      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Choose an Image</h1>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select a base image for your new virtual machine.</p>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Select an OS Image or Marketplace App</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Choose a starting point for your new virtual machine.</p>
     </div>
-    <a routerLink="/app/cloud-edge/resources/virtual-machines/create" class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2">
-      <app-icon name="fas fa-arrow-left" className="mr-2 text-xs"></app-icon>
-      Back to Create VM
-    </a>
   </div>
 
   <!-- Tabs -->
-  <div class="mb-6 border-b border-gray-200 dark:border-slate-700">
-    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+  <div class="border-b border-gray-200 dark:border-slate-700">
+    <nav class="-mb-px flex space-x-6" aria-label="Tabs">
       <button (click)="setActiveTab('os')"
-              [class]="activeTab() === 'os' ? 'border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
+              [class]="activeTab() === 'os' ? 'border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
               class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
         OS Images
       </button>
       <button (click)="setActiveTab('marketplace')"
-              [class]="activeTab() === 'marketplace' ? 'border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
+              [class]="activeTab() === 'marketplace' ? 'border-[#679a41] dark:border-[#8cc866] text-[#679a41] dark:text-[#8cc866]' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-slate-600'"
               class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
-        WP Marketplace
+        Marketplace Apps
       </button>
     </nav>
   </div>
 
-  <!-- Tab Content -->
   @if (activeTab() === 'os') {
     <!-- OS Image Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       @for(image of osImages(); track image.id) {
-        <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
+        <div (click)="selectImage(image)" class="group border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-[#679a41] dark:hover:border-[#8cc866] transition-all duration-300 flex flex-col cursor-pointer">
           <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
             <app-icon [name]="image.icon" [className]="(image.iconClasses || '') + ' text-6xl'"></app-icon>
           </div>
           <div class="p-4 flex-grow flex flex-col">
-            <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200">{{ image.name }}</h3>
+            <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200 group-hover:text-[#679a41] dark:group-hover:text-[#8cc866] transition-colors">{{ image.name }}</h3>
             <div class="mt-4 flex-grow">
               <label [for]="image.id + '-version'" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Version</label>
-              <select [id]="image.id + '-version'" 
+              <select (click)="$event.stopPropagation()" [id]="image.id + '-version'" 
                       [ngModel]="image.selectedVersion" 
                       (change)="onVersionChange(image.id, $event)"
                       class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-1.5 px-2 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 text-sm">
@@ -51,9 +45,9 @@
               </select>
             </div>
             <div class="mt-4">
-              <button (click)="selectImage(image)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
+              <div class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-200 ease-in-out text-center">
                 Select
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -62,7 +56,7 @@
   }
   
   @if (activeTab() === 'marketplace') {
-    <div class="flex flex-col md:flex-row gap-8">
+    <div class="flex flex-col md:flex-row gap-8 lg:gap-12">
       <!-- Categories Sidebar -->
       <aside class="w-full md:w-60 lg:w-72 flex-shrink-0">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 px-2">Categories</h3>
@@ -109,7 +103,7 @@
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           @for(item of filteredMarketplaceItems(); track item.id) {
-            <div class="border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 flex flex-col">
+            <div (click)="selectMarketplaceItem(item)" class="group border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:border-[#679a41] dark:hover:border-[#8cc866] transition-all duration-300 flex flex-col text-left cursor-pointer">
               <div class="h-32 flex items-center justify-center p-4 bg-gray-50 dark:bg-slate-700/50 rounded-t-lg">
                 @if (item.icon) {
                   <div [innerHTML]="sanitizeIcon(item.icon)" class="h-16 w-16 text-gray-800 dark:text-gray-200"></div>
@@ -118,17 +112,17 @@
                 }
               </div>
               <div class="p-4 flex-grow flex flex-col">
-                <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200 flex-grow">{{ item.name }}</h3>
+                <h3 class="font-bold text-md text-[#293c51] dark:text-gray-200 flex-grow group-hover:text-[#679a41] dark:group-hover:text-[#8cc866] transition-colors">{{ item.name }}</h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-4 h-10 line-clamp-3">{{ item.description }}</p>
                 <div class="mt-auto">
-                  <button (click)="selectMarketplaceItem(item)" class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors duration-200 ease-in-out">
+                  <div class="w-full bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold text-center transition-colors duration-200 ease-in-out">
                     Select
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
           } @empty {
-            <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 text-center py-16 px-6 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg">
+            <div class="sm:col-span-2 lg:col-span-3 xl:grid-cols-4 text-center py-16 px-6 border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg">
                 <app-icon name="fas fa-search-minus" className="text-5xl text-gray-400 dark:text-gray-500 mb-4"></app-icon>
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">No Applications Found</h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Your search and filter combination did not return any results.</p>

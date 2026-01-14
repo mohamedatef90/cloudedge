@@ -1,3 +1,4 @@
+
 <header class="bg-white dark:bg-slate-800 px-4 h-16 flex justify-between items-center flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
   <div class="flex items-center">
     <button (click)="onToggleSidebar()"
@@ -51,11 +52,11 @@
       </button>
 
       @if (userMenuOpen()) {
-        <div #userMenuRef class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none text-[#293c51] dark:text-gray-200 z-10">
+        <div #userMenuRef class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none text-[#293c51] dark:text-gray-200 z-30">
           <a routerLink="/app/settings" (click)="closeMenus()" class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-emerald-500">
             <app-icon name="fas fa-cog" [fixedWidth]="true" className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" /> Settings
           </a>
-          <a routerLink="/app/dashboard" (click)="closeMenus()" class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-emerald-500">
+          <a (click)="logout(); closeMenus()" class="flex items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-emerald-500 cursor-pointer">
             <app-icon name="fas fa-sign-out-alt" [fixedWidth]="true" className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" /> Exit CloudEdge
           </a>
         </div>

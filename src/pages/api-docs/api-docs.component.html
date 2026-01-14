@@ -1,0 +1,77 @@
+<div class="flex flex-col md:flex-row -mx-6 h-full">
+  <!-- Left Sidebar -->
+  <aside class="w-full md:w-64 lg:w-72 flex-shrink-0 md:sticky md:top-28 md:h-[calc(100vh-7rem)] border-r dark:border-slate-700 px-6">
+    <nav class="flex flex-col space-y-2">
+      <h3 class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Getting Started</h3>
+      <button 
+        (click)="setActiveSection('introduction')" 
+        [class.bg-gray-100]="activeSectionId() === 'introduction'"
+        [class.dark:bg-slate-700]="activeSectionId() === 'introduction'"
+        class="text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+        Introduction
+      </button>
+      <button 
+        (click)="setActiveSection('authentication')" 
+        [class.bg-gray-100]="activeSectionId() === 'authentication'"
+        [class.dark:bg-slate-700]="activeSectionId() === 'authentication'"
+        class="text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+        Authentication
+      </button>
+      <h3 class="pt-4 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Core Resources</h3>
+      <button 
+        (click)="setActiveSection('vms')" 
+        [class.bg-gray-100]="activeSectionId() === 'vms'"
+        [class.dark:bg-slate-700]="activeSectionId() === 'vms'"
+        class="text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+        Virtual Machines
+      </button>
+      <button 
+        (click)="setActiveSection('gateways')" 
+        [class.bg-gray-100]="activeSectionId() === 'gateways'"
+        [class.dark:bg-slate-700]="activeSectionId() === 'gateways'"
+        class="text-left px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+        Gateways
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 min-w-0 px-6 pt-6 md:pt-0">
+    <article class="prose dark:prose-invert max-w-none">
+      @for(section of sections; track section.id) {
+        <section [id]="section.id" class="mb-16">
+          <h2 class="text-3xl font-bold border-b dark:border-slate-700 pb-2 mb-4">{{ section.title }}</h2>
+          <div [innerHTML]="section.content"></div>
+
+          @if (section.endpoints) {
+            <div class="space-y-12 mt-8">
+              @for(endpoint of section.endpoints; track endpoint.path) {
+                <div class="flex flex-col lg:flex-row gap-8">
+                  <!-- Description -->
+                  <div class="lg:w-1/2">
+                    <div class="flex items-center gap-3">
+                      <span class="font-mono text-sm font-semibold px-2 py-1 rounded-md" [class]="getMethodClass(endpoint.method)">{{ endpoint.method }}</span>
+                      <code class="font-mono font-semibold">{{ endpoint.path }}</code>
+                    </div>
+                    <p class="mt-2 text-sm">{{ endpoint.description }}</p>
+                  </div>
+                  <!-- Code Example -->
+                  <div class="lg:w-1/2">
+                    <div class="bg-slate-800 rounded-lg overflow-hidden">
+                      <div class="bg-slate-900 px-4 py-2 text-xs text-gray-300 font-semibold">REQUEST (cURL)</div>
+                      <pre><code class="language-bash text-sm p-4 block overflow-x-auto text-white">{{ endpoint.curl }}</code></pre>
+                    </div>
+                    <div class="bg-slate-800 rounded-lg overflow-hidden mt-4">
+                      <div class="bg-slate-900 px-4 py-2 text-xs text-gray-300 font-semibold">RESPONSE (200 OK)</div>
+                      <pre><code class="language-json text-sm p-4 block overflow-x-auto text-white">{{ endpoint.response }}</code></pre>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+    </article>
+  </main>
+</div>

@@ -1,0 +1,48 @@
+@if (isOpen()) {
+  <div (click)="close.emit()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div (click)="onDialogClick($event)" role="dialog" aria-modal="true" class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-lg m-4">
+      <div class="flex items-center justify-between p-4 border-b dark:border-slate-700">
+        <h2 class="text-lg font-semibold">Create Snapshot</h2>
+        <button (click)="close.emit()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700"><app-icon name="fas fa-times" /></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label for="snapshot-vm" class="block text-sm font-medium mb-1">Select Virtual Machine</label>
+          <select id="snapshot-vm" [(ngModel)]="selectedVmName" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3">
+            <option [ngValue]="null">-- Select a VM --</option>
+            @for(vm of availableVms(); track vm.id) {
+              <option [value]="vm.name">{{ vm.name }}</option>
+            }
+          </select>
+        </div>
+
+        @if (selectedVmName()) {
+          <div>
+            <label for="snapshot-disk" class="block text-sm font-medium mb-1">Select Disk</label>
+            <select id="snapshot-disk" [(ngModel)]="selectedDiskId" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3" [disabled]="disksOfSelectedVm().length === 0">
+              <option [ngValue]="null">-- Select a disk --</option>
+              @for(disk of disksOfSelectedVm(); track disk.id) {
+                <option [value]="disk.id">{{ disk.name }} ({{ disk.size }} GB)</option>
+              }
+            </select>
+             @if (disksOfSelectedVm().length === 0) {
+              <p class="text-xs text-red-500 mt-1">This VM has no attachable disks.</p>
+            }
+          </div>
+        }
+
+        @if (selectedDiskId()) {
+          <div>
+            <label for="snapshot-name" class="block text-sm font-medium mb-1">Snapshot Name</label>
+            <input type="text" id="snapshot-name" [(ngModel)]="snapshotName" placeholder="e.g., my-snapshot-2024-07-31" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3">
+          </div>
+        }
+
+      </div>
+      <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg">
+        <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
+        <button (click)="onSave()" [disabled]="!selectedDiskId() || !snapshotName()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">Create</button>
+      </div>
+    </div>
+  </div>
+}

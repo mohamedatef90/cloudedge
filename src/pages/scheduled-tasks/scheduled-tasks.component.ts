@@ -1,10 +1,12 @@
 
+
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { ToggleSwitchComponent } from '../distributed-firewall/components/toggle-switch/toggle-switch.component';
 import { CreateEditTaskModalComponent } from './components/create-edit-task-modal/create-edit-task-modal.component';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 export interface ScheduledTask {
   id: string;
@@ -25,7 +27,7 @@ type SortColumn = keyof ScheduledTask;
   styleUrls: ['./scheduled-tasks.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, ToggleSwitchComponent, CreateEditTaskModalComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ToggleSwitchComponent, CreateEditTaskModalComponent, AdvancedDeleteConfirmationModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
@@ -44,6 +46,8 @@ export class ScheduledTasksComponent {
   searchTerm = signal('');
   sortColumn = signal<SortColumn>('nextRun');
   sortDirection = signal<'asc' | 'desc'>('asc');
+  isDeleteModalOpen = signal(false);
+  taskToDelete = signal<ScheduledTask | null>(null);
 
   filteredTasks = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -133,11 +137,19 @@ export class ScheduledTasksComponent {
     this.closeModal();
   }
   
-  handleDeleteTask(id: string): void {
-    if (confirm('Are you sure you want to delete this task?')) {
-        this.tasks.update(tasks => tasks.filter(t => t.id !== id));
-    }
+  handleDeleteTask(task: ScheduledTask): void {
+    this.taskToDelete.set(task);
+    this.isDeleteModalOpen.set(true);
     this.closeActionMenu();
+  }
+
+  handleConfirmDelete(): void {
+    const task = this.taskToDelete();
+    if (task) {
+        this.tasks.update(tasks => tasks.filter(t => t.id !== task.id));
+    }
+    this.isDeleteModalOpen.set(false);
+    this.taskToDelete.set(null);
   }
 
   toggleTaskStatus(task: ScheduledTask, event: boolean): void {

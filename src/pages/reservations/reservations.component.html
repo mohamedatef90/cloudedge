@@ -79,7 +79,7 @@
             <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(res.startDate) }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(res.endDate) }}</td>
             <td class="px-6 py-4 text-right">
-              <a href="#" class="font-medium text-[#679a41] dark:text-[#8cc866] hover:underline">Details</a>
+              <a [routerLink]="['/app/cloud-edge/resources/reservations', res.id]" class="font-medium text-[#679a41] dark:text-[#8cc866] hover:underline">Details</a>
             </td>
           </tr>
           @if(expandedReservationId() === res.id) {

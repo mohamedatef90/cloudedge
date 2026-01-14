@@ -1,4 +1,3 @@
-
 export interface VirtualMachine {
   id: string;
   name: string;
@@ -12,6 +11,7 @@ export interface VirtualMachine {
   reservationName: string | null;
   creationDate: string;
   status: 'running' | 'stopped' | 'suspended';
+  deletedAt?: string;
 }
 
 export const VIRTUAL_MACHINES_DATA: VirtualMachine[] = [

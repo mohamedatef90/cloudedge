@@ -1,3 +1,4 @@
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,6 +15,11 @@ import { DashboardAnimationService } from '../../services/dashboard-animation.se
 import { AuthService } from '../../services/auth.service';
 import { StatCard, VirtualMachine, AuditTrailEntry, QuickStartLink, HelpfulResource } from './dashboard.types';
 import { StatChartModalComponent } from './components/stat-chart-modal/stat-chart-modal.component';
+import { DashboardStateService, DashboardWidgetVisibility } from '../../services/dashboard-state.service';
+import { CustomizeDashboardModalComponent } from './components/customize-dashboard-modal/customize-dashboard-modal.component';
+import { GatewayService } from '../gateways/gateway.service';
+import { NatService } from '../nats/nat.service';
+import { VirtualMachineService } from '../virtual-machines/services/virtual-machine.service';
 
 // Helper function to generate mock historical data
 const generateHistoricalData = (days: number, pointsPerHour: number, max: number, startPercent: number = 0.6, noise: number = 0.2, sineFactor: number = 0.1) => {
@@ -36,7 +42,7 @@ const generateHistoricalData = (days: number, pointsPerHour: number, max: number
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent, RouterModule, FormsModule, StatChartModalComponent],
+  imports: [CommonModule, IconComponent, RouterModule, FormsModule, StatChartModalComponent, CustomizeDashboardModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
@@ -44,15 +50,27 @@ const generateHistoricalData = (days: number, pointsPerHour: number, max: number
 export class DashboardComponent implements AfterViewInit {
   private animationService = inject(DashboardAnimationService);
   private authService = inject(AuthService);
+  private dashboardStateService = inject(DashboardStateService);
+  private gatewayService = inject(GatewayService);
+  private natService = inject(NatService);
+  private virtualMachineService = inject(VirtualMachineService);
 
   animationsReady = signal(false);
   openVmMenuId = signal<string | null>(null);
   user = this.authService.user;
   auditTrailSearchTerm = signal('');
+  isTestingSpeed = signal(false);
+  speedTestResult = signal<string | null>(null);
+
+  // Widget visibility state from the service
+  widgetVisibility = this.dashboardStateService.widgetVisibility;
 
   // Chart Modal State
   isChartModalOpen = signal(false);
   selectedStatForChart = signal<StatCard | null>(null);
+  
+  // Customize Modal State
+  isCustomizeModalOpen = signal(false);
 
   showWelcomeCard = computed(() => this.user()?.isNewUser && !this.animationService.welcomeDismissed());
 
@@ -100,17 +118,37 @@ export class DashboardComponent implements AfterViewInit {
   closeChartModal(): void {
     this.isChartModalOpen.set(false);
   }
+  
+  // Methods for customize modal
+  openCustomizeModal(): void {
+    this.isCustomizeModalOpen.set(true);
+  }
+
+  closeCustomizeModal(): void {
+    this.isCustomizeModalOpen.set(false);
+  }
+
+  saveDashboardLayout(newVisibility: DashboardWidgetVisibility): void {
+    this.dashboardStateService.updateVisibility(newVisibility);
+    this.isCustomizeModalOpen.set(false);
+  }
 
   runSpeedTest(): void {
-    // In a real app, this would trigger a network test. For now, it's a placeholder.
-    alert('Running network speed test...');
+    this.isTestingSpeed.set(true);
+    this.speedTestResult.set(null);
+    // Simulate a network test
+    setTimeout(() => {
+      const downloadSpeedMbps = (Math.random() * (500 - 50) + 50).toFixed(2); // Random speed between 50 and 500 Mbps
+      this.speedTestResult.set(`${downloadSpeedMbps} Mbps`);
+      this.isTestingSpeed.set(false);
+    }, 2500);
   }
 
   quickStartLinks = signal<QuickStartLink[]>([
-    { title: 'Create a Virtual Machine', description: 'Spin up a new server in minutes.', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines' },
-    { title: 'Set up a Gateway', description: 'Configure your network entry point.', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways' },
+    { title: 'Getting Started Guide', description: 'Follow our step-by-step guide.', icon: 'fas fa-rocket', path: '/app/cloud-edge/resources/getting-started' },
+    { title: 'Create a Virtual Machine', description: 'Spin up a new server in minutes.', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines/create' },
+    { title: 'Set up a Gateway', description: 'Configure your network entry point.', icon: 'fas fa-dungeon', path: '/app/cloud-edge/network/gateways/create' },
     { title: 'Configure Applications', description: 'Define applications for your policies.', icon: 'far fa-file-alt', path: '/app/cloud-edge/inventory/applications' },
-    { title: 'View Documentation', description: 'Find detailed guides and help.', icon: 'fas fa-book', path: '/#' }
   ]);
 
   helpfulResources = signal<HelpfulResource[]>([
@@ -118,19 +156,13 @@ export class DashboardComponent implements AfterViewInit {
       title: 'Getting Started Guide',
       description: 'Our step-by-step guide to launch your first VM.',
       icon: 'fas fa-rocket',
-      path: '/#',
-    },
-    {
-      title: 'API Documentation',
-      description: 'Automate your infrastructure with our powerful API.',
-      icon: 'fas fa-code',
-      path: '/#',
+      path: '/app/cloud-edge/resources/getting-started',
     },
     {
       title: 'Community Forum',
       description: 'Ask questions and share knowledge with others.',
       icon: 'fas fa-users',
-      path: '/#',
+      path: '/app/cloud-edge/resources/community-forum',
     },
     {
       title: 'Contact Support',
@@ -167,17 +199,51 @@ export class DashboardComponent implements AfterViewInit {
     }));
   });
 
-  topVMs = signal<VirtualMachine[]>([
-    { id: 'vm-01', name: 'Production Web Server', os: 'linux', status: 'running', cpu: { usage: 85 }, memory: { usage: 76 }, storage: { usage: 60 } },
-    { id: 'vm-02', name: 'Database Cluster Node 1', os: 'ubuntu', status: 'running', cpu: { usage: 72 }, memory: { usage: 88 }, storage: { usage: 45 } },
-    { id: 'vm-03', name: 'Development Environment', os: 'windows', status: 'stopped', cpu: { usage: 0 }, memory: { usage: 0 }, storage: { usage: 80 } },
-  ]);
+  topVMs = computed(() => {
+    const allVMs = this.virtualMachineService.virtualMachines();
+
+    // Map VMs to the format needed by the dashboard, adding mocked usage data.
+    const vmsWithUsage = allVMs.map(vm => {
+      const isRunning = vm.status === 'running';
+      // Generate more realistic "high usage" for a "top VMs" widget.
+      const cpuUsage = isRunning ? Math.floor(Math.random() * 35) + 60 : 0; // 60-95%
+      const memoryUsage = isRunning ? Math.floor(Math.random() * 40) + 55 : 0; // 55-95%
+      const storageUsage = isRunning ? Math.floor(Math.random() * 70) + 20 : 0; // 20-90%
+
+      return {
+        id: vm.id,
+        name: vm.name,
+        os: vm.os,
+        status: vm.status,
+        cpu: { usage: cpuUsage },
+        memory: { usage: memoryUsage },
+        storage: { usage: storageUsage },
+        // Add a temporary property for sorting by overall "busyness"
+        _combinedUsage: cpuUsage + memoryUsage 
+      };
+    });
+
+    // Sort by combined CPU and Memory usage to find the "top" VMs, and take the top 3.
+    return vmsWithUsage
+      .sort((a, b) => b._combinedUsage - a._combinedUsage)
+      .slice(0, 3)
+      .map(({ _combinedUsage, ...vm }) => vm); // Remove the temporary property before returning
+  });
 
   securityScore = signal({ score: 87, activeThreats: 2, blockedAttempts: 156, sslCertificates: '8 valid' });
 
-  networkStatus = signal({
-    bandwidthUsage: { used: 3.2, total: 10, unit: 'Gbps', percentage: 32 },
-    latency: '12ms', activeConnections: '2,847', packetLoss: '0.01%',
+  networkStatus = computed(() => {
+    const gateways = this.gatewayService.gateways();
+    const natRules = this.natService.natRules();
+    
+    return {
+      gateways: gateways.length,
+      activeNatRules: natRules.filter(r => r.status === 'Enabled').length,
+      latency: '12ms',
+      packetLoss: '0.01%',
+      isTestingSpeed: this.isTestingSpeed(),
+      speedTestResult: this.speedTestResult()
+    };
   });
   
   auditTrailEntries = signal<AuditTrailEntry[]>([

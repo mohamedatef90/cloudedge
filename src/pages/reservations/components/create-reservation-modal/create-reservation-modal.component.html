@@ -15,8 +15,8 @@
         <!-- Plan Selection Tabs -->
         <div class="border-b border-gray-200 dark:border-slate-700">
           <nav class="-mb-px flex space-x-6" aria-label="Tabs">
-            <button (click)="activePlanTab.set('Standard')" [class]="activePlanTab() === 'Standard' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Standard Plan</button>
-            <button (click)="activePlanTab.set('Performance')" [class]="activePlanTab() === 'Performance' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Performance Plan</button>
+            <button (click)="activePlanTab.set('General Purpose')" [class]="activePlanTab() === 'General Purpose' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">General Purpose</button>
+            <button (click)="activePlanTab.set('Compute Optimized')" [class]="activePlanTab() === 'Compute Optimized' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Compute Optimized</button>
             <button (click)="activePlanTab.set('Custom')" [class]="activePlanTab() === 'Custom' ? 'border-[#679a41] text-[#679a41]' : 'border-transparent text-gray-500 hover:text-gray-700'" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors">Custom Plan</button>
           </nav>
         </div>

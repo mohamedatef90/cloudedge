@@ -1,7 +1,7 @@
 
 export interface User {
   id: string;
-  role: 'customer' | 'admin' | 'reseller';
+  role: 'customer' | 'admin' | 'reseller' | 'micro';
   displayName: string;
   avatarUrl?: string;
   isNewUser?: boolean;

@@ -9,6 +9,7 @@ import { VirtualMachine } from './mock-data';
 import { FilterPanelComponent } from '../../components/filter-panel/filter-panel.component';
 import { ConfirmationModalComponent } from '../../components/confirmation-modal/confirmation-modal.component';
 import { VirtualMachineService } from './services/virtual-machine.service';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 interface VmFilterState {
   status: 'all' | 'running' | 'stopped' | 'suspended';
@@ -21,7 +22,7 @@ interface VmFilterState {
   templateUrl: './virtual-machines.component.html',
   styleUrls: ['./virtual-machines.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent, VmCardViewComponent, VmTableViewComponent, RouterModule, FormsModule, FilterPanelComponent, ConfirmationModalComponent],
+  imports: [CommonModule, IconComponent, VmCardViewComponent, VmTableViewComponent, RouterModule, FormsModule, FilterPanelComponent, ConfirmationModalComponent, AdvancedDeleteConfirmationModalComponent],
   host: {
     '(document:mousedown)': 'onGlobalClick($event)',
   },
@@ -86,7 +87,7 @@ export class VirtualMachinesComponent {
     return count;
   });
 
-  // --- Confirmation Modal State ---
+  // --- Confirmation Modal State (Non-delete actions) ---
   isConfirmModalOpen = signal(false);
   confirmModalConfig = signal({
       title: '',
@@ -97,6 +98,22 @@ export class VirtualMachinesComponent {
       iconClass: ''
   });
   selectedVmForAction = signal<VirtualMachine | null>(null);
+  actionToConfirm = signal<'connect' | 'powerOff' | 'restart' | null>(null);
+  
+  // --- Delete Modal State ---
+  isDeleteModalOpen = signal(false);
+  vmToDelete = signal<VirtualMachine | null>(null);
+
+  deleteModalMessage = computed(() => {
+    const vmName = this.vmToDelete()?.name;
+    if (!vmName) return '';
+    return `
+        <p class="mb-2">If this VM is running, it will be powered off before being moved to the Recycle Bin.</p>
+        <p>You can't get your deleted virtual machine data (OS, hard disks,...) after 24 hour from now.</p>
+        <p class="mt-2">You could recover deleted virtual machine within 24 hour from recycle bin.</p>
+        <p class="mt-4">To proceed, please type the name of the Virtual Machine (<strong class="text-gray-900 dark:text-gray-100">${vmName}</strong>) below.</p>
+    `;
+  });
 
   setViewMode(mode: 'card' | 'table'): void {
     this.viewMode.set(mode);
@@ -146,122 +163,4 @@ export class VirtualMachinesComponent {
     }));
 
     let csvContent = headers.join(',') + '\r\n';
-    selectedData.forEach(row => {
-      const values = Object.values(row).map(value => {
-        const stringValue = String(value);
-        if (stringValue.includes(',')) {
-          return `"${stringValue}"`;
-        }
-        return stringValue;
-      });
-      csvContent += values.join(',') + '\r\n';
-    });
-    
-    this.downloadFile(csvContent, 'virtual-machines.csv', 'text/csv;charset=utf-8;');
-  }
-
-  exportAsJson(): void {
-    const vms = this.filteredVirtualMachines();
-    const selectedData = vms.map(vm => ({
-      name: vm.name,
-      os: vm.os,
-      status: vm.status,
-      ipAddress: vm.ipAddress,
-      creationDate: vm.creationDate,
-      specs: {
-        cores: vm.cores,
-        memory_gb: vm.memory,
-        storage_gb: vm.storage,
-      },
-      description: vm.description,
-      reservation: vm.reservationName,
-    }));
-    const jsonContent = JSON.stringify(selectedData, null, 2);
-    this.downloadFile(jsonContent, 'virtual-machines.json', 'application/json;charset=utf-8;');
-  }
-
-  // --- Filter Panel Methods ---
-  openFilterPanel(): void {
-    this.tempFilters.set(this.filters());
-    this.isFilterPanelOpen.set(true);
-  }
-
-  closeFilterPanel(): void {
-    this.isFilterPanelOpen.set(false);
-  }
-
-  applyFilters(): void {
-    this.filters.set(this.tempFilters());
-    this.closeFilterPanel();
-  }
-
-  clearFilters(): void {
-    this.tempFilters.set({ ...this.defaultFilters });
-    this.filters.set({ ...this.defaultFilters });
-  }
-
-  // --- VM Action Methods ---
-  handleVmAction(event: { action: 'connect' | 'powerOff' | 'restart' | 'delete'; vm: VirtualMachine }): void {
-    this.selectedVmForAction.set(event.vm);
-    let config;
-    switch (event.action) {
-        case 'connect':
-            config = {
-                title: `Connect to ${event.vm.name}`,
-                message: `You are about to connect to the web console for <strong>${event.vm.name}</strong>. Proceed?`,
-                confirmButtonText: 'Connect',
-                confirmButtonClass: 'bg-[#679a41] hover:bg-[#537d34]',
-                iconName: 'fas fa-terminal',
-                iconClass: 'text-gray-500'
-            };
-            break;
-        case 'powerOff':
-            config = {
-                title: `Power Off ${event.vm.name}`,
-                message: `Are you sure you want to power off <strong>${event.vm.name}</strong>? This is equivalent to pulling the power cord.`,
-                confirmButtonText: 'Power Off',
-                confirmButtonClass: 'bg-red-600 hover:bg-red-700',
-                iconName: 'fas fa-power-off',
-                iconClass: 'text-red-500'
-            };
-            break;
-        case 'restart':
-             config = {
-                title: `Restart ${event.vm.name}`,
-                message: `Are you sure you want to restart <strong>${event.vm.name}</strong>? This will abruptly stop and then start the virtual machine.`,
-                confirmButtonText: 'Restart',
-                confirmButtonClass: 'bg-orange-500 hover:bg-orange-600',
-                iconName: 'fas fa-sync-alt',
-                iconClass: 'text-orange-500'
-            };
-            break;
-        case 'delete':
-             config = {
-                title: `Delete ${event.vm.name}`,
-                message: `Are you sure you want to permanently delete <strong>${event.vm.name}</strong>? This action cannot be undone.`,
-                confirmButtonText: 'Delete',
-                confirmButtonClass: 'bg-red-600 hover:bg-red-700',
-                iconName: 'fas fa-trash-alt',
-                iconClass: 'text-red-500'
-            };
-            break;
-    }
-    this.confirmModalConfig.set(config);
-    this.isConfirmModalOpen.set(true);
-  }
-
-  onConfirmAction(): void {
-      const vm = this.selectedVmForAction();
-      if (vm) {
-          console.log(`Action confirmed for VM: ${vm.name}`);
-          // Here you would call a service to perform the action.
-          // For now, just logging it.
-      }
-      this.onCloseConfirmModal();
-  }
-
-  onCloseConfirmModal(): void {
-      this.isConfirmModalOpen.set(false);
-      this.selectedVmForAction.set(null);
-  }
-}
+    selectedData.forEach

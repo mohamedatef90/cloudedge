@@ -1,4 +1,3 @@
-
 import { FirewallPolicy, GroupData, SelectableGroup, Service } from './types';
 
 export const mockGroupData: { [key: string]: GroupData } = {
@@ -133,28 +132,19 @@ export const mockAvailableGroupsForSelection: SelectableGroup[] = [
 ];
 
 export const mockPoliciesData: FirewallPolicy[] = [
-    { id: 'policy1', name: 'Web Servers Policy', policyId: '(2)', appliedTo: '2 Groups', status: 'Success', rules: [
-        { id: 'rule-web-1', name: 'Allow HTTP', ruleId: '5', sources: 'Any', destinations: 'Web Servers Group', services: [{ name: 'HTTP', icon: 'fas fa-globe' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-        { id: 'rule-web-2', name: 'Allow HTTPS', ruleId: '6', sources: 'Any', destinations: 'Web Servers Group', services: [{ name: 'HTTPS', icon: 'fas fa-lock' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-    ], isExpanded: false },
-    { id: 'policy2', name: 'Database Policy', policyId: '(1)', appliedTo: 'DB Servers Group', status: 'Success', rules: [
-        { id: 'rule-db-1', name: 'Allow SQL', ruleId: '7', sources: 'App Servers Group', destinations: 'DB Servers Group', services: [{ name: 'MySQL', icon: 'fas fa-database' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-    ], isExpanded: false },
-    { id: 'policy3', name: 'hello?!', policyId: '(1)', appliedTo: '1 Groups', status: 'Success', rules: [], isExpanded: false },
-    { id: 'policy4', name: 'test', policyId: '(0)', appliedTo: 'DFW', status: 'Success', rules: [], isExpanded: false },
-    {
-        id: 'policy5', name: 'Default Layer3 Section', policyId: '(3)', appliedTo: 'DFW', status: 'Success', isExpanded: false,
-        rules: [
-            { id: 'rule1', name: 'Default Rule NDP', ruleId: '3', sources: 'Any', destinations: 'Any', services: [{ name: 'IPv6-ICMP Neigh...', icon: 'fas fa-cog' }, { name: 'IPv6-ICMP Neigh...', icon: 'fas fa-cog' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-            { id: 'rule2', name: 'Default Rule DHCP', ruleId: '4', sources: 'Any', destinations: 'Any', services: [{ name: 'DHCP-Server', icon: 'fas fa-cog' }, { name: 'DHCP-Client', icon: 'fas fa-cog' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-            { id: 'rule3', name: 'Default Layer3 Rule', ruleId: '2', sources: 'Any', destinations: 'Any', services: [{ name: 'Any', icon: '' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: false },
-        ]
+    { 
+        id: 'policy1', name: 'asfsfdsgdfg', policyId: '(1)', appliedTo: 'DFW', status: 'Success', rules: [
+            { id: 'rule-web-1', name: 'asfsfdsgdfg', ruleId: '1', sources: 'g1, as, em, v1, yyyyyyyyy, 1.1.1.1, new-source-1, new-source-2, another-long-source-name-for-testing', destinations: 'g1', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'name2', appliedTo: 'v1', action: 'Allow', enabled: true, status: 'Success' },
+        ], isExpanded: true 
     },
-    { id: 'policy6', name: 'Management Access', policyId: '(2)', appliedTo: 'Mgmt Group', status: 'Success', isExpanded: false,
-        rules: [
-            { id: 'rule-mgmt-1', name: 'Allow SSH from Admin', ruleId: '8', sources: 'Admin IP Group', destinations: 'Mgmt Group', services: [{ name: 'SSH', icon: 'fas fa-terminal' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Allow', enabled: true },
-            // FIX: The 'action' property was missing, and 'appliedTo' had the wrong value.
-            { id: 'rule-mgmt-2', name: 'Deny All Other Mgmt', ruleId: '9', sources: 'Any', destinations: 'Mgmt Group', services: [{ name: 'Any', icon: '' }], contextProfiles: 'None', appliedTo: 'DFW', action: 'Deny', enabled: true },
-        ]
-    }
+    { 
+        id: 'policy2', name: 'hj', policyId: '(1)', appliedTo: 'DFW', status: 'Success', rules: [
+            { id: 'rule-db-1', name: '639ddb61-3af1-4ead-b605-adc4d54e633', ruleId: '2', sources: 'g1, as, em, v1, yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy..., 1.1.1.1', destinations: 'mk', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'xzzx', appliedTo: 'v1', action: 'Reject', enabled: true, status: 'Error' },
+        ], isExpanded: true 
+    },
+    { 
+        id: 'policy3', name: 'Deny-Ping', policyId: '(1)', appliedTo: 'DFW', status: 'Success', rules: [
+            { id: 'rule-ping-1', name: 'Deny-Ping', ruleId: '3', sources: 'Tamer-test-group1, Tamer-test-group2', destinations: 'Tamer-test-group2, Tamer-test-group1', services: [{ name: 'SSH', icon: 'fas fa-terminal' }], contextProfiles: 'None', appliedTo: 'Tamer-test-group1, Tamer-test-group2', action: 'Reject', enabled: true, status: 'Success' },
+        ], isExpanded: true 
+    },
 ];

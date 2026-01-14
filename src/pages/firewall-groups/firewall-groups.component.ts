@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { ViewMembersModalComponent } from './components/view-members-modal/view-members-modal.component';
 import { WhereUsedModalComponent } from './components/where-used-modal/where-used-modal.component';
-import { DeleteGroupModalComponent } from './components/delete-group-modal/delete-group-modal.component';
 import { FilterPanelComponent } from '../../components/filter-panel/filter-panel.component';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 // --- TYPES AND MOCK DATA ---
 export interface FirewallGroup {
@@ -78,7 +78,7 @@ const mockGroupMemberData: { [key: string]: GroupData } = {
   templateUrl: './firewall-groups.component.html',
   styleUrls: ['./firewall-groups.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent, ViewMembersModalComponent, WhereUsedModalComponent, DeleteGroupModalComponent, FilterPanelComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ViewMembersModalComponent, WhereUsedModalComponent, AdvancedDeleteConfirmationModalComponent, FilterPanelComponent],
   host: {
     '(document:mousedown)': 'onGlobalClick($event)',
   },
@@ -267,6 +267,7 @@ export class FirewallGroupsComponent {
   handleOpenDeleteModal(group: FirewallGroup): void {
     this.groupToDelete.set(group);
     this.isDeleteModalOpen.set(true);
+    this.openMenuId.set(null);
   }
 
   handleCloseDeleteModal(): void {

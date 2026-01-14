@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { IconComponent } from '../../components/icon/icon.component';
 import { NatService } from './nat.service';
 import { NatRule } from './nats.types';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 type SortColumn = keyof Omit<NatRule, 'id' | 'dhcp'>;
 
@@ -13,7 +14,7 @@ type SortColumn = keyof Omit<NatRule, 'id' | 'dhcp'>;
   templateUrl: './nats.component.html',
   styleUrls: ['./nats.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent, RouterModule],
+  imports: [CommonModule, FormsModule, IconComponent, RouterModule, AdvancedDeleteConfirmationModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
@@ -25,6 +26,8 @@ export class NatsComponent {
   searchTerm = signal('');
   sortColumn = signal<SortColumn>('name');
   sortDirection = signal<'asc' | 'desc'>('asc');
+  isDeleteModalOpen = signal(false);
+  natRuleToDelete = signal<NatRule | null>(null);
 
   natRules = this.natService.natRules;
 
@@ -86,5 +89,20 @@ export class NatsComponent {
       case 'Disabled':
         return 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-300';
     }
+  }
+
+  openDeleteModal(rule: NatRule): void {
+    this.natRuleToDelete.set(rule);
+    this.isDeleteModalOpen.set(true);
+    this.closeActionMenu();
+  }
+  
+  handleConfirmDelete(): void {
+    const rule = this.natRuleToDelete();
+    if (rule) {
+      this.natService.deleteNatRule(rule.id);
+    }
+    this.isDeleteModalOpen.set(false);
+    this.natRuleToDelete.set(null);
   }
 }

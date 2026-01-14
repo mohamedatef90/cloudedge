@@ -1,4 +1,8 @@
 
+
+
+
+
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../../components/icon/icon.component';
@@ -15,9 +19,9 @@ import { mockAvailableGroupsForSelection, mockAvailableServices, mockGroupData }
 import { MOCK_IDS_IPS_PROFILES_DATA } from '../../../ids-ips-malware-prevention/mock-data';
 import { ViewMembersModalComponent } from '../../../distributed-firewall/components/view-members-modal/view-members-modal.component';
 import { RelatedGroupsModalComponent } from '../../../distributed-firewall/components/related-groups-modal/related-groups-modal.component';
-import { DeleteConfirmationModalComponent } from '../../../distributed-firewall/components/delete-confirmation-modal/delete-confirmation-modal.component';
 import { AddPolicyModalComponent } from '../../../distributed-firewall/components/add-policy-modal/add-policy-modal.component';
 import { FormsModule } from '@angular/forms';
+import { AdvancedDeleteConfirmationModalComponent } from '../../../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 @Component({
   selector: 'app-gateway-rules',
@@ -35,7 +39,7 @@ import { FormsModule } from '@angular/forms';
     EditProfilesModalComponent,
     ViewMembersModalComponent,
     RelatedGroupsModalComponent,
-    DeleteConfirmationModalComponent,
+    AdvancedDeleteConfirmationModalComponent,
     AddPolicyModalComponent,
     FormsModule
   ],
@@ -221,7 +225,9 @@ export class GatewayRulesComponent {
     const mappedRule: FirewallRule = {
         ...rule,
         contextProfiles: rule.profiles,
-        action: 'Allow' // Placeholder
+        action: 'Allow', // Placeholder
+// FIX: Add missing 'status' property to satisfy the FirewallRule interface.
+status: 'Success'
     };
     this.editSourceDestModalState.set({ isOpen: true, rule: mappedRule, policyId, field });
   }
@@ -231,7 +237,8 @@ export class GatewayRulesComponent {
     if (!policyId) return;
     const formState = this.newRuleForm();
     const tempRule: GatewayRule = { id: 'new-rule', ruleId: 'new', ...formState };
-    const mappedRule: FirewallRule = { ...tempRule, contextProfiles: tempRule.profiles, action: 'Allow' };
+    // FIX: Add missing 'status' property to satisfy the FirewallRule interface.
+    const mappedRule: FirewallRule = { ...tempRule, contextProfiles: tempRule.profiles, action: 'Allow', status: 'Success' };
     this.editSourceDestModalState.set({ isOpen: true, rule: mappedRule, policyId, field, isNewRule: true });
   }
 
@@ -293,26 +300,26 @@ export class GatewayRulesComponent {
     } else if (state.rule && state.policyId) {
       this.handleRuleUpdate(state.policyId, state.rule.id, state.field, newValue);
     }
-    this.editSourceDestModalState.set({ isOpen: false, rule: null, policyId: null, field: null });
+    this.editSourceDestModalState.set({isOpen: false, rule: null, policyId: null, field: null});
   }
 
   handleSaveServices(newServices: Service[]): void {
-      const state = this.editServicesModalState();
-      if (state.isNewRule) {
-        this.newRuleForm.update(form => ({ ...form, services: newServices }));
-      } else if (state.rule && state.policyId) {
-        this.handleRuleUpdate(state.policyId, state.rule.id, 'services', newServices);
-      }
-      this.editServicesModalState.set({ isOpen: false, rule: null, policyId: null });
+    const state = this.editServicesModalState();
+    if (state.isNewRule) {
+      this.newRuleForm.update(form => ({...form, services: newServices}));
+    } else if (state.rule && state.policyId) {
+      this.handleRuleUpdate(state.policyId, state.rule.id, 'services', newServices);
+    }
+    this.editServicesModalState.set({isOpen: false, rule: null, policyId: null});
   }
-
+  
   handleSaveProfile(newProfile: string): void {
-      const state = this.editProfilesModalState();
-      if (state.isNewRule) {
-        this.newRuleForm.update(form => ({ ...form, profiles: newProfile }));
-      } else if (state.rule && state.policyId) {
-        this.handleRuleUpdate(state.policyId, state.rule.id, 'profiles', newProfile);
-      }
-      this.editProfilesModalState.set({ isOpen: false, rule: null, policyId: null });
+    const state = this.editProfilesModalState();
+    if (state.isNewRule) {
+      this.newRuleForm.update(form => ({...form, profiles: newProfile}));
+    } else if (state.rule && state.policyId) {
+      this.handleRuleUpdate(state.policyId, state.rule.id, 'profiles', newProfile);
+    }
+    this.editProfilesModalState.set({isOpen: false, rule: null, policyId: null});
   }
 }

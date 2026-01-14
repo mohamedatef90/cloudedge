@@ -23,7 +23,6 @@ type StatusFilter = 'all' | 'Running' | 'Success' | 'Failed' | 'Pending';
   templateUrl: './running-tasks.component.html',
   styleUrls: ['./running-tasks.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [CommonModule, FormsModule, IconComponent],
 })
 export class RunningTasksComponent {

@@ -1,4 +1,5 @@
 
+
 @if (isOpen()) {
   <div (click)="close.emit()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div (click)="$event.stopPropagation()" role="dialog" aria-modal="true" class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-lg m-4">
@@ -36,6 +37,17 @@
               }
             </select>
           </div>
+          @if (diskData().attachedTo) {
+            <div>
+              <label for="diskNumber" class="block text-sm font-medium mb-1">Disk # <span class="text-red-500">*</span></label>
+              <select id="diskNumber" [(ngModel)]="diskData().diskNumber" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3">
+                <option [ngValue]="null" disabled>Select disk number</option>
+                @for(num of availableDiskNumbers(); track num) {
+                  <option [value]="num">{{ num }}</option>
+                }
+              </select>
+            </div>
+          }
         }
       </div>
       <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg">

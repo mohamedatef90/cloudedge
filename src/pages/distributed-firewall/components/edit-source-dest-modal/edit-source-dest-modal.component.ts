@@ -43,7 +43,7 @@ export class EditSourceDestModalComponent {
     effect(() => {
       if (this.isOpen()) {
         const currentValue = this.rule()[this.field()];
-        this.selected.set(currentValue && currentValue !== 'Any' ? [currentValue] : []);
+        this.selected.set(currentValue && currentValue !== 'Any' ? currentValue.split(',').map(s => s.trim()) : []);
         // Reset state on open
         this.searchTerm.set('');
         this.expandedGroupId.set(null);
@@ -66,12 +66,20 @@ export class EditSourceDestModalComponent {
   });
 
   handleSelect(groupName: string): void {
-    // Single select logic for this implementation
-    this.selected.update(prev => prev.includes(groupName) ? [] : [groupName]);
+    this.selected.update(prev => {
+      const newSelected = new Set(prev);
+      if (newSelected.has(groupName)) {
+        newSelected.delete(groupName);
+      } else {
+        newSelected.add(groupName);
+      }
+      return Array.from(newSelected);
+    });
   }
 
   handleSave(): void {
-    this.save.emit(this.selected()[0] || 'Any');
+    const selectedItems = this.selected();
+    this.save.emit(selectedItems.length > 0 ? selectedItems.join(', ') : 'Any');
   }
 
   toggleGroupExpansion(groupId: string): void {

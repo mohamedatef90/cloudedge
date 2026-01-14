@@ -1,0 +1,61 @@
+
+@if (isOpen()) {
+  <div 
+    (click)="close.emit()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg m-4">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+        <h2 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+          Customize Dashboard
+        </h2>
+        <button 
+          (click)="close.emit()" 
+          aria-label="Close" 
+          class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+          <app-icon name="fas fa-times" className="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Select the widgets you want to display on your dashboard.</p>
+        <div class="space-y-3">
+          @for (widget of widgetConfig; track widget.key) {
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 rounded-md">
+              <label [for]="'toggle-' + widget.key" class="font-medium text-[#293c51] dark:text-gray-300">
+                {{ widget.label }}
+              </label>
+              <app-toggle-switch 
+                [id]="'toggle-' + widget.key"
+                [ngModel]="visibilityState()[widget.key]"
+                (ngModelChange)="toggleWidget(widget.key, $event)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+        <button 
+          (click)="close.emit()"
+          type="button" 
+          class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out mr-2">
+          Cancel
+        </button>
+        <button 
+          (click)="onSave()"
+          type="button" 
+          class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

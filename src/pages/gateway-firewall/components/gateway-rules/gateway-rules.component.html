@@ -163,7 +163,15 @@
 
 <!-- Modals -->
 <app-add-policy-modal [isOpen]="isAddPolicyModalOpen()" (close)="isAddPolicyModalOpen.set(false)" (save)="handleSaveNewPolicy($event)"></app-add-policy-modal>
-<app-delete-confirmation-modal [isOpen]="isDeleteModalOpen()" [itemCount]="selectedItems().length" (close)="isDeleteModalOpen.set(false)" (confirm)="handleConfirmDelete()"></app-delete-confirmation-modal>
+
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen()"
+  itemType="Item"
+  [itemCount]="selectedItems().length"
+  [itemName]="''"
+  (close)="isDeleteModalOpen.set(false)"
+  (confirm)="handleConfirmDelete()">
+</app-advanced-delete-confirmation-modal>
 
 @if(editSourceDestModalState().isOpen) {
   <app-edit-source-dest-modal

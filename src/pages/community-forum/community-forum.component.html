@@ -1,0 +1,85 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4 pb-6 mb-6 border-b border-gray-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-3xl font-bold text-[#293c51] dark:text-gray-100">Community Forum</h1>
+      <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Connect, share, and learn with other CloudEdge users.</p>
+    </div>
+    <div class="flex items-center gap-4 w-full md:w-auto">
+      <div class="relative flex-grow">
+        <input type="text" placeholder="Search topics..." class="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <app-icon name="fas fa-search" className="text-gray-400"></app-icon>
+        </div>
+      </div>
+      <button class="bg-[#679a41] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#537d34] transition-colors flex-shrink-0">
+        New Topic
+      </button>
+    </div>
+  </div>
+
+  <!-- Forum Categories -->
+  <div class="space-y-8">
+    @for(category of categories(); track category.id) {
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700">
+        <!-- Category Header -->
+        <div class="p-4 bg-gray-50 dark:bg-slate-700/50 border-b dark:border-slate-700">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-[#679a41]/10 dark:bg-[#8cc866]/10 rounded-lg text-[#679a41] dark:text-[#8cc866]">
+              <app-icon [name]="category.icon" className="text-xl"></app-icon>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-[#293c51] dark:text-gray-200">{{ category.name }}</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ category.description }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Topics Table -->
+        <table class="w-full text-sm">
+          <thead class="text-xs text-gray-500 dark:text-gray-400 uppercase">
+            <tr class="border-b dark:border-slate-700">
+              <th class="px-6 py-3 text-left w-1/2">Topic</th>
+              <th class="px-6 py-3 text-center hidden sm:table-cell">Replies</th>
+              <th class="px-6 py-3 text-center hidden sm:table-cell">Views</th>
+              <th class="px-6 py-3 text-left hidden md:table-cell">Last Activity</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+            @for(topic of category.topics; track topic.id) {
+              <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-start gap-3">
+                    <img [src]="topic.author.avatar" alt="" class="w-9 h-9 rounded-full flex-shrink-0 mt-0.5">
+                    <div>
+                      <a [routerLink]="['/app/cloud-edge/resources/community-forum/topic', topic.id]" class="font-semibold text-[#293c51] dark:text-gray-200 hover:text-[#679a41] dark:hover:text-[#8cc866] line-clamp-2">
+                        @if(topic.isPinned) { <app-icon name="fas fa-thumbtack" className="text-xs mr-1 text-gray-400"></app-icon> }
+                        {{ topic.title }}
+                      </a>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">by {{ topic.author.name }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center hidden sm:table-cell">
+                  <div class="font-semibold">{{ topic.replies }}</div>
+                </td>
+                <td class="px-6 py-4 text-center hidden sm:table-cell">
+                  <div class="font-semibold">{{ topic.views.toLocaleString() }}</div>
+                </td>
+                <td class="px-6 py-4 hidden md:table-cell">
+                  <div class="flex items-center gap-2">
+                    <img [src]="topic.lastActivity.author.avatar" alt="" class="w-7 h-7 rounded-full">
+                    <div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">by {{ topic.lastActivity.author.name }}</div>
+                      <div class="text-xs text-gray-400">{{ topic.lastActivity.time }}</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

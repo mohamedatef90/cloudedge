@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { CreateOrganizationModalComponent } from './components/create-organization-modal/create-organization-modal.component';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 interface Organization {
   id: string;
@@ -21,7 +22,7 @@ type SortColumn = keyof Omit<Organization, 'id'>;
   templateUrl: './organizations.component.html',
   styleUrls: ['./organizations.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, IconComponent, CreateOrganizationModalComponent, FormsModule],
+  imports: [CommonModule, RouterModule, IconComponent, CreateOrganizationModalComponent, FormsModule, AdvancedDeleteConfirmationModalComponent],
   // FIX: Replaced @HostListener with the host property for better component encapsulation.
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
@@ -34,6 +35,8 @@ export class OrganizationsComponent {
   searchTerm = signal('');
   sortColumn = signal<SortColumn>('name');
   sortDirection = signal<'asc' | 'desc'>('asc');
+  isDeleteModalOpen = signal(false);
+  organizationToDelete = signal<Organization | null>(null);
 
   organizations = signal<Organization[]>([
     { id: 'org-1', name: 'WorldPosta', creationDate: '2023-01-15', description: 'Primary corporate organization for all services.' },
@@ -99,6 +102,7 @@ export class OrganizationsComponent {
   openEditModal(org: Organization): void {
     this.organizationToEdit.set(org);
     this.isModalOpen.set(true);
+    this.closeActionMenu();
   }
 
   closeModal(): void {
@@ -122,5 +126,20 @@ export class OrganizationsComponent {
       orgs.map(org => (org.id === updatedOrg.id ? updatedOrg : org))
     );
     this.closeModal();
+  }
+
+  openDeleteModal(org: Organization): void {
+    this.organizationToDelete.set(org);
+    this.isDeleteModalOpen.set(true);
+    this.closeActionMenu();
+  }
+
+  handleConfirmDelete(): void {
+    const orgToDelete = this.organizationToDelete();
+    if (orgToDelete) {
+      this.organizations.update(orgs => orgs.filter(o => o.id !== orgToDelete.id));
+    }
+    this.isDeleteModalOpen.set(false);
+    this.organizationToDelete.set(null);
   }
 }

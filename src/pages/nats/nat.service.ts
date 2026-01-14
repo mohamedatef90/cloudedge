@@ -58,4 +58,8 @@ export class NatService {
   private natRulesState = signal<NatRule[]>(MOCK_NAT_RULES);
   
   natRules = this.natRulesState.asReadonly();
+
+  deleteNatRule(id: string): void {
+    this.natRulesState.update(rules => rules.filter(r => r.id !== id));
+  }
 }

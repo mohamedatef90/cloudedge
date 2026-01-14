@@ -1,0 +1,63 @@
+<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow min-h-full">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Recycle Bin</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">VMs deleted in the last 24 hours can be recovered from here.</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3">Name</th>
+            <th scope="col" class="px-6 py-3">Deleted At</th>
+            <th scope="col" class="px-6 py-3">Time to Recover</th>
+            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (vm of recycledVms(); track vm.id) {
+            <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">{{ vm.name }}</td>
+              <td class="px-6 py-4">{{ vm.deletedAt | date:'medium' }}</td>
+              <td class="px-6 py-4">
+                <span class="font-semibold" [class.text-orange-500]="getTimeRemaining(vm.deletedAt) !== 'Expired'" [class.text-red-500]="getTimeRemaining(vm.deletedAt) === 'Expired'">
+                  {{ getTimeRemaining(vm.deletedAt) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right space-x-2">
+                <button (click)="recoverVm(vm.id)" [disabled]="getTimeRemaining(vm.deletedAt) === 'Expired'" class="bg-green-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  Recover
+                </button>
+                <button (click)="requestPermanentDelete(vm)" class="bg-red-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-red-700">
+                  Delete Permanently
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr class="bg-white dark:bg-slate-800">
+              <td colspan="4" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                <div class="flex flex-col items-center">
+                  <app-icon name="fas fa-recycle" className="text-4xl mb-3"></app-icon>
+                  <p class="font-semibold">The Recycle Bin is empty.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen()"
+  itemType="Virtual Machine"
+  [itemName]="vmToPermanentlyDelete()?.name || ''"
+  (close)="isDeleteModalOpen.set(false); vmToPermanentlyDelete.set(null)"
+  (confirm)="confirmPermanentDelete()">
+</app-advanced-delete-confirmation-modal>

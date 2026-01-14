@@ -1,4 +1,5 @@
 
+
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
@@ -95,7 +96,7 @@
                         <app-icon name="fas fa-pencil-alt" className="w-4 h-4 mr-3" />
                         <span>Edit</span>
                       </a>
-                      <a href="#" (click)="$event.preventDefault(); closeActionMenu()" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                      <a href="#" (click)="$event.preventDefault(); openDeleteModal(gateway)" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                         <app-icon name="fas fa-trash-alt" className="w-4 h-4 mr-3" />
                         <span>Delete</span>
                       </a>
@@ -120,3 +121,11 @@
     </div>
   </div>
 </div>
+
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen()"
+  itemType="Gateway"
+  [itemName]="gatewayToDelete()?.name || ''"
+  (close)="isDeleteModalOpen.set(false); gatewayToDelete.set(null)"
+  (confirm)="handleConfirmDelete()">
+</app-advanced-delete-confirmation-modal>

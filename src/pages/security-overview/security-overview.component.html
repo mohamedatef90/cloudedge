@@ -2,13 +2,13 @@
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Security - IDS/IPS</h1>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Intrusion Detection and Prevention System</p>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Security Hub</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Centralized security monitoring and management.</p>
     </div>
     <div class="flex items-center space-x-2">
       <button class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-colors flex items-center shadow-sm">
-        <app-icon [name]="isIdsEnabled() ? 'fas fa-toggle-on' : 'fas fa-toggle-off'" className="mr-2"></app-icon>
-        {{ isIdsEnabled() ? 'IDS/IPS Enabled' : 'Enable Intrusion Detection' }}
+        <app-icon [name]="isHubEnabled() ? 'fas fa-toggle-on' : 'fas fa-toggle-off'" className="mr-2"></app-icon>
+        {{ isHubEnabled() ? 'Security Hub Enabled' : 'Enable Security Hub' }}
       </button>
     </div>
   </div>
@@ -20,7 +20,7 @@
       <div class="flex-grow">
         <h3 class="font-bold">Welcome to your Security Command Center.</h3>
         <p class="text-sm mt-1">
-          This Intrusion Detection & Prevention System (IDS/IPS) dashboard is your first line of defense against network threats. It actively monitors your traffic for suspicious activity, malicious patterns, and known attack signatures. Here, you can get a high-level security overview, dive deep into event logs to investigate incidents, and manage the system's protective signatures to tailor your security posture. Use this page to gain peace of mind and ensure your cloud environment is secure.
+          This Security Hub dashboard is your first line of defense against network threats. It actively monitors your traffic for suspicious activity, malicious patterns, and known attack signatures. Here, you can get a high-level security overview, dive deep into event logs to investigate incidents, and manage the system's protective signatures to tailor your security posture. Use this page to gain peace of mind and ensure your cloud environment is secure.
         </p>
       </div>
       <button (click)="dismissInfo()" aria-label="Dismiss" class="absolute top-2 right-2 p-1 rounded-full hover:bg-blue-200/50 dark:hover:bg-sky-800/50 transition-colors">

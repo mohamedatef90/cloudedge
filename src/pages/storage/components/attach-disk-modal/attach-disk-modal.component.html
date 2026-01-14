@@ -1,3 +1,5 @@
+
+
 @if (isOpen() && diskToAttach()) {
   <div (click)="close.emit()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div (click)="$event.stopPropagation()" role="dialog" aria-modal="true" class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col max-h-[80vh]">
@@ -10,7 +12,7 @@
           Select a Virtual Machine to attach the disk <span class="font-bold text-[#293c51] dark:text-gray-200">{{ diskToAttach()?.name }}</span> to.
         </p>
         
-        <div class="border rounded-md dark:border-slate-600 max-h-80 overflow-y-auto">
+        <div class="border rounded-md dark:border-slate-600 max-h-60 overflow-y-auto">
           @if (availableVms().length > 0) {
             <ul class="divide-y dark:divide-slate-600">
               @for (vm of availableVms(); track vm.id) {
@@ -27,10 +29,22 @@
             <p class="p-6 text-center text-gray-500 dark:text-gray-400">No available Virtual Machines found.</p>
           }
         </div>
+
+        @if (selectedVmName()) {
+            <div class="pt-4">
+              <label for="diskNumber" class="block text-sm font-medium mb-1">Disk # <span class="text-red-500">*</span></label>
+              <select id="diskNumber" [(ngModel)]="selectedDiskNumber" class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-md py-2 px-3">
+                <option [ngValue]="null" disabled>Select available disk number</option>
+                @for(num of availableDiskNumbers(); track num) {
+                  <option [value]="num">{{ num }}</option>
+                }
+              </select>
+            </div>
+        }
       </div>
       <div class="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 rounded-b-lg flex-shrink-0">
         <button (click)="close.emit()" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Cancel</button>
-        <button (click)="onConfirm()" [disabled]="!selectedVmName()" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">
+        <button (click)="onConfirm()" [disabled]="!selectedVmName() || selectedDiskNumber() === null" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] disabled:opacity-50">
           Attach Disk
         </button>
       </div>

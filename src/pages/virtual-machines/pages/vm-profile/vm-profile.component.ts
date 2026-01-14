@@ -1,4 +1,5 @@
 
+
 import { ChangeDetectionStrategy, Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -8,6 +9,7 @@ import { VirtualMachine, VIRTUAL_MACHINES_DATA } from '../../mock-data';
 import { AddEditDiskModalComponent, Disk } from './components/add-edit-disk-modal/add-edit-disk-modal.component';
 import { AddEditGatewayModalComponent, GatewayInfo } from './components/add-edit-gateway-modal/add-edit-gateway-modal.component';
 import { ConfirmationModalComponent } from '../../../../components/confirmation-modal/confirmation-modal.component';
+import { DeleteDiskConfirmationModalComponent } from './components/delete-disk-confirmation-modal/delete-disk-confirmation-modal.component';
 
 
 // Define local interfaces for the tabs
@@ -25,7 +27,7 @@ interface Snapshot {
   templateUrl: './vm-profile.component.html',
   styleUrls: ['./vm-profile.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, IconComponent, FormsModule, AddEditDiskModalComponent, AddEditGatewayModalComponent, ConfirmationModalComponent],
+  imports: [CommonModule, RouterModule, IconComponent, FormsModule, AddEditDiskModalComponent, AddEditGatewayModalComponent, ConfirmationModalComponent, DeleteDiskConfirmationModalComponent],
   standalone: true,
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
@@ -40,6 +42,7 @@ export class VmProfileComponent implements OnInit {
   editedVm = signal<Partial<VirtualMachine>>({});
   activeTab = signal<'disk' | 'gateway' | 'snapshot'>('disk');
   openMenuId = signal<string | null>(null);
+  openDiskMenuId = signal<string | null>(null);
   
   // Tab data
   disks = signal<Disk[]>([]);
@@ -51,6 +54,7 @@ export class VmProfileComponent implements OnInit {
   diskToEdit = signal<Disk | null>(null);
   isAddEditGatewayModalOpen = signal(false);
   gatewayToEdit = signal<GatewayInfo | null>(null);
+  isDeleteDiskModalOpen = signal(false);
   
   // Confirmation Modal State
   isConfirmModalOpen = signal(false);
@@ -62,6 +66,8 @@ export class VmProfileComponent implements OnInit {
       iconName: '',
       iconClass: ''
   });
+  diskToDelete = signal<Disk | null>(null);
+  vmActionToConfirm = signal<'connect' | 'powerOff' | 'restart' | 'delete' | null>(null);
 
   totalStorageCapacity = 2048; // Mock total capacity in GB
   
@@ -81,14 +87,15 @@ export class VmProfileComponent implements OnInit {
     const clickedInside = (target as HTMLElement)?.closest('.vm-menu-container');
     if (!clickedInside) {
       this.openMenuId.set(null);
+      this.openDiskMenuId.set(null);
     }
   }
 
   loadTabData(vmId: string): void {
     // Mock data based on vmId
     this.disks.set([
-      { id: 'disk-1', name: 'OS Disk', sizeGB: 100, type: 'SSD' },
-      { id: 'disk-2', name: 'Data Disk 1', sizeGB: 500, type: 'SSD' },
+      { id: 'disk-1', name: 'OS Disk', sizeGB: 100, type: 'SSD', diskNumber: 0 },
+      { id: 'disk-2', name: 'Data Disk 1', sizeGB: 500, type: 'SSD', diskNumber: 1 },
     ]);
     this.gateways.set([{ id: 'gw-1', name: 'Default Gateway', ipAddress: '192.168.1.1', status: 'Connected' }]);
     this.snapshots.set([
@@ -116,17 +123,38 @@ export class VmProfileComponent implements OnInit {
 
   setActiveTab(tab: 'disk' | 'gateway' | 'snapshot'): void {
     this.activeTab.set(tab);
+    this.closeDiskMenu();
+  }
+
+  getAvailableDiskNumbers(): number[] {
+    const usedDiskNumbers = this.disks()
+        .map(d => d.diskNumber)
+        .filter((d): d is number => d !== undefined)
+        .sort((a, b) => a - b);
+    
+    const available: number[] = [];
+    let nextNumber = 0;
+    while (available.length < 16) { // Offer up to 16 slots
+        if (!usedDiskNumbers.includes(nextNumber)) {
+            available.push(nextNumber);
+        }
+        nextNumber++;
+        if (nextNumber > 100) break; // safety break
+    }
+    return available;
   }
   
   // Disk Modal Methods
   openAddDiskModal(): void {
       this.diskToEdit.set(null);
       this.isAddEditDiskModalOpen.set(true);
+      this.closeDiskMenu();
   }
   
   openEditDiskModal(disk: Disk): void {
       this.diskToEdit.set(disk);
       this.isAddEditDiskModalOpen.set(true);
+      this.closeDiskMenu();
   }
   
   handleDiskSave(diskToSave: Disk): void {
@@ -135,11 +163,30 @@ export class VmProfileComponent implements OnInit {
           this.disks.update(disks => disks.map(d => d.id === diskToSave.id ? diskToSave : d));
       } else {
           // Add new disk
+          if (diskToSave.diskNumber === undefined || diskToSave.diskNumber === null) {
+            alert('A disk number must be selected.');
+            return;
+          }
           this.disks.update(disks => [...disks, diskToSave]);
       }
       this.isAddEditDiskModalOpen.set(false);
   }
   
+  handleDeleteDisk(disk: Disk): void {
+    this.diskToDelete.set(disk);
+    this.isDeleteDiskModalOpen.set(true);
+    this.closeDiskMenu();
+  }
+
+  handleConfirmDiskDelete(): void {
+    const disk = this.diskToDelete();
+    if (disk) {
+      this.disks.update(disks => disks.filter(d => d.id !== disk.id));
+    }
+    this.isDeleteDiskModalOpen.set(false);
+    this.diskToDelete.set(null);
+  }
+
   // Gateway Modal Methods
   openAddGatewayModal(): void {
       this.gatewayToEdit.set(null);
@@ -164,6 +211,8 @@ export class VmProfileComponent implements OnInit {
   handleVmAction(action: 'connect' | 'powerOff' | 'restart' | 'delete'): void {
     const vm = this.vm();
     if (!vm) return;
+
+    this.vmActionToConfirm.set(action);
 
     let config;
     switch (action) {
@@ -215,8 +264,10 @@ export class VmProfileComponent implements OnInit {
 
   onConfirmAction(): void {
       const vm = this.vm();
-      if (vm) {
-          console.log(`Action confirmed for VM: ${vm.name}`);
+      const vmAction = this.vmActionToConfirm();
+
+      if (vm && vmAction) {
+          console.log(`Action '${vmAction}' confirmed for VM: ${vm.name}`);
           // Here you would call a service to perform the action.
           // For now, just logging it.
       }
@@ -225,5 +276,16 @@ export class VmProfileComponent implements OnInit {
 
   onCloseConfirmModal(): void {
       this.isConfirmModalOpen.set(false);
+      this.vmActionToConfirm.set(null);
+  }
+
+  // Disk action menu methods
+  toggleDiskMenu(event: MouseEvent, diskId: string): void {
+    event.stopPropagation();
+    this.openDiskMenuId.update(currentId => (currentId === diskId ? null : diskId));
+  }
+
+  closeDiskMenu(): void {
+    this.openDiskMenuId.set(null);
   }
 }

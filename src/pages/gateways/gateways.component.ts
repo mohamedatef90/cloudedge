@@ -1,4 +1,5 @@
 
+
 import { ChangeDetectionStrategy, Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { IconComponent } from '../../components/icon/icon.component';
 import { GatewayService } from './gateway.service';
 import { Gateway } from './gateways.types';
+import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 type SortColumn = keyof Omit<Gateway, 'id' | 'dhcp'>;
 
@@ -14,7 +16,7 @@ type SortColumn = keyof Omit<Gateway, 'id' | 'dhcp'>;
   templateUrl: './gateways.component.html',
   styleUrls: ['./gateways.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent, RouterModule],
+  imports: [CommonModule, FormsModule, IconComponent, RouterModule, AdvancedDeleteConfirmationModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
@@ -26,6 +28,8 @@ export class GatewaysComponent {
   searchTerm = signal('');
   sortColumn = signal<SortColumn>('name');
   sortDirection = signal<'asc' | 'desc'>('asc');
+  isDeleteModalOpen = signal(false);
+  gatewayToDelete = signal<Gateway | null>(null);
 
   gateways = this.gatewayService.gateways;
 
@@ -77,5 +81,20 @@ export class GatewaysComponent {
 
   closeActionMenu(): void {
     this.openActionMenuId.set(null);
+  }
+
+  openDeleteModal(gateway: Gateway): void {
+    this.gatewayToDelete.set(gateway);
+    this.isDeleteModalOpen.set(true);
+    this.closeActionMenu();
+  }
+
+  handleConfirmDelete(): void {
+    const gateway = this.gatewayToDelete();
+    if (gateway) {
+      this.gatewayService.deleteGateway(gateway.id);
+    }
+    this.isDeleteModalOpen.set(false);
+    this.gatewayToDelete.set(null);
   }
 }

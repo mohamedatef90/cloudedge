@@ -1,4 +1,3 @@
-
 export interface Service { 
   name: string; 
   icon: string; 
@@ -13,8 +12,9 @@ export interface FirewallRule {
   services: Service[];
   contextProfiles: string;
   appliedTo: string;
-  action: 'Allow' | 'Deny' | 'Drop';
+  action: 'Allow' | 'Deny' | 'Drop' | 'Reject';
   enabled: boolean;
+  status: 'Success' | 'Error';
 }
 
 export interface FirewallPolicy {

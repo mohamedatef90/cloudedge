@@ -1,0 +1,95 @@
+@if (isOpen()) {
+  <div 
+    (click)="onClose()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div 
+      (click)="onDialogClick($event)"
+      role="dialog" 
+      aria-modal="true" 
+      class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-2xl m-4">
+      
+      <form [formGroup]="ticketForm" (ngSubmit)="onSave()">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700">
+          <h2 class="text-lg font-semibold text-[#293c51] dark:text-gray-200">
+            Create New Support Ticket
+          </h2>
+          <button 
+            type="button"
+            (click)="onClose()" 
+            aria-label="Close" 
+            class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
+            <app-icon name="fas fa-times" className="w-4 h-4" />
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-4">
+          <div>
+            <label for="subject" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+              Subject <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="subject" 
+              formControlName="subject"
+              class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+            >
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="department" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+                Department <span class="text-red-500">*</span>
+              </label>
+              <select id="department" formControlName="department" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+                @for(dept of departments; track dept) {
+                  <option [value]="dept">{{ dept }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="priority" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+                Priority <span class="text-red-500">*</span>
+              </label>
+              <select id="priority" formControlName="priority" class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+                 @for(p of priorities; track p) {
+                  <option [value]="p">{{ p }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="message" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
+              Message <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+              id="message" 
+              formControlName="message"
+              rows="6"
+              placeholder="Please describe your issue in detail..."
+              class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end items-center p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-200 dark:border-slate-700 rounded-b-xl">
+          <button 
+            type="button"
+            (click)="onClose()"
+            class="bg-transparent text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold transition-all duration-200 ease-in-out mr-2">
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            [disabled]="ticketForm.invalid"
+            class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit Ticket
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

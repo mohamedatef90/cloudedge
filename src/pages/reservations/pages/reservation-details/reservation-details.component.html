@@ -1,0 +1,118 @@
+
+@if (reservation(); as res) {
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">{{ res.name }}</h1>
+        <div class="mt-2 flex items-center gap-2">
+            <span [class]="getStatusClass(res.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize">
+                {{ res.status }}
+            </span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+                Active from {{ formatDate(res.startDate) }} to {{ formatDate(res.endDate) }}
+            </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="bg-transparent border border-[#679a41] text-[#679a41] dark:border-[#8cc866] dark:text-[#8cc866] hover:bg-[#679a41]/10 dark:hover:bg-[#8cc866]/10 px-4 py-2 rounded-md text-sm font-semibold transition-colors flex items-center shadow-sm">
+            <app-icon name="fas fa-calendar-plus" className="mr-2"></app-icon>
+            Extend Reservation
+        </button>
+         <button class="bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-md text-sm font-semibold transition-colors flex items-center shadow-sm">
+            <app-icon name="fas fa-ban" className="mr-2"></app-icon>
+            Cancel Reservation
+        </button>
+      </div>
+    </div>
+
+    <!-- Plan Details Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border dark:border-slate-700">
+        <h2 class="text-xl font-bold text-[#293c51] dark:text-gray-200 mb-4">Plan Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Plan Name</p>
+                <p class="text-lg font-semibold text-[#293c51] dark:text-gray-200">{{ res.plan.name }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Plan Type</p>
+                <p class="text-lg font-semibold text-[#293c51] dark:text-gray-200">{{ res.plan.type }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Cores</p>
+                <p class="text-lg font-semibold text-[#293c51] dark:text-gray-200">{{ res.plan.cores }} vCPU</p>
+            </div>
+             <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">RAM</p>
+                <p class="text-lg font-semibold text-[#293c51] dark:text-gray-200">{{ res.plan.ram }} GB</p>
+            </div>
+             <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Storage</p>
+                <p class="text-lg font-semibold text-[#293c51] dark:text-gray-200">{{ res.plan.storage }} GB</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Included Add-ons Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border dark:border-slate-700">
+        <h2 class="text-xl font-bold text-[#293c51] dark:text-gray-200 mb-4">Included Add-ons</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            @for(addon of res.plan.addons; track addon.name) {
+                @if (addon.included) {
+                    <div class="flex items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                        <app-icon [name]="getAddonIcon(addon.name)" className="mr-3 fa-fw text-xl text-[#679a41] dark:text-[#8cc866]"></app-icon>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ addon.name }} {{ addon.quantity ? '(' + addon.quantity + ')' : '' }}</span>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Associated VMs Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6 border dark:border-slate-700">
+        <h2 class="text-xl font-bold text-[#293c51] dark:text-gray-200 mb-4">Associated Virtual Machines ({{ associatedVms().length }})</h2>
+        <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3">VM Name</th>
+                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Cores</th>
+                        <th class="px-6 py-3">Memory</th>
+                        <th class="px-6 py-3">Storage</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+                    @for(vm of associatedVms(); track vm.id) {
+                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                            <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                <a [routerLink]="['/app/cloud-edge/resources/virtual-machines', vm.id]" class="hover:underline hover:text-[#679a41] dark:hover:text-[#8cc866]">{{ vm.name }}</a>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span [class]="getVmStatusClass(vm.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize">
+                                    {{ vm.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">{{ vm.cores }} vCPU</td>
+                            <td class="px-6 py-4">{{ vm.memory }} GB</td>
+                            <td class="px-6 py-4">{{ vm.storage }} GB</td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td colspan="5" class="text-center p-6 text-gray-500 dark:text-gray-400">
+                                No virtual machines are currently associated with this reservation.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+  </div>
+} @else {
+  <div class="text-center py-16">
+    <app-icon name="fas fa-spinner fa-spin" className="text-4xl text-gray-400"></app-icon>
+    <p class="mt-4 text-gray-500 dark:text-gray-400">Loading reservation details...</p>
+  </div>
+}

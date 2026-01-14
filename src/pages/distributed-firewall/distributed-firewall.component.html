@@ -1,4 +1,5 @@
 
+
 <div class="bg-white dark:bg-slate-900/50 text-[#293c51] dark:text-gray-200 font-sans rounded-xl shadow-sm">
   <div class="p-6">
     <div class="flex justify-between items-center pb-3 mb-3 border-b border-gray-200 dark:border-slate-700">
@@ -211,7 +212,14 @@
 <!-- Modals -->
 <app-add-policy-modal [isOpen]="isAddPolicyModalOpen()" (close)="isAddPolicyModalOpen.set(false)" (save)="handleSaveNewPolicy($event)"></app-add-policy-modal>
 
-<app-delete-confirmation-modal [isOpen]="isDeleteModalOpen()" [itemCount]="selectedItems().length" (close)="isDeleteModalOpen.set(false)" (confirm)="handleConfirmDelete()"></app-delete-confirmation-modal>
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen()"
+  itemType="Item"
+  [itemCount]="selectedItems().length"
+  [itemName]="''"
+  (close)="isDeleteModalOpen.set(false)"
+  (confirm)="handleConfirmDelete()">
+</app-advanced-delete-confirmation-modal>
 
 @if(editSourceDestModalState().isOpen) {
   <app-edit-source-dest-modal

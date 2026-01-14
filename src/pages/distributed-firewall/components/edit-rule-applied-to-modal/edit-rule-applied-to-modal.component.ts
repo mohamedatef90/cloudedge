@@ -1,5 +1,3 @@
-
-
 import { ChangeDetectionStrategy, Component, input, output, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -45,8 +43,8 @@ export class EditRuleAppliedToModalComponent {
       if (this.isOpen()) {
         const currentRule = this.rule();
         if (currentRule) {
-          if (currentRule.appliedTo !== 'DFW' && !currentRule.appliedTo.includes('Groups')) {
-              this.selected.set([currentRule.appliedTo]);
+          if (currentRule.appliedTo && currentRule.appliedTo !== 'DFW') {
+              this.selected.set(currentRule.appliedTo.split(',').map(s => s.trim()));
           } else {
               this.selected.set([]);
           }
@@ -90,12 +88,7 @@ export class EditRuleAppliedToModalComponent {
     if (!p || !r) return;
 
     const selectedGroups = this.selected();
-    let newAppliedTo = 'DFW';
-    if (selectedGroups.length === 1) {
-      newAppliedTo = selectedGroups[0];
-    } else if (selectedGroups.length > 1) {
-      newAppliedTo = `${selectedGroups.length} Groups`;
-    }
+    const newAppliedTo = selectedGroups.length > 0 ? selectedGroups.join(', ') : 'DFW';
     
     this.save.emit({ policyId: p.id, ruleId: r.id, newAppliedTo });
     this.close.emit();

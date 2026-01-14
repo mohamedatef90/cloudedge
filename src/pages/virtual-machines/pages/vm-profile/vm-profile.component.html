@@ -1,4 +1,5 @@
 
+
 @if (vm(); as vmData) {
 <div class="space-y-6">
   <!-- Main Details Card -->
@@ -94,9 +95,43 @@
                 </div>
                 <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
                     <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">Size (GB)</th><th class="px-6 py-3">Type</th><th class="px-6 py-3">Actions</th></tr></thead>
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400"><tr><th class="px-6 py-3">Name</th><th class="px-6 py-3">Disk #</th><th class="px-6 py-3">Size (GB)</th><th class="px-6 py-3">Type</th><th class="px-6 py-3 text-right">Actions</th></tr></thead>
                         <tbody>
-                            @for(disk of disks(); track disk.id) {<tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700"><td class="px-6 py-4 font-medium">{{disk.name}}</td><td class="px-6 py-4">{{disk.sizeGB}}</td><td class="px-6 py-4">{{disk.type}}</td><td class="px-6 py-4"><button (click)="openEditDiskModal(disk)" class="text-sky-600 dark:text-sky-400 hover:underline">Edit</button></td></tr>}
+                            @for(disk of disks(); track disk.id; let i = $index; let count = $count) {
+                                <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                                    <td class="px-6 py-4 font-medium">{{disk.name}}</td>
+                                    <td class="px-6 py-4 font-mono">{{disk.diskNumber}}</td>
+                                    <td class="px-6 py-4">{{disk.sizeGB}}</td>
+                                    <td class="px-6 py-4">{{disk.type}}</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="relative inline-block text-left vm-menu-container">
+                                            <button (click)="toggleDiskMenu($event, disk.id)" class="text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center">
+                                                <app-icon name="fas fa-ellipsis-v" />
+                                            </button>
+                                            @if (openDiskMenuId() === disk.id) {
+                                                <div class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 z-10"
+                                                    [class.origin-top-right]="i < count - 2"
+                                                    [class.origin-bottom-right]="i >= count - 2"
+                                                    [class.bottom-full]="i >= count - 2"
+                                                    [class.mb-2]="i >= count-2">
+                                                    <div class="py-1">
+                                                        <button (click)="openEditDiskModal(disk)" class="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                                                            <app-icon name="fas fa-pencil-alt" class="w-4 mr-3" />
+                                                            Edit
+                                                        </button>
+                                                        @if (disk.diskNumber !== 0) {
+                                                            <button (click)="handleDeleteDisk(disk)" class="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                                <app-icon name="fas fa-trash-alt" class="w-4 mr-3" />
+                                                                Delete
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -160,6 +195,7 @@
     [isOpen]="isAddEditDiskModalOpen()"
     [diskToEdit]="diskToEdit()"
     [availableStorage]="availableStorage()"
+    [availableDiskNumbers]="getAvailableDiskNumbers()"
     (close)="isAddEditDiskModalOpen.set(false)"
     (save)="handleDiskSave($event)"
 />
@@ -182,3 +218,10 @@
   (close)="onCloseConfirmModal()"
   (confirm)="onConfirmAction()">
 </app-confirmation-modal>
+
+<app-delete-disk-confirmation-modal
+    [isOpen]="isDeleteDiskModalOpen()"
+    [disk]="diskToDelete()"
+    (close)="isDeleteDiskModalOpen.set(false)"
+    (confirm)="handleConfirmDiskDelete()">
+</app-delete-disk-confirmation-modal>

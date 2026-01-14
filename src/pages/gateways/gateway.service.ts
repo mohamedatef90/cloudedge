@@ -1,4 +1,5 @@
 
+
 import { Injectable, signal } from '@angular/core';
 import { Gateway, GatewayFormData } from './gateways.types';
 
@@ -52,5 +53,9 @@ export class GatewayService {
     this.gatewaysState.update(gateways =>
       gateways.map(gw => (gw.id === id ? updatedGateway : gw))
     );
+  }
+
+  deleteGateway(id: string): void {
+    this.gatewaysState.update(gateways => gateways.filter(gw => gw.id !== id));
   }
 }

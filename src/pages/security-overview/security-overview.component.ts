@@ -38,7 +38,7 @@ export class SecurityOverviewComponent implements AfterViewInit, OnInit {
 
   // Page state
   activeTab = signal<'overview' | 'logs' | 'signatures' | 'settings'>('overview');
-  isIdsEnabled = signal(true);
+  isHubEnabled = signal(true);
   isInfoVisible = signal(false);
   
   tabs = [
@@ -56,7 +56,7 @@ export class SecurityOverviewComponent implements AfterViewInit, OnInit {
   ]);
 
   ngOnInit(): void {
-    if (localStorage.getItem('idsIpsInfoDismissed') !== 'true') {
+    if (localStorage.getItem('securityHubInfoDismissed') !== 'true') {
       this.isInfoVisible.set(true);
     }
   }
@@ -75,7 +75,7 @@ export class SecurityOverviewComponent implements AfterViewInit, OnInit {
   
   dismissInfo(): void {
     this.isInfoVisible.set(false);
-    localStorage.setItem('idsIpsInfoDismissed', 'true');
+    localStorage.setItem('securityHubInfoDismissed', 'true');
   }
 
   setActiveTab(tabId: 'overview' | 'logs' | 'signatures' | 'settings'): void {

@@ -1,0 +1,54 @@
+
+<div class="login-container">
+  <div class="login-card">
+    <img src="https://i.postimg.cc/m2JfPxcb/Cloud-Edge.png" alt="CloudEdge Logo" class="m-auto w-40 mb-2" />
+    <h2 class="text-xl font-semibold text-center text-gray-800 dark:text-gray-200">Welcome Back</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">Sign in to your account</p>
+    
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-4">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+        <div class="mt-1 relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <app-icon name="fas fa-user" className="text-gray-400"></app-icon>
+          </div>
+          <input type="text" id="username" name="username" [(ngModel)]="username" required
+                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+        </div>
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+        <div class="mt-1 relative">
+           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <app-icon name="fas fa-lock" className="text-gray-400"></app-icon>
+          </div>
+          <input type="password" id="password" name="password" [(ngModel)]="password" required
+                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
+        </div>
+      </div>
+      
+      @if (errorMessage()) {
+        <div class="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded relative text-sm">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div>
+        <button type="submit" [disabled]="!loginForm.form.valid || isLoading()"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#679a41] hover:bg-[#537d34] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#679a41] disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (isLoading()) {
+            <div class="flex items-center">
+              <app-icon name="fas fa-spinner fa-spin" className="mr-2"></app-icon>
+              <span>Signing in...</span>
+            </div>
+          } @else {
+            <span>Sign in</span>
+          }
+        </button>
+      </div>
+    </form>
+    <div class="text-xs text-gray-500 mt-4 text-center">
+      <p>Hint: Use admin/123456 or micro/123456</p>
+    </div>
+  </div>
+</div>

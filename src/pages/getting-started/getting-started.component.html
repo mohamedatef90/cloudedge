@@ -1,0 +1,49 @@
+<div class="getting-started-container">
+  <div class="circle-container">
+    <div class="circle-track"></div>
+    <div class="circle-rotator" [style.transform]="'rotate(' + rotation() + 'deg)'">
+      @for (step of positionedSteps(); track step.id; let i = $index) {
+        <div 
+          class="step-item-wrapper"
+          [style.top]="step.top"
+          [style.left]="step.left">
+          <button 
+            class="step-item" 
+            [class.active]="i === activeStepIndex()"
+            (click)="setActiveStep(i)"
+            [style.transform]="'rotate(' + step.rotation + 'deg)'">
+            <span class="step-number">0{{ i + 1 }}</span>
+            <div class="step-details">
+                <app-icon [name]="step.icon" className="step-icon"></app-icon>
+                <span class="step-title">{{ step.title }}</span>
+                @if (step.completed) {
+                  <app-icon name="fas fa-check-circle" className="text-green-500 dark:text-green-400 ml-2"></app-icon>
+                }
+            </div>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="content-container">
+    @if (activeStep(); as step) {
+      <div class="content-item" [attr.data-id]="step.id">
+        <h2 class="content-title">
+          <span class="step-number-large">0{{ activeStepIndex() + 1 }}</span>
+          <span class="flex items-center gap-3">
+            {{ step.title }}
+            @if (step.completed) {
+              <app-icon name="fas fa-check-circle" className="text-green-500 dark:text-green-400 text-2xl"></app-icon>
+            }
+          </span>
+        </h2>
+        <p class="content-description">{{ step.description }}</p>
+        <a [routerLink]="step.path" class="content-cta">
+          {{ step.callToAction }}
+          <app-icon name="fas fa-arrow-right" className="ml-2"></app-icon>
+        </a>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,74 @@
+
+@if (topic(); as currentTopic) {
+  <div class="max-w-4xl mx-auto">
+    <!-- Topic Header -->
+    <div class="mb-8">
+        <nav class="text-sm mb-4">
+            <a routerLink="/app/cloud-edge/resources/community-forum" class="text-gray-500 dark:text-gray-400 hover:underline">Community Forum</a>
+            @if(category(); as cat) {
+                <app-icon name="fas fa-chevron-right" className="mx-2 text-xs"></app-icon>
+                <a routerLink="/app/cloud-edge/resources/community-forum" class="text-gray-500 dark:text-gray-400 hover:underline">{{ cat.name }}</a>
+            }
+        </nav>
+      <h1 class="text-3xl font-bold text-[#293c51] dark:text-gray-100">{{ currentTopic.title }}</h1>
+      <div class="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+        <div class="flex items-center gap-2">
+            <img [src]="currentTopic.author.avatar" alt="" class="w-6 h-6 rounded-full">
+            <span>{{ currentTopic.author.name }}</span>
+        </div>
+        <span>{{ currentTopic.replies }} replies</span>
+        <span>{{ currentTopic.views.toLocaleString() }} views</span>
+      </div>
+    </div>
+
+    <!-- Main Post -->
+    <div class="flex items-start gap-6 bg-white dark:bg-slate-800 rounded-xl shadow p-6 border dark:border-slate-700">
+        <div class="flex-shrink-0 text-center">
+            <img [src]="currentTopic.author.avatar" alt="" class="w-14 h-14 rounded-full mx-auto">
+            <p class="mt-2 font-semibold text-sm">{{ currentTopic.author.name }}</p>
+        </div>
+        <div class="flex-1 border-l dark:border-slate-700 pl-6">
+            <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">Posted on July 31, 2024</div>
+            <div class="prose dark:prose-invert max-w-none" [innerHTML]="currentTopic.content"></div>
+        </div>
+    </div>
+
+    <!-- Replies -->
+    <div class="mt-10 space-y-6">
+        @for(comment of currentTopic.comments; track comment.id) {
+            <div class="flex items-start gap-6">
+                <div class="flex-shrink-0 text-center w-20">
+                    <img [src]="comment.author.avatar" alt="" class="w-14 h-14 rounded-full mx-auto">
+                    <p class="mt-2 font-semibold text-sm truncate">{{ comment.author.name }}</p>
+                    @if(comment.author.role) {
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300">{{ comment.author.role }}</span>
+                    }
+                </div>
+                <div class="flex-1 bg-white dark:bg-slate-800 rounded-xl shadow p-6 border dark:border-slate-700">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">{{ comment.time }}</div>
+                    <div class="prose dark:prose-invert max-w-none text-sm" [innerHTML]="comment.content"></div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Reply Box -->
+    <div class="mt-10 pt-8 border-t dark:border-slate-700">
+        <h3 class="text-xl font-semibold text-[#293c51] dark:text-gray-200 mb-4">Leave a Reply</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-4 border dark:border-slate-700">
+            <textarea placeholder="Write your reply here..." rows="5" class="w-full p-2 border-0 rounded-md focus:ring-0 dark:bg-slate-800 dark:placeholder-gray-500"></textarea>
+            <div class="flex justify-end mt-2">
+                <button class="bg-[#679a41] text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-[#537d34] transition-colors">
+                    Post Reply
+                </button>
+            </div>
+        </div>
+    </div>
+
+  </div>
+} @else {
+    <div class="text-center py-20">
+        <app-icon name="fas fa-spinner fa-spin" className="text-4xl text-gray-400"></app-icon>
+        <p class="mt-4 text-gray-500">Loading topic...</p>
+    </div>
+}

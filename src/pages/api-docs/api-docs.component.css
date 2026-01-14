@@ -1,0 +1,22 @@
+/* In a real app with a proper build process, you'd use a syntax highlighting library.
+   For this demo, we'll just style the code blocks for a good visual appearance. */
+
+:host ::ng-deep .prose pre {
+  background-color: #1e293b; /* slate-800 */
+  color: #e2e8f0; /* slate-200 */
+  border: 1px solid #334155; /* slate-700 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+  overflow-x: auto;
+}
+
+:host ::ng-deep .prose code {
+  color: #e2e8f0; /* slate-200 */
+  font-weight: normal;
+}
+
+:host ::ng-deep .prose code::before,
+:host ::ng-deep .prose code::after {
+  content: none;
+}

@@ -7,14 +7,36 @@
       (toggleSidebar)="toggleSidebar()"
     />
     <!-- The main area is the scroll container. Added a consistent background color. -->
-    <main class="flex-1 overflow-y-auto overflow-x-hidden bg-[#f7f8fa] dark:bg-slate-900">
+    <main
+      class="flex-1 overflow-x-hidden"
+      [class.overflow-y-auto]="!isGettingStartedPage()"
+      [class.overflow-y-hidden]="isGettingStartedPage()"
+      [class.bg-[#f7f8fa]]="!isGettingStartedPage()"
+      [class.dark:bg-slate-900]="!isGettingStartedPage()"
+    >
       <!-- Sticky Breadcrumbs Header -->
-      <div class="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 px-6 pt-6 pb-4">
-          <app-breadcrumbs [items]="breadcrumbItems()" />
-      </div>
+      @if (!isGettingStartedPage()) {
+        <div class="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 px-6 pt-6 pb-4 flex justify-between items-center">
+            <app-breadcrumbs [items]="breadcrumbItems()" />
+
+            @if (isDistributedFirewallOldPage()) {
+              <div class="flex items-center gap-2">
+                <button (click)="onAddPolicyClick()" class="bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-700 flex items-center gap-2">
+                  <app-icon name="fas fa-plus"></app-icon>
+                  Add
+                </button>
+                <button class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 px-2 py-2 rounded-md hover:bg-gray-50 dark:hover:bg-slate-600">
+                  <app-icon name="fas fa-sync-alt"></app-icon>
+                </button>
+              </div>
+            }
+        </div>
+      }
       
       <!-- Scrollable Content -->
-      <div class="p-6">
+      <div 
+        [class.p-6]="!isGettingStartedPage()"
+        [class.h-full]="isGettingStartedPage()">
           <router-outlet></router-outlet>
       </div>
     </main>

@@ -146,7 +146,7 @@ export const FIXED_PLANS: Plan[] = [
 export const MOCK_INITIAL_RESERVATIONS: Reservation[] = [
     {
       id: 'res-1',
-      name: 'Prod-WebServer-Reservation',
+      name: 'Web-Tier-Reservation',
       plan: FIXED_PLANS[0], // General Purpose
       status: 'Active',
       startDate: '2023-01-20T00:00:00Z',
@@ -154,7 +154,7 @@ export const MOCK_INITIAL_RESERVATIONS: Reservation[] = [
     },
     {
       id: 'res-2',
-      name: 'DB-Cluster-Reservation-Large',
+      name: 'DB-Tier-Reservation',
       plan: FIXED_PLANS[2], // Memory Optimized
       status: 'Active',
       startDate: '2023-08-01T00:00:00Z',
@@ -170,7 +170,7 @@ export const MOCK_INITIAL_RESERVATIONS: Reservation[] = [
     },
     {
       id: 'res-4',
-      name: 'K8s-Cluster-Nodes',
+      name: 'Compute-Cluster-Reservation',
       plan: FIXED_PLANS[1], // Compute Optimized
       status: 'Active',
       startDate: '2024-02-10T00:00:00Z',

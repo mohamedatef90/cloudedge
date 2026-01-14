@@ -1,0 +1,159 @@
+<div>
+  <!-- Policies -->
+  <div class="border border-gray-200 dark:border-slate-700 rounded-md">
+    @for (policy of filteredPolicies(); track policy.id; let first = $first) {
+      <div class="bg-white dark:bg-slate-800" [class.border-t]="!first" [class.border-gray-200]="!first" [class.dark:border-slate-700]="!first">
+        <!-- Policy Header -->
+        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-slate-900/50 border-b border-gray-200 dark:border-slate-700">
+          <div class="flex items-center gap-2">
+            <button class="text-gray-500 dark:text-gray-400 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-slate-700 cursor-grab">
+              <app-icon name="fas fa-grip-vertical"></app-icon>
+            </button>
+            <button (click)="togglePolicy(policy.id)" class="text-gray-500 dark:text-gray-400 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-slate-700">
+              <app-icon [name]="policy.isExpanded ? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></app-icon>
+            </button>
+            <span class="font-bold text-sm text-gray-800 dark:text-gray-200">Policy:</span>
+            <span class="text-sm text-gray-800 dark:text-gray-200">{{ policy.name }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{ policy.rules.length }} Rules</span>
+          </div>
+          <div class="relative">
+            <button (click)="toggleMenu(policy.id)" class="text-gray-500 dark:text-gray-400 w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-slate-700">
+              <app-icon name="fas fa-ellipsis-h"></app-icon>
+            </button>
+            @if(openMenus()[policy.id]) {
+              <div class="absolute right-0 mt-2 w-32 bg-white dark:bg-slate-700 rounded-md shadow-lg z-10 ring-1 ring-black ring-opacity-5">
+                <ul class="py-1">
+                  <li><button (click)="handleEditPolicy(policy)" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 flex items-center gap-2"><app-icon name="fas fa-pencil-alt" /> Edit</button></li>
+                  <li><button (click)="handleDeletePolicy(policy)" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"><app-icon name="fas fa-trash-alt" /> Delete</button></li>
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Rules Table -->
+        @if (policy.isExpanded) {
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-white dark:bg-slate-800">
+                <tr class="border-b border-gray-200 dark:border-slate-700">
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300 w-[20%]">Rule Name</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Source</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Destination</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">AppliedTo</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Context Profiles</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Service</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Action</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(rule of policy.rules; track rule.id) {
+                  <tr class="border-b border-gray-200 dark:border-slate-700 last:border-b-0">
+                    <td class="px-4 py-2 align-top">
+                      <div class="flex items-center">
+                        <span class="text-gray-800 dark:text-gray-200">{{ rule.name }}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 align-top text-gray-600 dark:text-gray-300">
+                      @let items = getDisplayItems(rule.sources);
+                      @for(item of items.slice(0, 5); track item) {
+                        <div class="flex items-center gap-2 mb-1">
+                          <app-icon [name]="isIpAddress(item) ? 'fas fa-network-wired' : 'fas fa-folder'" className="text-slate-500"></app-icon>
+                          <span class="truncate">{{ item }}</span>
+                        </div>
+                      }
+                      @if(items.length > 5) {
+                        <button (click)="openViewSourcesModal(rule.sources)" class="text-sky-600 dark:text-sky-400 text-xs hover:underline">+ {{ items.length - 5 }} more</button>
+                      }
+                    </td>
+                    <td class="px-4 py-2 align-top text-gray-600 dark:text-gray-300">
+                      @for(item of getDisplayItems(rule.destinations); track item) {
+                        <div class="flex items-center gap-2 mb-1">
+                          <app-icon [name]="isIpAddress(item) ? 'fas fa-network-wired' : 'fas fa-folder'" className="text-slate-500"></app-icon>
+                          <span>{{ item }}</span>
+                        </div>
+                      }
+                    </td>
+                    <td class="px-4 py-2 align-top text-gray-600 dark:text-gray-300">
+                      @for(item of getDisplayItems(rule.appliedTo); track item) {
+                        <div class="flex items-center gap-2 mb-1">
+                          <app-icon [name]="isIpAddress(item) ? 'fas fa-network-wired' : 'fas fa-folder'" className="text-slate-500"></app-icon>
+                          <span>{{ item }}</span>
+                        </div>
+                      }
+                    </td>
+                    <td class="px-4 py-2 align-top text-gray-600 dark:text-gray-300">
+                      @for(item of getDisplayItems(rule.contextProfiles); track item) {
+                        <div class="flex items-center gap-2 mb-1">
+                           @if(item !== 'None') {
+                            <app-icon [name]="isIpAddress(item) ? 'fas fa-network-wired' : 'fas fa-folder'" className="text-slate-500"></app-icon>
+                           }
+                          <span>{{ item }}</span>
+                        </div>
+                      }
+                    </td>
+                    <td class="px-4 py-2 align-top text-gray-600 dark:text-gray-300">{{ getServiceNames(rule.services) }}</td>
+                    <td class="px-4 py-2 align-top">
+                      <div class="flex items-center gap-2 font-medium" [class.text-green-600]="rule.action === 'Allow'" [class.dark:text-green-400]="rule.action === 'Allow'" [class.text-red-600]="rule.action !== 'Allow'" [class.dark:text-red-400]="rule.action !== 'Allow'">
+                        <span class="w-2.5 h-2.5 rounded-full" [class.bg-green-500]="rule.action === 'Allow'" [class.bg-red-500]="rule.action !== 'Allow'"></span>
+                        <span>{{ rule.action }}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 align-top">
+                      <span class="w-2.5 h-2.5 rounded-full inline-block" [class.bg-green-500]="rule.status === 'Success'" [class.bg-red-500]="rule.status === 'Error'"></span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="8" class="text-center p-4 text-gray-500 dark:text-gray-400">No rules in this policy.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    } @empty {
+      <div class="text-center py-16 px-6">
+        <app-icon name="fas fa-search-minus" className="text-5xl text-gray-400 dark:text-gray-500 mb-4"></app-icon>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">No Policies Found</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Your search did not return any results.</p>
+      </div>
+    }
+  </div>
+</div>
+
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeletePolicyModalOpen()"
+  itemType="Policy"
+  [itemName]="policyToDelete()?.name || ''"
+  (close)="isDeletePolicyModalOpen.set(false); policyToDelete.set(null)"
+  (confirm)="handleConfirmDeletePolicy()">
+</app-advanced-delete-confirmation-modal>
+
+@if(isViewSourcesModalOpen()) {
+  <div (click)="isViewSourcesModalOpen.set(false)" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div (click)="$event.stopPropagation()" class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md m-4 flex flex-col max-h-[60vh]">
+      <div class="p-4 border-b dark:border-slate-700 flex-shrink-0 flex justify-between items-center">
+        <h2 class="text-lg font-semibold">All Sources</h2>
+        <button (click)="isViewSourcesModalOpen.set(false)" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700">
+          <app-icon name="fas fa-times" />
+        </button>
+      </div>
+      <div class="p-6 flex-grow overflow-y-auto">
+        <ul class="space-y-2">
+          @for(source of sourcesToView(); track source) {
+            <li class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-slate-700/50 rounded-md">
+              <app-icon [name]="isIpAddress(source) ? 'fas fa-network-wired' : 'fas fa-folder'" className="text-slate-500"></app-icon>
+              <span>{{ source }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+      <div class="p-4 flex justify-end bg-gray-50 dark:bg-slate-800/50 border-t dark:border-slate-700 flex-shrink-0">
+        <button (click)="isViewSourcesModalOpen.set(false)" class="bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-semibold">Close</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,4 +1,3 @@
-
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow min-h-full">
   <!-- Header -->
   <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
@@ -40,10 +39,10 @@
           <span class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white ring-2 ring-white dark:ring-slate-800">{{ activeFilterCount() }}</span>
         }
       </button>
-       <button class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2">
+       <a routerLink="/app/cloud-edge/resources/recycle-bin" class="bg-transparent border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2">
         <app-icon name="fas fa-recycle" />
         Recycle Bin
-      </button>
+      </a>
     </div>
   </div>
 
@@ -145,7 +144,7 @@
   </div>
 </app-filter-panel>
 
-<!-- Confirmation Modal -->
+<!-- Confirmation Modal (for non-delete actions) -->
 <app-confirmation-modal 
   [isOpen]="isConfirmModalOpen()"
   [title]="confirmModalConfig().title"
@@ -157,3 +156,13 @@
   (close)="onCloseConfirmModal()"
   (confirm)="onConfirmAction()">
 </app-confirmation-modal>
+
+<!-- Advanced Delete Modal -->
+<app-advanced-delete-confirmation-modal
+  [isOpen]="isDeleteModalOpen()"
+  itemType="Virtual Machine"
+  [itemName]="vmToDelete()?.name || ''"
+  [customMessage]="deleteModalMessage()"
+  (close)="isDeleteModalOpen.set(false); vmToDelete.set(null)"
+  (confirm)="handleConfirmDelete()">
+</app-advanced-delete-confirmation-modal>

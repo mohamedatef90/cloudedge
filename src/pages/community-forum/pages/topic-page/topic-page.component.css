@@ -1,0 +1,13 @@
+:host ::ng-deep .prose p {
+  margin-bottom: 1em;
+}
+:host ::ng-deep .prose code {
+  background-color: #f3f4f6;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  border-radius: 3px;
+}
+:host-context(.dark) ::ng-deep .prose code {
+  background-color: #334155;
+}

@@ -71,7 +71,7 @@ export class CloudEdgeSidebarComponent {
         dashboardIcon = 'fas fa-tachometer-alt';
     }
 
-    return [
+    const allSections: SidebarSection[] = [
       { 
         title: '', 
         items: [
@@ -106,17 +106,18 @@ export class CloudEdgeSidebarComponent {
         items: [
             { name: 'Applications', icon: 'far fa-file-alt', path: '/app/cloud-edge/inventory/applications' },
             { name: 'Groups', icon: 'fas fa-layer-group', path: '/app/cloud-edge/inventory/firewall-groups' },
-            { name: 'Services', icon: 'fas fa-concierge-bell', path: '/app/cloud-edge/inventory/firewall-services' }
+            { name: 'Services', icon: 'fas fa-gears', path: '/app/cloud-edge/inventory/firewall-services' }
         ]
       },
       { 
         title: 'Security',
         items: [
-            { name: 'IDS/IPS', icon: 'fas fa-shield-alt', path: '/app/cloud-edge/security/ids-ips' },
+            { name: 'Security Hub', icon: 'fas fa-shield-alt', path: '/app/cloud-edge/security/hub' },
             { name: 'Filtering and Analysis', icon: 'fas fa-filter', path: '/app/cloud-edge/security/filtering-analysis' },
             { name: 'Distributed Firewall', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall' },
+            { name: 'Distributed Firewall-old', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall-old' },
             { name: 'Gateway Firewall', icon: 'fas fa-dungeon', path: '/app/cloud-edge/security/gateway-firewall' },
-            { name: 'IDS/IPS & Malware Prevention', icon: 'fas fa-bug', path: '/app/cloud-edge/security/ids-ips-malware-prevention' },
+            { name: 'IDS/IPS & Malware', icon: 'fas fa-bug', path: '/app/cloud-edge/security/hub-malware-prevention' },
         ]
       },
       {
@@ -127,5 +128,15 @@ export class CloudEdgeSidebarComponent {
           ]
       }
     ];
+
+    if (userRole === 'micro') {
+      return allSections.filter(section => 
+          section.title === '' || // Keep dashboard
+          section.title === 'Inventory' || 
+          section.title === 'Security'
+      );
+    }
+
+    return allSections;
   });
 }

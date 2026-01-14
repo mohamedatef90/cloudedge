@@ -1,5 +1,69 @@
-
 <div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
-  <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Tickets</h1>
-  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Manage your support tickets here.</p>
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Support Center</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">View and manage your support tickets.</p>
+    </div>
+    <button (click)="isModalOpen.set(true)" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center justify-center shadow-sm">
+      <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+      Create New Ticket
+    </button>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <div class="relative overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" class="px-6 py-3">Ticket ID</th>
+            <th scope="col" class="px-6 py-3">Subject</th>
+            <th scope="col" class="px-6 py-3">Department</th>
+            <th scope="col" class="px-6 py-3">Status</th>
+            <th scope="col" class="px-6 py-3">Last Update</th>
+            <th scope="col" class="px-6 py-3 text-center">Priority</th>
+            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of tickets(); track ticket.id) {
+            <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+              <td class="px-6 py-4 font-mono text-gray-900 dark:text-white whitespace-nowrap">{{ ticket.id }}</td>
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ ticket.subject }}</td>
+              <td class="px-6 py-4">{{ ticket.department }}</td>
+              <td class="px-6 py-4">
+                <span [class]="getStatusClass(ticket.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize">
+                  {{ ticket.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ ticket.lastUpdate }}</td>
+              <td class="px-6 py-4 text-center">
+                <app-icon name="fas fa-circle" [className]="getPriorityClass(ticket.priority)" [title]="ticket.priority"></app-icon>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <a href="#" class="font-medium text-[#679a41] dark:text-[#8cc866] hover:underline">View</a>
+              </td>
+            </tr>
+          } @empty {
+            <tr class="bg-white dark:bg-slate-800">
+              <td colspan="7" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                <div class="flex flex-col items-center">
+                  <app-icon name="fas fa-ticket-alt" className="text-4xl mb-3"></app-icon>
+                  <p class="font-semibold">No tickets found</p>
+                  <p class="text-sm">Create a new ticket to get support.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
+<app-create-ticket-modal 
+  [isOpen]="isModalOpen()" 
+  (close)="isModalOpen.set(false)"
+  (create)="handleCreateTicket($event)">
+</app-create-ticket-modal>
