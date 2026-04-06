@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../../../components/icon/icon.component';
-import { GroupData, MemberCategory } from '../../firewall-groups.component';
+import { GroupData, MemberCategory } from '../../../../services/firewall-groups.service';
 
 @Component({
   selector: 'app-view-members-modal',

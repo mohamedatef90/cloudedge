@@ -1,4 +1,5 @@
 
+
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -6,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
-import { IconComponent } from '../../../../components/icon/icon.component';
 import { NatService } from '../../nat.service';
 import { NatRule } from '../../nats.types';
 import { GatewayService } from '../../../gateways/gateway.service';
@@ -17,7 +17,7 @@ import { Gateway } from '../../../gateways/gateways.types';
   templateUrl: './create-edit-nat.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [RouterModule, IconComponent, CommonModule, ReactiveFormsModule]
+  imports: [RouterModule, CommonModule, ReactiveFormsModule]
 })
 export class CreateEditNatComponent implements OnInit {
   private fb = inject(FormBuilder);

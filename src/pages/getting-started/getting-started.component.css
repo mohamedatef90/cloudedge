@@ -1,3 +1,4 @@
+
 @keyframes aurora {
 	0% {
 		background-position: 0% 50%;
@@ -36,7 +37,7 @@
   }
 }
 
-:host-context(.dark) @keyframes pulseGlow {
+@keyframes pulseGlowDark {
   0% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(140, 200, 102, 0.4);
@@ -194,7 +195,7 @@
 }
 
 :host-context(.dark) .step-item.active::after {
-    animation-name: pulseGlow;
+    animation-name: pulseGlowDark;
 }
 
 .step-item.active .step-number {

@@ -1,8 +1,6 @@
 
 
 import { ChangeDetectionStrategy, Component, ElementRef, inject, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
-
 import { AppLauncherData } from '../../../../types';
 import { IconComponent } from '../../../../components/icon/icon.component';
 
@@ -11,7 +9,7 @@ import { IconComponent } from '../../../../components/icon/icon.component';
   templateUrl: './floating-app-launcher.component.html',
   styleUrls: ['./floating-app-launcher.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, IconComponent],
+  imports: [IconComponent],
   // FIX: Replaced @HostListener with the host property for better component encapsulation.
   host: {
     '(document:keydown.escape)': 'onEscapeKey()',

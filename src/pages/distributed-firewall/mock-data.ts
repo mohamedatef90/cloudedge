@@ -134,12 +134,12 @@ export const mockAvailableGroupsForSelection: SelectableGroup[] = [
 export const mockPoliciesData: FirewallPolicy[] = [
     { 
         id: 'policy1', name: 'asfsfdsgdfg', policyId: '(1)', appliedTo: 'DFW', status: 'Success', rules: [
-            { id: 'rule-web-1', name: 'asfsfdsgdfg', ruleId: '1', sources: 'g1, as, em, v1, yyyyyyyyy, 1.1.1.1, new-source-1, new-source-2, another-long-source-name-for-testing', destinations: 'g1', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'name2', appliedTo: 'v1', action: 'Allow', enabled: true, status: 'Success' },
+            { id: 'rule-web-1', name: 'asfsfdsgdfg', ruleId: '1', sources: '..., ..., em, v1, yyyyyyyyy, 1.1.1.1, new-source-1, new-source-2, another-long-source-name-for-testing', destinations: '..., ...', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'name2', appliedTo: '...', action: 'Allow', enabled: true, status: 'Success' },
         ], isExpanded: true 
     },
     { 
         id: 'policy2', name: 'hj', policyId: '(1)', appliedTo: 'DFW', status: 'Success', rules: [
-            { id: 'rule-db-1', name: '639ddb61-3af1-4ead-b605-adc4d54e633', ruleId: '2', sources: 'g1, as, em, v1, yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy..., 1.1.1.1', destinations: 'mk', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'xzzx', appliedTo: 'v1', action: 'Reject', enabled: true, status: 'Error' },
+            { id: 'rule-db-1', name: '639ddb61-3af1-4ead-b605-adc4d54e633', ruleId: '2', sources: '..., ..., em, v1, yyyyyyyyy, 1.1.1.1', destinations: '...', services: [{ name: 'Any', icon: 'fas fa-asterisk' }], contextProfiles: 'xzzx', appliedTo: '...', action: 'Reject', enabled: true, status: 'Error' },
         ], isExpanded: true 
     },
     { 

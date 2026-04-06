@@ -5,8 +5,19 @@ import { DashboardAnimationService } from './services/dashboard-animation.servic
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  template: `
+    @if (showSplash()) {
+      <app-splash-screen (animationFinished)="onAnimationFinished()"></app-splash-screen>
+    } @else {
+      <router-outlet></router-outlet>
+    }
+  `,
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, SplashScreenComponent],
 })

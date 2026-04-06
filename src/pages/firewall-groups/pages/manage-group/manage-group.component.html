@@ -1,0 +1,161 @@
+<div class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+  <div class="p-6 border-b border-gray-200 dark:border-slate-700">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+      {{ isEditMode() ? 'Edit' : 'Add' }} Firewall Group
+    </h2>
+  </div>
+
+  <!-- Tabs -->
+  <div class="px-6 pt-4">
+    <div class="flex border-b border-gray-200 dark:border-slate-700">
+      <button 
+        (click)="setActiveTab('main')"
+        [class.border-[#679a41]]="activeTab() === 'main'"
+        [class.text-[#679a41]]="activeTab() === 'main'"
+        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors focus:outline-none"
+        [class.border-transparent]="activeTab() !== 'main'"
+        [class.text-gray-500]="activeTab() !== 'main'"
+      >
+        Main Info
+      </button>
+      <button 
+        (click)="setActiveTab('members')"
+        [class.border-[#679a41]]="activeTab() === 'members'"
+        [class.text-[#679a41]]="activeTab() === 'members'"
+        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors focus:outline-none"
+        [class.border-transparent]="activeTab() !== 'members'"
+        [class.text-gray-500]="activeTab() !== 'members'"
+      >
+        Members
+      </button>
+      <button 
+        (click)="setActiveTab('ips')"
+        [class.border-[#679a41]]="activeTab() === 'ips'"
+        [class.text-[#679a41]]="activeTab() === 'ips'"
+        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors focus:outline-none"
+        [class.border-transparent]="activeTab() !== 'ips'"
+        [class.text-gray-500]="activeTab() !== 'ips'"
+      >
+        IPs
+      </button>
+    </div>
+  </div>
+
+  <div class="p-6">
+    <!-- Main Info Tab -->
+    @if (activeTab() === 'main') {
+      <div class="space-y-6 max-w-2xl animate-in fade-in duration-300">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name</label>
+          <input 
+            type="text" 
+            [ngModel]="groupForm().name"
+            (ngModelChange)="groupForm.update(f => ({ ...f, name: $event }))"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:bg-slate-700 dark:text-white"
+            placeholder="Enter group name"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reservations</label>
+          <input 
+            type="text" 
+            [ngModel]="groupForm().reservations"
+            (ngModelChange)="groupForm.update(f => ({ ...f, reservations: $event }))"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:bg-slate-700 dark:text-white"
+            placeholder="Enter reservations"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+          <textarea 
+            [ngModel]="groupForm().description"
+            (ngModelChange)="groupForm.update(f => ({ ...f, description: $event }))"
+            rows="4"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:bg-slate-700 dark:text-white"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+      </div>
+    }
+
+    <!-- Members Tab -->
+    @if (activeTab() === 'members') {
+      <div class="space-y-6 animate-in fade-in duration-300">
+        <div class="max-w-md">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter</label>
+          <select 
+            [ngModel]="memberFilter()"
+            (ngModelChange)="memberFilter.set($event)"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:bg-slate-700 dark:text-white"
+          >
+            <option value="All">Select Type...</option>
+            <option value="VM">VM</option>
+            <option value="Gateway">Gateway</option>
+          </select>
+        </div>
+
+        <div class="border border-gray-200 dark:border-slate-700 rounded-md overflow-hidden">
+          <div class="divide-y divide-gray-100 dark:divide-slate-700">
+            @for (member of filteredMembers(); track member.id) {
+              <div class="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <div class="flex items-center gap-4">
+                  <button 
+                    (click)="toggleMemberSelection(member.id)"
+                    class="w-6 h-6 flex items-center justify-center rounded border transition-colors"
+                    [class.bg-[#679a41]]="member.isSelected"
+                    [class.border-[#679a41]]="member.isSelected"
+                    [class.text-white]="member.isSelected"
+                    [class.border-gray-300]="!member.isSelected"
+                    [class.dark:border-slate-600]="!member.isSelected"
+                  >
+                    <app-icon [name]="member.isSelected ? 'fas fa-check' : 'fas fa-plus'" [className]="member.isSelected ? 'text-[10px]' : 'text-xs text-gray-400'"></app-icon>
+                  </button>
+                  <span class="text-sm text-gray-700 dark:text-gray-300">
+                    {{ member.name }} ({{ member.type }})
+                  </span>
+                </div>
+              </div>
+            } @empty {
+              <div class="p-8 text-center text-gray-500">
+                No members found matching the filter.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- IPs Tab -->
+    @if (activeTab() === 'ips') {
+      <div class="space-y-6 max-w-2xl animate-in fade-in duration-300">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">IP Addresses</label>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Enter IP addresses separated by commas (e.g., 192.168.1.1, 10.0.0.0/24)</p>
+          <input 
+            type="text" 
+            [ngModel]="groupForm().ipAddresses"
+            (ngModelChange)="groupForm.update(f => ({ ...f, ipAddresses: $event }))"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md font-mono text-sm focus:outline-none focus:ring-1 focus:ring-[#679a41] dark:bg-slate-700 dark:text-white"
+            placeholder="192.168.1.1, 10.0.0.0/24"
+          >
+        </div>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="mt-8 flex items-center gap-3">
+      <button 
+        (click)="handleSave()"
+        class="bg-[#679a41] text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-[#5a8739] transition-colors"
+      >
+        Save
+      </button>
+      <button 
+        (click)="handleCancel()"
+        class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

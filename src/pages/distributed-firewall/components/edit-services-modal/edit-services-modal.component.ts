@@ -1,14 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IconComponent } from '../../../../components/icon/icon.component';
 import { Service } from '../../types';
 
 @Component({
   selector: 'app-edit-services-modal',
   templateUrl: './edit-services-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule],
 })
 export class EditServicesModalComponent {
   isOpen = input.required<boolean>();

@@ -1,59 +1,12 @@
-import { ChangeDetectionStrategy, Component, signal, computed, ElementRef, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, computed, ElementRef, viewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { IconComponent } from '../../components/icon/icon.component';
 import { ViewMembersModalComponent } from './components/view-members-modal/view-members-modal.component';
 import { WhereUsedModalComponent } from './components/where-used-modal/where-used-modal.component';
-import { FilterPanelComponent } from '../../components/filter-panel/filter-panel.component';
 import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
-
-// --- TYPES AND MOCK DATA ---
-export interface FirewallGroup {
-  id: string;
-  name: string;
-  type: 'IP Addresses Only' | 'Generic';
-  description: string;
-  tags: number;
-  isSystemDefined?: boolean;
-  isLocked?: boolean;
-  status: 'Success' | 'Pending' | 'Error';
-}
-
-export interface Member { [key: string]: string | number; }
-export interface MemberCategory {
-  id: string;
-  name: string;
-  count: number;
-  members: Member[];
-  headers: string[];
-}
-export interface GroupData {
-  id: string;
-  name: string;
-  groupType: 'Generic' | 'IPSet';
-  memberCategories: MemberCategory[];
-}
-
-export interface FilterState {
-  type: 'all' | 'Generic' | 'IP Addresses Only';
-  isSystemDefined: boolean;
-  isLocked: boolean;
-  status: 'all' | 'Success' | 'Pending' | 'Error';
-}
-
-const mockFirewallGroups: FirewallGroup[] = [
-    { id: 'group1', name: 'DefaultMaliciousIpGroup', type: 'IP Addresses Only', description: 'Default Malicious IP group', tags: 0, isSystemDefined: true, status: 'Success' },
-    { id: 'group2', name: 'Edge_NSGroup', type: 'Generic', description: 'NSX group for edge nodes', tags: 0, isLocked: true, status: 'Success' },
-    { id: 'group3', name: 'f31e1b66-29e3-4ff2-a5bc-5233fd1a891a', type: 'Generic', description: 'Auto-generated application group', tags: 2, status: 'Success' },
-    { id: 'group4', name: 'group from code', type: 'IP Addresses Only', description: 'Group managed via infrastructure-as-code', tags: 1, isSystemDefined: true, status: 'Pending' },
-    { id: 'group5', name: 'MCA>Como>org>wdqwd', type: 'Generic', description: 'Group for Como org', tags: 0, status: 'Success' },
-    { id: 'group6', name: 'MCA>rotest>org>bb', type: 'Generic', description: 'Test group for BB', tags: 0, status: 'Error' },
-    { id: 'group7', name: 'MCA>protest>org>n', type: 'Generic', description: 'Test group for N', tags: 0, status: 'Success' },
-    { id: 'group8', name: 'MCA>protest>org>rkjrjg', type: 'Generic', description: 'Test group for RKJRJG', tags: 0, status: 'Success' },
-    { id: 'group9', name: 'MCA>sso11>sso11>Ahmed Mohamed Ra...', type: 'Generic', description: 'SSO group for Ahmed Mohamed', tags: 0, status: 'Pending' },
-    { id: 'group10', name: 'MCA>sso11>sso11>sa', type: 'Generic', description: 'SSO group for SA', tags: 0, status: 'Success' },
-    { id: 'group11', name: 'MCA>sso8>sso8>Ahmed Mohamed R', type: 'Generic', description: 'SSO group for Ahmed Mohamed R', tags: 0, status: 'Success' },
-];
+import { FirewallGroupsService, FirewallGroup, GroupData, MemberCategory } from '../../services/firewall-groups.service';
 
 const mockGroupMemberData: { [key: string]: GroupData } = {
   'DefaultMaliciousIpGroup': {
@@ -73,28 +26,27 @@ const mockGroupMemberData: { [key: string]: GroupData } = {
   },
 };
 
+type SortColumn = 'name' | 'reservation' | 'description';
+
 @Component({
   selector: 'app-firewall-groups',
   templateUrl: './firewall-groups.component.html',
   styleUrls: ['./firewall-groups.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent, ViewMembersModalComponent, WhereUsedModalComponent, AdvancedDeleteConfirmationModalComponent, FilterPanelComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ViewMembersModalComponent, WhereUsedModalComponent, AdvancedDeleteConfirmationModalComponent],
   host: {
-    '(document:mousedown)': 'onGlobalClick($event)',
+    '(document:click)': 'onGlobalClick($event.target)',
   },
 })
 export class FirewallGroupsComponent {
-  groups = signal<FirewallGroup[]>(mockFirewallGroups);
-  expandedRows = signal<string[]>([]);
-  isRefreshing = signal(false);
-  openMenuId = signal<string | null>(null);
+  private router = inject(Router);
+  private firewallGroupsService = inject(FirewallGroupsService);
+  
+  groups = this.firewallGroupsService.getGroups();
   searchTerm = signal('');
-
-  // Add/Edit State
-  isAddingGroup = signal(false);
-  newGroupForm = signal({ name: '', description: '' });
-  editingGroupId = signal<string | null>(null);
-  editGroupForm = signal({ name: '', description: '' });
+  sortColumn = signal<SortColumn>('name');
+  sortDirection = signal<'asc' | 'desc'>('asc');
+  openActionMenuId = signal<string | null>(null);
 
   // Modal State
   isViewMembersModalOpen = signal(false);
@@ -104,145 +56,65 @@ export class FirewallGroupsComponent {
   isDeleteModalOpen = signal(false);
   groupToDelete = signal<FirewallGroup | null>(null);
 
-  // Filter Panel State
-  isFilterPanelOpen = signal(false);
-  
-  private readonly defaultFilters: FilterState = {
-    type: 'all',
-    isSystemDefined: false,
-    isLocked: false,
-    status: 'all',
-  };
-  
-  filters = signal<FilterState>({ ...this.defaultFilters });
-  tempFilters = signal<FilterState>({ ...this.defaultFilters });
-
-  public readonly groupTypes: FilterState['type'][] = ['all', 'Generic', 'IP Addresses Only'];
-  public readonly groupStatuses: FilterState['status'][] = ['all', 'Success', 'Pending', 'Error'];
-
   menuRef = viewChild<ElementRef>('menuRef');
 
   filteredGroups = computed(() => {
-    const currentFilters = this.filters();
     const term = this.searchTerm().toLowerCase();
+    const column = this.sortColumn();
+    const direction = this.sortDirection();
     
-    let filtered = this.groups();
-
-    // Apply main search term
-    if (term) {
-      filtered = filtered.filter(g => 
-        g.name.toLowerCase().includes(term) || 
-        g.description.toLowerCase().includes(term)
-      );
-    }
+    let filtered = this.groups().filter(g => 
+      g.name.toLowerCase().includes(term) || 
+      g.description.toLowerCase().includes(term)
+    );
     
-    // Apply advanced filters
-    return filtered.filter(g => {
-      const typeMatch = currentFilters.type === 'all' || g.type === currentFilters.type;
-      const systemDefinedMatch = !currentFilters.isSystemDefined || g.isSystemDefined === true;
-      const lockedMatch = !currentFilters.isLocked || g.isLocked === true;
-      const statusMatch = currentFilters.status === 'all' || g.status === currentFilters.status;
+    return [...filtered].sort((a, b) => {
+      const aValue = a[column];
+      const bValue = b[column];
+      let comparison = 0;
 
-      return typeMatch && systemDefinedMatch && lockedMatch && statusMatch;
+      if (aValue === undefined || bValue === undefined) {
+        comparison = aValue === bValue ? 0 : aValue === undefined ? -1 : 1;
+      } else {
+        comparison = String(aValue).localeCompare(String(bValue));
+      }
+      
+      return direction === 'asc' ? comparison : -comparison;
     });
   });
 
-  activeFilterCount = computed(() => {
-    const { type, isSystemDefined, isLocked, status } = this.filters();
-    let count = 0;
-    if (type !== 'all') count++;
-    if (isSystemDefined) count++;
-    if (isLocked) count++;
-    if (status !== 'all') count++;
-    return count;
-  });
-
-  onGlobalClick(event: MouseEvent): void {
-    const target = event.target as Node;
-    // Close 3-dot menu
-    if (this.openMenuId() && this.menuRef() && !this.menuRef()!.nativeElement.contains(target)) {
-        const clickedButton = (event.target as HTMLElement).closest(`[data-menu-button-id="${this.openMenuId()}"]`);
-        if (!clickedButton) {
-            this.openMenuId.set(null);
-        }
+  onGlobalClick(target: any): void {
+    if (!target.closest('.action-menu-container')) {
+      this.closeActionMenu();
     }
   }
   
-  toggleActionMenu(event: MouseEvent, id: string): void {
-      event.stopPropagation();
-      this.openMenuId.update(current => current === id ? null : id);
+  setSort(column: SortColumn): void {
+    if (this.sortColumn() === column) {
+      this.sortDirection.update(dir => (dir === 'asc' ? 'desc' : 'asc'));
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
+  }
+
+  toggleActionMenu(id: string): void {
+    this.openActionMenuId.update(currentId => (currentId === id ? null : id));
+  }
+
+  closeActionMenu(): void {
+    this.openActionMenuId.set(null);
   }
 
   // --- Add Group Logic ---
   handleAddGroupClick(): void {
-    this.isAddingGroup.set(true);
-    this.handleCancelEdit(); // Ensure we're not editing at the same time
-  }
-
-  handleCancelNewGroup(): void {
-    this.isAddingGroup.set(false);
-    this.newGroupForm.set({ name: '', description: '' });
-  }
-
-  handleSaveNewGroup(): void {
-    const formValue = this.newGroupForm();
-    if (!formValue.name.trim()) return;
-    
-    const newGroup: FirewallGroup = {
-      id: `group-${Date.now()}`,
-      name: formValue.name.trim(),
-      type: 'Generic',
-      description: formValue.description.trim(),
-      tags: 0,
-      isSystemDefined: false,
-      isLocked: false,
-      status: 'Success',
-    };
-    this.groups.update(groups => [newGroup, ...groups]);
-    this.handleCancelNewGroup();
+    this.router.navigate(['/app/cloud-edge/inventory/firewall-groups/manage']);
   }
 
   // --- Edit Group Logic ---
   handleStartEdit(group: FirewallGroup): void {
-    this.editingGroupId.set(group.id);
-    this.editGroupForm.set({ name: group.name, description: group.description });
-    this.handleCancelNewGroup(); // Ensure we're not adding at the same time
-  }
-
-  handleCancelEdit(): void {
-    this.editingGroupId.set(null);
-  }
-
-  handleSaveEdit(): void {
-    const editingId = this.editingGroupId();
-    if (!editingId) return;
-    
-    const formValue = this.editGroupForm();
-    if (!formValue.name.trim()) return;
-
-    this.groups.update(groups =>
-      groups.map(g =>
-        g.id === editingId
-          ? { ...g, name: formValue.name.trim(), description: formValue.description.trim() }
-          : g
-      )
-    );
-    this.editingGroupId.set(null);
-  }
-
-  // --- Table Interaction ---
-  handleToggleRow(id: string): void {
-    this.expandedRows.update(prev => prev.includes(id) ? prev.filter(rowId => rowId !== id) : [...prev, id]);
-  }
-
-  handleToggleExpandAll(): void {
-    const allIds = this.filteredGroups().map(g => g.id);
-    this.expandedRows.update(prev => prev.length === allIds.length ? [] : allIds);
-  }
-
-  handleRefresh(): void {
-    this.isRefreshing.set(true);
-    setTimeout(() => this.isRefreshing.set(false), 1000);
+    this.router.navigate(['/app/cloud-edge/inventory/firewall-groups/manage', group.id]);
+    this.closeActionMenu();
   }
 
   // --- Modals ---
@@ -267,7 +139,7 @@ export class FirewallGroupsComponent {
   handleOpenDeleteModal(group: FirewallGroup): void {
     this.groupToDelete.set(group);
     this.isDeleteModalOpen.set(true);
-    this.openMenuId.set(null);
+    this.closeActionMenu();
   }
 
   handleCloseDeleteModal(): void {
@@ -278,45 +150,8 @@ export class FirewallGroupsComponent {
   handleConfirmDelete(): void {
     const group = this.groupToDelete();
     if (group) {
-      this.groups.update(currentGroups => currentGroups.filter(g => g.id !== group.id));
+      this.firewallGroupsService.deleteGroup(group.id);
     }
     this.handleCloseDeleteModal();
-  }
-
-  // --- Filter Panel Logic ---
-  openFilterPanel(): void {
-    this.tempFilters.set(this.filters());
-    this.isFilterPanelOpen.set(true);
-  }
-
-  closeFilterPanel(): void {
-    this.isFilterPanelOpen.set(false);
-  }
-
-  applyFilters(): void {
-    this.filters.set(this.tempFilters());
-    this.closeFilterPanel();
-  }
-
-  clearFilters(): void {
-    this.tempFilters.set({ ...this.defaultFilters });
-    this.filters.set({ ...this.defaultFilters });
-    this.closeFilterPanel();
-  }
-  
-  updateTempFilterType(type: FilterState['type']): void {
-    this.tempFilters.update(f => ({...f, type}));
-  }
-
-  updateTempFilterStatus(status: FilterState['status']): void {
-    this.tempFilters.update(f => ({...f, status}));
-  }
-
-  updateTempFilterSystemDefined(checked: boolean): void {
-    this.tempFilters.update(f => ({...f, isSystemDefined: checked}));
-  }
-
-  updateTempFilterLocked(checked: boolean): void {
-    this.tempFilters.update(f => ({...f, isLocked: checked}));
   }
 }

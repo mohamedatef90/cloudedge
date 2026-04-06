@@ -89,7 +89,6 @@ export class CloudEdgeSidebarComponent {
         items: [
           { name: 'Virtual Machines', icon: 'fas fa-desktop', path: '/app/cloud-edge/resources/virtual-machines' },
           { name: 'Storage', icon: 'fas fa-database', path: '/app/cloud-edge/resources/storage' },
-          { name: 'Reservations', icon: 'fas fa-calendar-check', path: '/app/cloud-edge/resources/reservations' },
         ]
       },
       {
@@ -113,11 +112,8 @@ export class CloudEdgeSidebarComponent {
         title: 'Security',
         items: [
             { name: 'Security Hub', icon: 'fas fa-shield-alt', path: '/app/cloud-edge/security/hub' },
-            { name: 'Filtering and Analysis', icon: 'fas fa-filter', path: '/app/cloud-edge/security/filtering-analysis' },
-            { name: 'Distributed Firewall', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall' },
-            { name: 'Distributed Firewall-old', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall-old' },
+            { name: 'Distributed Firewall (Legacy)', icon: 'fas fa-project-diagram', path: '/app/cloud-edge/security/distributed-firewall-old' },
             { name: 'Gateway Firewall', icon: 'fas fa-dungeon', path: '/app/cloud-edge/security/gateway-firewall' },
-            { name: 'IDS/IPS & Malware', icon: 'fas fa-bug', path: '/app/cloud-edge/security/hub-malware-prevention' },
         ]
       },
       {

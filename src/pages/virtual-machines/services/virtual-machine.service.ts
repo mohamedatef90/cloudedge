@@ -50,13 +50,16 @@ export class VirtualMachineService {
     const vmToDelete = this.virtualMachinesState().find(vm => vm.id === vmId);
     if (!vmToDelete) return;
 
-    // Power off if running
-    const finalVmState = vmToDelete.status === 'running' ? { ...vmToDelete, status: 'stopped' as const } : vmToDelete;
-
+    const vmToRecycle: VirtualMachine = {
+      ...vmToDelete,
+      status: vmToDelete.status === 'running' ? 'stopped' : vmToDelete.status,
+      deletedAt: new Date().toISOString(),
+    };
+    
     // Move to recycled
     this.recycledVirtualMachinesState.update(recycled => [
       ...recycled,
-      { ...finalVmState, deletedAt: new Date().toISOString() } as VirtualMachine,
+      vmToRecycle,
     ]);
 
     // Remove from active

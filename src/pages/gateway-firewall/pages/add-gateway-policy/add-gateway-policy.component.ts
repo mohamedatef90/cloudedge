@@ -1,22 +1,24 @@
+
 import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IconComponent } from '../../../../components/icon/icon.component';
-import { FirewallPolicy, FirewallRule, GroupData, SelectableGroup, Service } from '../../../distributed-firewall/types';
+import { GatewayPolicy, GatewayRule } from '../../types';
+import { Service, GroupData, SelectableGroup } from '../../../distributed-firewall/types';
 import { mockAvailableGroupsForSelection, mockAvailableServices, mockGroupData } from '../../../distributed-firewall/mock-data';
 import { MOCK_IDS_IPS_PROFILES_DATA } from '../../../ids-ips-malware-prevention/mock-data';
-import { DistributedFirewallOldService } from '../../../../services/distributed-firewall-old.service';
+import { GatewayFirewallService } from '../../../../services/gateway-firewall.service';
 
 import { EditSourceDestModalComponent } from '../../../distributed-firewall/components/edit-source-dest-modal/edit-source-dest-modal.component';
 import { EditServicesModalComponent } from '../../../distributed-firewall/components/edit-services-modal/edit-services-modal.component';
-import { EditProfilesModalComponent } from '../../../gateway-firewall/components/edit-profiles-modal/edit-profiles-modal.component';
+import { EditProfilesModalComponent } from '../../components/edit-profiles-modal/edit-profiles-modal.component';
 import { EditRuleAppliedToModalComponent } from '../../../distributed-firewall/components/edit-rule-applied-to-modal/edit-rule-applied-to-modal.component';
 import { ViewMembersModalComponent } from '../../../distributed-firewall/components/view-members-modal/view-members-modal.component';
 import { RelatedGroupsModalComponent } from '../../../distributed-firewall/components/related-groups-modal/related-groups-modal.component';
 
 @Component({
-  selector: 'app-add-dfw-old-policy',
+  selector: 'app-add-gateway-policy',
   standalone: true,
   imports: [
     CommonModule,
@@ -29,25 +31,25 @@ import { RelatedGroupsModalComponent } from '../../../distributed-firewall/compo
     ViewMembersModalComponent,
     RelatedGroupsModalComponent
   ],
-  templateUrl: './add-dfw-old-policy.component.html',
-  styleUrls: ['./add-dfw-old-policy.component.css'],
+  templateUrl: './add-gateway-policy.component.html',
+  styleUrls: ['./add-gateway-policy.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddDfwOldPolicyComponent implements OnInit {
+export class AddGatewayPolicyComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private dfwService = inject(DistributedFirewallOldService);
+  private gatewayService = inject(GatewayFirewallService);
 
   policyId = signal<string | null>(null);
   isEditMode = computed(() => !!this.policyId());
   policyName = signal('');
-  rules = signal<Partial<FirewallRule>[]>([]);
+  rules = signal<Partial<GatewayRule>[]>([]);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.policyId.set(id);
-      const policy = this.dfwService.getPolicyById(id);
+      const policy = this.gatewayService.getPolicyById(id);
       if (policy) {
         this.policyName.set(policy.name);
         this.rules.set([...policy.rules]);
@@ -56,10 +58,10 @@ export class AddDfwOldPolicyComponent implements OnInit {
   }
 
   // Modal states
-  editSourceDestModalState = signal<{ isOpen: boolean; rule: Partial<FirewallRule> | null; field: 'sources' | 'destinations' | null; ruleIndex: number | null }>({ isOpen: false, rule: null, field: null, ruleIndex: null });
-  editServicesModalState = signal<{ isOpen: boolean; rule: Partial<FirewallRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
-  editProfilesModalState = signal<{ isOpen: boolean; rule: Partial<FirewallRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
-  editAppliedToModalState = signal<{ isOpen: boolean; rule: Partial<FirewallRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
+  editSourceDestModalState = signal<{ isOpen: boolean; rule: Partial<GatewayRule> | null; field: 'sources' | 'destinations' | null; ruleIndex: number | null }>({ isOpen: false, rule: null, field: null, ruleIndex: null });
+  editServicesModalState = signal<{ isOpen: boolean; rule: Partial<GatewayRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
+  editProfilesModalState = signal<{ isOpen: boolean; rule: Partial<GatewayRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
+  editAppliedToModalState = signal<{ isOpen: boolean; rule: Partial<GatewayRule> | null; ruleIndex: number | null }>({ isOpen: false, rule: null, ruleIndex: null });
   isViewMoreModalOpen = signal(false);
   viewMoreModalTitle = signal('');
   viewMoreModalItems = signal<string[]>([]);
@@ -77,17 +79,16 @@ export class AddDfwOldPolicyComponent implements OnInit {
   newPolicyName = computed(() => this.policyName() || 'New Policy');
 
   addRule() {
-    const newRule: Partial<FirewallRule> = {
-      id: `new-rule-${this.rules().length}`,
+    const newRule: Partial<GatewayRule> = {
+      id: `gw-rule-${this.rules().length}`,
       name: `New Rule ${this.rules().length + 1}`,
-      sources: 'DefaultMaliciousIpGroup, Edge_NSGroup, f31e1b66-29e3-4ff2-a5bc-5233fd1a891a, Web Servers Group, DB Servers Group, App Servers Group',
-      destinations: 'Web Servers Group, DB Servers Group, App Servers Group, Admin IP Group, Mgmt Group',
-      services: [{ name: 'HTTP', icon: 'fas fa-globe' }, { name: 'HTTPS', icon: 'fas fa-lock' }, { name: 'SSH', icon: 'fas fa-terminal' }, { name: 'MySQL', icon: 'fas fa-database' }, { name: 'DHCP-Server', icon: 'fas fa-cog' }],
-      contextProfiles: 'DefaultIDSProfile',
-      appliedTo: 'DFW, Edge_NSGroup',
+      sources: 'Any',
+      destinations: 'Any',
+      services: [{ name: 'Any', icon: 'fas fa-asterisk' }],
+      profiles: 'None',
+      appliedTo: 'Tier1-Gateway-01',
       action: 'Allow',
-      enabled: true,
-      status: 'Success'
+      enabled: true
     };
     this.rules.update(rules => [...rules, newRule]);
   }
@@ -112,19 +113,19 @@ export class AddDfwOldPolicyComponent implements OnInit {
   }
 
   // --- Modal Openers ---
-  openEditSourceDestModal(rule: Partial<FirewallRule>, ruleIndex: number, field: 'sources' | 'destinations') {
+  openEditSourceDestModal(rule: Partial<GatewayRule>, ruleIndex: number, field: 'sources' | 'destinations') {
     this.editSourceDestModalState.set({ isOpen: true, rule, field, ruleIndex });
   }
 
-  openEditServicesModal(rule: Partial<FirewallRule>, ruleIndex: number) {
+  openEditServicesModal(rule: Partial<GatewayRule>, ruleIndex: number) {
     this.editServicesModalState.set({ isOpen: true, rule, ruleIndex });
   }
 
-  openEditProfilesModal(rule: Partial<FirewallRule>, ruleIndex: number) {
+  openEditProfilesModal(rule: Partial<GatewayRule>, ruleIndex: number) {
     this.editProfilesModalState.set({ isOpen: true, rule, ruleIndex });
   }
 
-  openEditAppliedToModal(rule: Partial<FirewallRule>, ruleIndex: number) {
+  openEditAppliedToModal(rule: Partial<GatewayRule>, ruleIndex: number) {
     this.editAppliedToModalState.set({ isOpen: true, rule, ruleIndex });
   }
 
@@ -195,7 +196,7 @@ export class AddDfwOldPolicyComponent implements OnInit {
           this.rules.update(rules => {
               const newRules = [...rules];
               const profileValue = profiles.length > 0 ? profiles.join(', ') : 'None';
-              newRules[ruleIndex] = { ...newRules[ruleIndex], contextProfiles: profileValue };
+              newRules[ruleIndex] = { ...newRules[ruleIndex], profiles: profileValue };
               return newRules;
           });
       }
@@ -216,26 +217,25 @@ export class AddDfwOldPolicyComponent implements OnInit {
 
   save() {
     if (this.isEditMode()) {
-      this.dfwService.updatePolicy(this.policyId()!, {
+      this.gatewayService.updatePolicy(this.policyId()!, {
         name: this.policyName(),
-        rules: this.rules() as FirewallRule[]
+        rules: this.rules() as GatewayRule[]
       });
     } else {
-      const newPolicy: FirewallPolicy = {
-        id: `policy-${Date.now()}`,
+      const newPolicy: GatewayPolicy = {
+        id: `gw-policy-${Date.now()}`,
         name: this.policyName(),
-        policyId: `POL-${Math.floor(Math.random() * 10000)}`,
-        appliedTo: 'DFW',
-        rules: this.rules() as FirewallRule[],
+        policyId: `(${Math.floor(Math.random() * 10)})`,
+        rules: this.rules() as GatewayRule[],
         status: 'Success',
         isExpanded: false
       };
-      this.dfwService.addPolicy(newPolicy);
+      this.gatewayService.addPolicy(newPolicy);
     }
-    this.router.navigate(['/app/cloud-edge/security/distributed-firewall-old']);
+    this.router.navigate(['/app/cloud-edge/security/gateway-firewall']);
   }
   
   cancel() {
-      this.router.navigate(['/app/cloud-edge/security/distributed-firewall-old']);
+      this.router.navigate(['/app/cloud-edge/security/gateway-firewall']);
   }
 }

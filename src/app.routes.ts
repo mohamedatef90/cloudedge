@@ -21,6 +21,7 @@ import { RoutesComponent } from './pages/routes/routes.component';
 import { ScheduledTasksComponent } from './pages/scheduled-tasks/scheduled-tasks.component';
 import { RunningTasksComponent } from './pages/running-tasks/running-tasks.component';
 import { FirewallGroupsComponent } from './pages/firewall-groups/firewall-groups.component';
+import { ManageGroupComponent } from './pages/firewall-groups/pages/manage-group/manage-group.component';
 import { FirewallServicesComponent } from './pages/firewall-services/firewall-services.component';
 import { OrganizationProfileComponent } from './pages/organization-profile/organization-profile.component';
 import { OsImagesComponent } from './pages/virtual-machines/pages/os-images/os-images.component';
@@ -79,6 +80,8 @@ export const APP_ROUTES: Routes = [
       // Inventory
       { path: 'inventory/applications', component: FirewallPoliciesComponent, title: 'Applications' },
       { path: 'inventory/firewall-groups', component: FirewallGroupsComponent, title: 'Groups' },
+      { path: 'inventory/firewall-groups/manage', component: ManageGroupComponent, title: 'Add Group' },
+      { path: 'inventory/firewall-groups/manage/:id', component: ManageGroupComponent, title: 'Edit Group' },
       { path: 'inventory/firewall-services', component: FirewallServicesComponent, title: 'Services' },
       // Security
       { path: 'security/hub', component: SecurityOverviewComponent, title: 'Security Hub' },
@@ -87,7 +90,10 @@ export const APP_ROUTES: Routes = [
       { path: 'security/distributed-firewall', component: DistributedFirewallComponent, title: 'Distributed Firewall' },
       { path: 'security/distributed-firewall-old', component: DistributedFirewallOldComponent, title: 'Distributed Firewall-old' },
       { path: 'security/distributed-firewall-old/add-policy', component: AddDfwOldPolicyComponent, title: 'Add Distributed Firewall Policy' },
+      { path: 'security/distributed-firewall-old/edit-policy/:id', component: AddDfwOldPolicyComponent, title: 'Edit Distributed Firewall Policy' },
       { path: 'security/gateway-firewall', component: GatewayFirewallComponent, title: 'Gateway Firewall' },
+      { path: 'security/gateway-firewall/add-policy', loadComponent: () => import('./pages/gateway-firewall/pages/add-gateway-policy/add-gateway-policy.component').then(m => m.AddGatewayPolicyComponent), title: 'Add Gateway Firewall Policy' },
+      { path: 'security/gateway-firewall/edit-policy/:id', loadComponent: () => import('./pages/gateway-firewall/pages/add-gateway-policy/add-gateway-policy.component').then(m => m.AddGatewayPolicyComponent), title: 'Edit Gateway Firewall Policy' },
       { path: 'security/hub-malware-prevention', component: IdsIpsMalwarePreventionComponent, title: 'IDS/IPS & Malware Prevention' },
       // Operations
       { path: 'operations/scheduled-tasks', component: ScheduledTasksComponent, title: 'Scheduled Tasks' },

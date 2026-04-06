@@ -115,6 +115,27 @@ export class VirtualMachinesComponent {
     `;
   });
 
+  // --- Filter Panel Logic ---
+  openFilterPanel(): void {
+    this.tempFilters.set({ ...this.filters() });
+    this.isFilterPanelOpen.set(true);
+  }
+
+  closeFilterPanel(): void {
+    this.isFilterPanelOpen.set(false);
+  }
+
+  applyFilters(): void {
+    this.filters.set(this.tempFilters());
+    this.closeFilterPanel();
+  }
+
+  clearFilters(): void {
+    this.filters.set({ ...this.defaultFilters });
+    this.tempFilters.set({ ...this.defaultFilters });
+    this.closeFilterPanel();
+  }
+
   setViewMode(mode: 'card' | 'table'): void {
     this.viewMode.set(mode);
   }
@@ -164,41 +185,21 @@ export class VirtualMachinesComponent {
 
     let csvContent = headers.join(',') + '\r\n';
     selectedData.forEach(row => {
-      csvContent += Object.values(row).join(',') + '\r\n';
+        const values = Object.values(row).map(value => `"${value}"`).join(',');
+        csvContent += values + '\r\n';
     });
-
-    this.downloadFile(csvContent, 'virtual-machines.csv', 'text/csv');
+    this.downloadFile(csvContent, 'virtual_machines.csv', 'text/csv');
   }
 
   exportAsJson(): void {
     const vms = this.filteredVirtualMachines();
-    const jsonData = JSON.stringify(vms, null, 2);
-    this.downloadFile(jsonData, 'virtual-machines.json', 'application/json');
+    const jsonContent = JSON.stringify(vms, null, 2);
+    this.downloadFile(jsonContent, 'virtual_machines.json', 'application/json');
   }
 
-  // --- Filter Panel Methods ---
-  openFilterPanel(): void {
-    this.tempFilters.set({ ...this.filters() });
-    this.isFilterPanelOpen.set(true);
-  }
-
-  closeFilterPanel(): void {
-    this.isFilterPanelOpen.set(false);
-  }
-
-  applyFilters(): void {
-    this.filters.set({ ...this.tempFilters() });
-    this.isFilterPanelOpen.set(false);
-  }
-
-  clearFilters(): void {
-    this.tempFilters.set({ ...this.defaultFilters });
-    this.filters.set({ ...this.defaultFilters });
-    this.isFilterPanelOpen.set(false);
-  }
-
-  // --- VM Actions ---
-  handleVmAction(vm: VirtualMachine, action: 'connect' | 'powerOff' | 'restart' | 'delete'): void {
+  handleVmAction(event: { action: 'connect' | 'powerOff' | 'restart' | 'delete'; vm: VirtualMachine }): void {
+    const { action, vm } = event;
+    
     if (action === 'delete') {
       this.vmToDelete.set(vm);
       this.isDeleteModalOpen.set(true);
@@ -207,40 +208,42 @@ export class VirtualMachinesComponent {
 
     this.selectedVmForAction.set(vm);
     this.actionToConfirm.set(action);
+    let config;
 
     switch (action) {
       case 'connect':
-        this.confirmModalConfig.set({
-          title: 'Connect to VM',
-          message: `Are you sure you want to connect to "${vm.name}"?`,
+        config = {
+          title: `Connect to ${vm.name}`,
+          message: `You are about to connect to the web console for <strong>${vm.name}</strong>. Proceed?`,
           confirmButtonText: 'Connect',
           confirmButtonClass: 'bg-[#679a41] hover:bg-[#537d34]',
-          iconName: 'fas fa-plug',
-          iconClass: 'text-[#679a41]'
-        });
+          iconName: 'fas fa-terminal',
+          iconClass: 'text-gray-500',
+        };
         break;
       case 'powerOff':
-        this.confirmModalConfig.set({
-          title: 'Power Off VM',
-          message: `Are you sure you want to power off "${vm.name}"? This will stop the virtual machine.`,
+        config = {
+          title: `Power Off ${vm.name}`,
+          message: `Are you sure you want to power off <strong>${vm.name}</strong>? This is equivalent to pulling the power cord.`,
           confirmButtonText: 'Power Off',
-          confirmButtonClass: 'bg-amber-500 hover:bg-amber-600',
+          confirmButtonClass: 'bg-red-600 hover:bg-red-700',
           iconName: 'fas fa-power-off',
-          iconClass: 'text-amber-500'
-        });
+          iconClass: 'text-red-500',
+        };
         break;
       case 'restart':
-        this.confirmModalConfig.set({
-          title: 'Restart VM',
-          message: `Are you sure you want to restart "${vm.name}"? The VM will be briefly unavailable.`,
+        config = {
+          title: `Restart ${vm.name}`,
+          message: `Are you sure you want to restart <strong>${vm.name}</strong>? This will abruptly stop and then start the virtual machine.`,
           confirmButtonText: 'Restart',
-          confirmButtonClass: 'bg-blue-500 hover:bg-blue-600',
-          iconName: 'fas fa-redo',
-          iconClass: 'text-blue-500'
-        });
+          confirmButtonClass: 'bg-orange-500 hover:bg-orange-600',
+          iconName: 'fas fa-sync-alt',
+          iconClass: 'text-orange-500',
+        };
         break;
     }
 
+    this.confirmModalConfig.set(config);
     this.isConfirmModalOpen.set(true);
   }
 
@@ -251,34 +254,25 @@ export class VirtualMachinesComponent {
   }
 
   onConfirmAction(): void {
-    const vm = this.selectedVmForAction();
-    const action = this.actionToConfirm();
-
-    if (!vm || !action) return;
-
-    switch (action) {
-      case 'connect':
-        console.log(`Connecting to VM: ${vm.name}`);
-        break;
-      case 'powerOff':
-        this.virtualMachineService.updateVmStatus(vm.id, 'stopped');
-        break;
-      case 'restart':
-        this.virtualMachineService.updateVmStatus(vm.id, 'stopped');
-        setTimeout(() => {
-          this.virtualMachineService.updateVmStatus(vm.id, 'running');
-        }, 1000);
-        break;
-    }
-
-    this.onCloseConfirmModal();
+      const vm = this.selectedVmForAction();
+      const action = this.actionToConfirm();
+      if (vm && action) {
+          console.log(`Action '${action}' confirmed for VM: ${vm.name}`);
+          if (action === 'powerOff') {
+            this.virtualMachineService.updateVmStatus(vm.id, 'stopped');
+          } else if (action === 'restart') {
+            this.virtualMachineService.updateVmStatus(vm.id, 'stopped');
+            setTimeout(() => this.virtualMachineService.updateVmStatus(vm.id, 'running'), 1000);
+          }
+      }
+      this.onCloseConfirmModal();
   }
 
   handleConfirmDelete(): void {
     const vm = this.vmToDelete();
-    if (!vm) return;
-
-    this.virtualMachineService.deleteVm(vm.id);
+    if (vm) {
+      this.virtualMachineService.deleteVm(vm.id);
+    }
     this.isDeleteModalOpen.set(false);
     this.vmToDelete.set(null);
   }

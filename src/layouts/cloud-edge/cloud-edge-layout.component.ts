@@ -15,7 +15,40 @@ import { IconComponent } from '../../components/icon/icon.component';
 
 @Component({
   selector: 'app-cloud-edge-layout',
-  templateUrl: './cloud-edge-layout.component.html',
+  template: `
+    <div class="flex h-screen overflow-hidden">
+      <app-cloud-edge-sidebar [isCollapsed]="isSidebarCollapsed()" />
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <app-cloud-edge-top-bar
+          [launcherData]="appLauncherItems()"
+          [isSidebarCollapsed]="isSidebarCollapsed()"
+          (toggleSidebar)="toggleSidebar()"
+        />
+        <!-- The main area is the scroll container. Added a consistent background color. -->
+        <main
+          class="flex-1 overflow-x-hidden"
+          [class.overflow-y-auto]="!isGettingStartedPage()"
+          [class.overflow-y-hidden]="isGettingStartedPage()"
+          [class.bg-[#f7f8fa]]="!isGettingStartedPage()"
+          [class.dark:bg-slate-900]="!isGettingStartedPage()"
+        >
+          <!-- Sticky Breadcrumbs Header -->
+          @if (!isGettingStartedPage()) {
+            <div class="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 px-6 pt-6 pb-4 flex justify-between items-center">
+                <app-breadcrumbs [items]="breadcrumbItems()" />
+            </div>
+          }
+          
+          <!-- Scrollable Content -->
+          <div 
+            [class.p-6]="!isGettingStartedPage()"
+            [class.h-full]="isGettingStartedPage()">
+              <router-outlet></router-outlet>
+          </div>
+        </main>
+      </div>
+    </div>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CloudEdgeSidebarComponent, CloudEdgeTopBarComponent, RouterOutlet, BreadcrumbsComponent, CommonModule, IconComponent],
 })
@@ -78,9 +111,9 @@ export class CloudEdgeLayoutComponent {
     const BREADCRUMB_LABELS: { [key: string]: string } = {
         'cloud-edge': 'CloudEdge', 'security': 'Security', 'overview': 'Security Overview',
         'hub': 'Security Hub', 'suspicious-traffic': 'Suspicious Traffic', 'filtering-analysis': 'Filtering and Analysis',
-        'distributed-firewall': 'Distributed Firewall', 'distributed-firewall-old': 'Distributed Firewall', 'add-policy': 'Distributed Firewall Policy', 'gateway-firewall': 'Gateway Firewall', 'hub-malware-prevention': 'IDS/IPS & Malware Prevention',
+        'distributed-firewall': 'Distributed Firewall', 'distributed-firewall-old': 'Distributed Firewall (Legacy)', 'add-policy': 'Distributed Firewall Policy', 'gateway-firewall': 'Gateway Firewall', 'hub-malware-prevention': 'IDS/IPS & Malware Prevention',
         'administration': 'Administration', 'organizations': 'Organizations', 'applications': 'Applications', 'inventory': 'Inventory',
-        'firewall-groups': 'Groups', 'firewall-services': 'Services', 'virtual-machines': 'Virtual Machines',
+        'firewall-groups': 'Groups', 'manage': 'Manage Group', 'firewall-services': 'Services', 'virtual-machines': 'Virtual Machines',
         'create': 'Create Virtual Machine', 'images': 'Select OS Image', 'resources': 'Resources', 'network': 'Network',
         'operations': 'Operations', 'marketplace': 'Marketplace', 'community-forum': 'Community Forum'
     };

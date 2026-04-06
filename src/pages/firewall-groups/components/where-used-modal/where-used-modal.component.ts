@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../../components/icon/icon.component';
-import { FirewallGroup } from '../../firewall-groups.component';
+import { FirewallGroup } from '../../../../services/firewall-groups.service';
 
 interface WhereUsedReference {
     id: string;

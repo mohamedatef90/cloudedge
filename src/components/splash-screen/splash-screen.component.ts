@@ -2,8 +2,79 @@ import { ChangeDetectionStrategy, Component, OnInit, output } from '@angular/cor
 
 @Component({
   selector: 'app-splash-screen',
-  templateUrl: './splash-screen.component.html',
-  styleUrls: ['./splash-screen.component.css'],
+  template: `
+    <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center splash-container">
+      <div class="flex flex-col items-center justify-center content-wrapper">
+        <img src="https://i.postimg.cc/L5gg2KYJ/Cloud-Edge.png" alt="CloudEdge Logo" class="h-48 w-auto logo" />
+        <h2 class="mt-6 text-xl font-semibold text-[#293c51] dark:text-gray-200 subtitle">
+          Unleashing the Power of Secure, Scalable Cloud.
+        </h2>
+      </div>
+    </div>
+  `,
+  styles: [`
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scale-up {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      30% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fade-in-subtitle {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-out {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    .splash-container {
+      background-image: url('https://media.istockphoto.com/id/1319390959/vector/abstract-dark-blue-mesh-gradient-with-glowing-green-curve-lines-pattern-textured-background.jpg?s=2048x2048&w=is&k=20&c=MpPs1XrCZIHUp1LRMq8FtTs2ZSw0ZoF7zWBqpYx_4f0=');
+      background-size: cover;
+      background-position: center;
+      height: 100%;
+      animation: 
+        fade-in 0.5s ease-in-out, 
+        fade-out 0.5s ease-in-out 4.5s forwards;
+    }
+
+    .splash-container::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background: linear-gradient(270deg, rgba(236, 233, 230, 0.85), rgba(255, 255, 255, 0.85));
+      z-index: 1;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo {
+      animation: scale-up 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s both;
+    }
+
+    .subtitle {
+      animation: fade-in-subtitle 1s ease-out 1.5s both;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SplashScreenComponent implements OnInit {
