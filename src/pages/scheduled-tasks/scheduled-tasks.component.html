@@ -33,55 +33,100 @@
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
           <tr>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('name')">Name</th>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('targetResource')">Target Resource</th>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('action')">Action</th>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('schedule')">Schedule</th>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('lastRun')">Last Run</th>
-            <th scope="col" class="px-6 py-3 cursor-pointer select-none" (click)="setSort('nextRun')">Next Run</th>
-            <th scope="col" class="px-6 py-3 text-center cursor-pointer select-none" (click)="setSort('status')">Status</th>
-            <th scope="col" class="px-6 py-3 text-right">Actions</th>
+            <th scope="col" class="px-4 py-3 text-center w-24">Status</th>
+            <th scope="col" class="px-4 py-3">Action / Group</th>
+            <th scope="col" class="px-4 py-3">Recurring</th>
+            <th scope="col" class="px-4 py-3">Object</th>
+            <th scope="col" class="px-4 py-3">Type</th>
+            <th scope="col" class="px-4 py-3">Start / End Date</th>
+            <th scope="col" class="px-4 py-3">Recurring Time</th>
+            <th scope="col" class="px-4 py-3 w-24">Max Count</th>
+            <th scope="col" class="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (task of filteredTasks(); track task.id; let i = $index; let count = $count) {
-            <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">{{ task.name }}</td>
-              <td class="px-6 py-4">{{ task.targetResource }}</td>
-              <td class="px-6 py-4">{{ task.action }}</td>
-              <td class="px-6 py-4">{{ task.schedule }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ task.lastRun ?? 'Never' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ task.nextRun }}</td>
-              <td class="px-6 py-4 text-center">
-                <app-toggle-switch [ngModel]="task.status === 'Enabled'" (ngModelChange)="toggleTaskStatus(task, $event)" size="sm" />
+          @for (group of filteredGroups(); track group.id) {
+            <!-- Group Row -->
+            <tr class="bg-gray-100 dark:bg-slate-700/80 hover:bg-gray-200 dark:hover:bg-slate-700 border-b border-gray-200 dark:border-slate-700 h-[52px]">
+              <td class="px-4 py-3 text-center">
+                <app-toggle-switch [ngModel]="group.status === 'Enabled'" [disabled]="true" size="sm" />
               </td>
-              <td class="px-6 py-4 text-right">
-                <div class="relative inline-block action-menu-container">
-                  <button (click)="toggleActionMenu(task.id)" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
-                    <app-icon name="fas fa-ellipsis-v"></app-icon>
+              <td colspan="8" class="px-4 py-3 cursor-pointer" (click)="toggleGroup(group.id)">
+                <div class="flex items-center gap-x-2">
+                  <button class="text-gray-500 w-5 text-center flex-shrink-0">
+                    <app-icon [name]="group.isExpanded ? 'fas fa-chevron-down' : 'fas fa-chevron-right'" />
                   </button>
-                  @if (openActionMenuId() === task.id) {
-                    <div class="absolute right-0 w-32 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 z-10 text-left"
-                         [class.origin-top-right]="i < count - 2" [class.mt-2]="i < count - 2"
-                         [class.origin-bottom-right]="i >= count - 2" [class.bottom-full]="i >= count - 2" [class.mb-2]="i >= count - 2">
-                        <a href="#" (click)="$event.preventDefault(); openEditModal(task)" class="flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-[#8cc866]">
-                            <app-icon name="fas fa-pencil-alt" className="w-4 h-4 mr-3" /><span>Edit</span>
-                        </a>
-                        <a href="#" (click)="$event.preventDefault(); handleDeleteTask(task)" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
-                            <app-icon name="fas fa-trash-alt" className="w-4 h-4 mr-3" /><span>Delete</span>
-                        </a>
-                    </div>
-                  }
+                  <span class="font-bold text-[#293c51] dark:text-gray-200">{{ group.name }}</span>
+                  <span class="text-xs font-semibold bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 px-2.5 py-0.5 rounded-full border border-gray-200 dark:border-slate-600">{{ group.tasks.length }} Tasks</span>
                 </div>
               </td>
             </tr>
+
+            <!-- Tasks Rows -->
+            @if (group.isExpanded) {
+              @for (task of group.tasks; track task.id; let i = $index; let count = $count) {
+                <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td class="px-4 py-4 text-center align-top">
+                    <app-toggle-switch [ngModel]="task.status === 'Enabled'" (ngModelChange)="toggleTaskStatus(group.id, task.id, $event)" size="sm" />
+                  </td>
+                  <td class="px-4 py-4 font-medium text-gray-900 dark:text-white align-top pl-8">
+                    {{ task.action }}
+                  </td>
+                  <td class="px-4 py-4 align-top">{{ task.recurring }}</td>
+                  <td class="px-4 py-4 align-top">{{ task.objectName }}</td>
+                  <td class="px-4 py-4 align-top">{{ task.type }}</td>
+                  <td class="px-4 py-4 align-top">{{ task.startEndDate }}</td>
+                  <td class="px-4 py-4 align-top">{{ task.recurringTime }}</td>
+                  <td class="px-4 py-4 align-top">{{ task.maxCount }}</td>
+                  <td class="px-4 py-4 text-right align-top">
+                    <div class="relative inline-block action-menu-container">
+                      <button (click)="toggleActionMenu(task.id)" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors focus:ring-2 focus:ring-[#679a41] focus:outline-none">
+                        <app-icon name="fas fa-ellipsis-v"></app-icon>
+                      </button>
+                      @if (openActionMenuId() === task.id) {
+                        <div class="absolute right-0 w-36 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 z-10 text-left border border-gray-100 dark:border-slate-700"
+                            [class.origin-top-right]="i < count - 2" [class.mt-1]="i < count - 2"
+                            [class.origin-bottom-right]="i >= count - 2" [class.bottom-full]="i >= count - 2" [class.mb-1]="i >= count - 2">
+                            
+                            <button (click)="toggleTaskStatus(group.id, task.id, task.status === 'Disabled')" class="w-full text-left flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-[#8cc866] transition-colors gap-3">
+                                <app-icon [name]="task.status === 'Enabled' ? 'fas fa-ban' : 'fas fa-play'" className="w-4 text-center"></app-icon>
+                                <span>{{ task.status === 'Enabled' ? 'Disable' : 'Enable' }}</span>
+                            </button>
+                            <button class="w-full text-left flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-[#8cc866] transition-colors gap-3">
+                                <app-icon name="fas fa-file-alt" className="w-4 text-center"></app-icon>
+                                <span>Log</span>
+                            </button>
+                            <div class="border-t border-gray-100 dark:border-slate-700 my-1"></div>
+                            <button (click)="handleDeleteTask(group.id, task.id)" class="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors gap-3">
+                                <app-icon name="fas fa-trash-alt" className="w-4 text-center"></app-icon>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+                  <td colspan="9" class="px-6 py-6 text-center text-gray-500 dark:text-gray-400 italic">
+                    No tasks found in this group.
+                  </td>
+                </tr>
+              }
+            }
           } @empty {
             <tr>
-              <td colspan="8" class="text-center py-10 text-gray-500 dark:text-gray-400">
+              <td colspan="9" class="text-center py-12 text-gray-500 dark:text-gray-400">
                 <div class="flex flex-col items-center">
-                  <app-icon name="fas fa-clock" class="text-4xl mb-3"></app-icon>
-                  <p class="font-semibold">No scheduled tasks found.</p>
-                  <p class="text-sm">Click "Create Task" to get started.</p>
+                  <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+                    <app-icon name="fas fa-clock" class="text-2xl text-gray-400"></app-icon>
+                  </div>
+                  <p class="font-semibold text-[#293c51] dark:text-gray-200 text-lg">No scheduled tasks found.</p>
+                  <p class="text-sm mt-1 mb-6 max-w-md">You haven't set up any recurring or scheduled operations yet. Create a task to automate routine workflows.</p>
+                  <button class="bg-[#679a41] text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all flex items-center shadow-sm">
+                    <app-icon name="fas fa-plus" className="mr-2"></app-icon>
+                    Create Task
+                  </button>
                 </div>
               </td>
             </tr>
@@ -92,17 +137,285 @@
   </div>
 </div>
 
-<app-create-edit-task-modal
-  [isOpen]="isModalOpen()"
-  [taskToEdit]="taskToEdit()"
-  (close)="closeModal()"
-  (save)="handleSaveTask($event)">
-</app-create-edit-task-modal>
-
 <app-advanced-delete-confirmation-modal
     [isOpen]="isDeleteModalOpen()"
     itemType="Scheduled Task"
-    [itemName]="taskToDelete()?.name || ''"
+    [itemName]="'this task'"
     (close)="isDeleteModalOpen.set(false); taskToDelete.set(null)"
     (confirm)="handleConfirmDelete()">
 </app-advanced-delete-confirmation-modal>
+
+<!-- Create Task Modal -->
+@if (isCreateModalOpen()) {
+  <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl overflow-hidden flex flex-col border border-gray-200 dark:border-slate-700 relative scale-in-center">
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-700/50">
+        <h3 class="font-bold text-gray-900 dark:text-white text-lg flex items-center">
+          <app-icon name="fas fa-plus-circle" className="mr-2 text-[#679a41] dark:text-[#8cc866]"></app-icon>
+          Create New Task
+        </h3>
+        <button (click)="closeCreateModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+          <app-icon name="fas fa-times" className="text-lg"></app-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-6 flex-grow overflow-y-auto max-h-[70vh]">
+        
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-semibold text-[#293c51] dark:text-gray-200 mb-1.5">Name <span class="text-red-500">*</span></label>
+          <input 
+            type="text" 
+            [(ngModel)]="newTaskName"
+            placeholder="Enter task name"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow"
+          />
+        </div>
+
+        <!-- Reservation -->
+        <div>
+          <label class="block text-sm font-semibold text-[#293c51] dark:text-gray-200 mb-1.5">Reservation</label>
+          <select 
+            [(ngModel)]="newTaskReservation"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow h-[38px]"
+          >
+            <option value="" disabled selected>Select a reservation</option>
+            <option value="res-1">Reservation Alpha</option>
+            <option value="res-2">Reservation Beta</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-semibold text-[#293c51] dark:text-gray-200 mb-1.5">Description</label>
+          <textarea 
+            [(ngModel)]="newTaskDescription"
+            rows="3"
+            placeholder="Optional description"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Add Task Details Button -->
+        <div>
+          <button (click)="openTaskDetailModal()" class="bg-gray-100 dark:bg-slate-700 text-[#293c51] dark:text-gray-200 border border-gray-300 dark:border-slate-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors shadow-sm flex items-center">
+            <app-icon name="fas fa-list-ul" className="mr-2 text-xs"></app-icon>
+            Add Task Details
+          </button>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="block text-sm font-semibold text-[#293c51] dark:text-gray-200 mb-2">Status</label>
+          <div class="flex items-center gap-3">
+            <app-toggle-switch 
+              [ngModel]="newTaskStatus() === 'Enabled'" 
+              (ngModelChange)="newTaskStatus.set($event ? 'Enabled' : 'Disabled')" 
+              size="md"
+            />
+            <span class="text-sm font-bold text-gray-700 dark:text-gray-300" 
+                  [class.text-[#679a41]]="newTaskStatus() === 'Enabled'"
+                  [class.dark:text-[#8cc866]]="newTaskStatus() === 'Enabled'">
+              {{ newTaskStatus() }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50 border-t border-gray-200 dark:border-slate-700 flex justify-end gap-3">
+        <button (click)="closeCreateModal()" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600 transition-colors shadow-sm">
+          Cancel
+        </button>
+        <button 
+          (click)="saveNewTask()" 
+          [disabled]="!newTaskName().trim()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-[#679a41] rounded-md hover:bg-[#537d34] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#679a41] transition-colors shadow-sm flex items-center"
+        >
+          <app-icon name="fas fa-save" className="mr-2 text-xs" [hidden]="!newTaskName().trim()"></app-icon>
+          Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- Task Detail Modal -->
+@if (isTaskDetailModalOpen()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-3xl overflow-hidden flex flex-col border border-gray-200 dark:border-slate-700 relative scale-in-center">
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+        <h3 class="font-bold text-gray-900 dark:text-white text-lg">
+          Task Detail
+        </h3>
+        <button (click)="closeTaskDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+          <app-icon name="fas fa-times" className="text-lg"></app-icon>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-6 flex-grow overflow-y-auto max-h-[75vh]">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Object Type -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Object Type</label>
+            <select 
+              [(ngModel)]="detailObjectType"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow h-[38px]"
+            >
+              <option value="VirtualMachine">VirtualMachine</option>
+              <option value="Database">Database</option>
+              <option value="Storage">Storage</option>
+            </select>
+          </div>
+          <!-- Object -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Object</label>
+            <select 
+              [(ngModel)]="detailObject"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow h-[38px]"
+            >
+              <option value="" disabled selected>Select an object</option>
+              <option value="jkkl">jkkl</option>
+              <option value="vm-alpha">vm-alpha</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Radio Buttons -->
+        <div class="flex items-center gap-6">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative flex items-center">
+              <input type="radio" name="actionType" value="One Action" [(ngModel)]="detailActionType" class="appearance-none w-5 h-5 border border-gray-300 rounded-full checked:border-[#679a41] checked:border-[5px] transition-all bg-white dark:bg-slate-700 dark:border-slate-500">
+            </div>
+            <span class="text-sm font-bold text-[#293c51] dark:text-gray-200 select-none">One Action</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative flex items-center">
+               <input type="radio" name="actionType" value="Group of actions" [(ngModel)]="detailActionType" class="appearance-none w-5 h-5 border border-gray-300 rounded-full checked:border-[#679a41] checked:border-[5px] transition-all bg-white dark:bg-slate-700 dark:border-slate-500">
+            </div>
+            <span class="text-sm font-bold text-[#293c51] dark:text-gray-200 select-none">Group of actions</span>
+          </label>
+        </div>
+
+        <!-- Action -->
+        <div>
+          <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Action</label>
+          <select 
+            [(ngModel)]="detailAction"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow h-[38px]"
+          >
+            <option value="Snapshot">Snapshot</option>
+            <option value="Start">Start</option>
+            <option value="Stop">Stop</option>
+          </select>
+        </div>
+
+        <!-- Max Count -->
+        <div>
+          <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Max Count <span class="text-red-500">*</span></label>
+          <input 
+            type="number" 
+            [(ngModel)]="detailMaxCount"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Recurring -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Recurring</label>
+            <select 
+              [(ngModel)]="detailRecurring"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow h-[38px]"
+            >
+              <option value="Daily">Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+          </div>
+          <!-- Recurring Value -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Recurring Value <span class="text-red-500">*</span></label>
+            <input 
+              type="number" 
+              [(ngModel)]="detailRecurringValue"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Start Date -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Start Date <span class="text-red-500">*</span></label>
+            <input 
+              type="date" 
+              [(ngModel)]="detailStartDate"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow min-w-0"
+            />
+          </div>
+          <!-- End Date -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">End Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="detailEndDate"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow min-w-0"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Recurring Time -->
+          <div>
+            <label class="block text-sm font-bold text-[#293c51] dark:text-gray-200 mb-1.5">Recurring Time <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <input 
+                type="time" 
+                [(ngModel)]="detailRecurringTime"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#679a41] focus:border-transparent dark:bg-slate-700 dark:text-white transition-shadow min-w-0"
+              />
+            </div>
+          </div>
+          <!-- Active -->
+          <div class="flex items-end pb-2">
+            <div class="flex items-center gap-3">
+              <app-toggle-switch 
+                [ngModel]="detailActive()" 
+                (ngModelChange)="detailActive.set($event)" 
+                size="md"
+              />
+              <span class="text-sm font-bold text-gray-700 dark:text-gray-300 select-none">
+                Active
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-4 flex justify-end gap-3 mt-auto">
+        <button (click)="closeTaskDetailModal()" class="px-5 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600 transition-colors shadow-sm">
+          Close
+        </button>
+        <button 
+          (click)="saveTaskDetail()" 
+          class="px-5 py-2 text-sm font-semibold text-white bg-[#5cb85c] rounded hover:bg-[#4cae4c] transition-colors shadow-sm"
+        >
+          Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

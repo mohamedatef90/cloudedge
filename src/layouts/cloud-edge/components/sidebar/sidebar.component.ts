@@ -6,8 +6,9 @@ import { AuthService } from '../../../../services/auth.service';
 
 interface SidebarItem {
   name: string;
-  icon: string;
-  path: string;
+  icon?: string;
+  path?: string;
+  children?: SidebarItem[];
 }
 
 interface SidebarSection {
@@ -28,6 +29,14 @@ export class CloudEdgeSidebarComponent {
   private authService = inject(AuthService);
   // FIX: Explicitly type router to fix a type inference issue where it was being inferred as 'unknown'.
   private router: Router = inject(Router);
+
+  expandedItems = signal<{ [key: string]: boolean }>({
+    'Scheduled Tasks': false
+  });
+
+  toggleExpand(itemName: string) {
+    this.expandedItems.update(state => ({...state, [itemName]: !state[itemName]}));
+  }
   user = this.authService.user;
   activeSectionTitle = signal<string>('');
 
@@ -82,6 +91,7 @@ export class CloudEdgeSidebarComponent {
         title: 'Administration', 
         items: [
           { name: 'Organizations', icon: 'fas fa-building', path: '/app/cloud-edge/administration/organizations' },
+          { name: 'Profiles', icon: 'fas fa-id-badge', path: '/app/cloud-edge/administration/profiles' },
         ] 
       },
       { 
@@ -119,7 +129,14 @@ export class CloudEdgeSidebarComponent {
       {
           title: 'Operations',
           items: [
-              { name: 'Scheduled Tasks', icon: 'fas fa-clock', path: '/app/cloud-edge/operations/scheduled-tasks' },
+              { 
+                name: 'Scheduled Tasks', 
+                icon: 'fas fa-clock', 
+                children: [
+                  { name: 'Tasks', path: '/app/cloud-edge/operations/scheduled-tasks' },
+                  { name: 'Scheduled Groups', path: '/app/cloud-edge/operations/scheduled-groups' }
+                ]
+              },
               { name: 'Running Tasks', icon: 'fas fa-tasks', path: '/app/cloud-edge/operations/running-tasks' },
           ]
       }

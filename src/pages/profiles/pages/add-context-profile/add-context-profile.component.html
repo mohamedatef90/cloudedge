@@ -1,0 +1,245 @@
+<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow space-y-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">Context Attributes</h1>
+    <span class="px-2.5 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">
+      Context Profile
+    </span>
+  </div>
+
+  <!-- Context Information -->
+  <div class="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden bg-gray-50/30 dark:bg-slate-800/30">
+    <div class="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 flex items-center gap-2">
+      <app-icon name="fas fa-info-circle" className="text-gray-500 dark:text-gray-400"></app-icon>
+      <h2 class="text-sm font-semibold text-[#293c51] dark:text-gray-200">Context Information</h2>
+    </div>
+    <div class="p-4">
+      <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">Name <span class="text-red-500">*</span></label>
+      <input 
+        type="text" 
+        [(ngModel)]="profileName"
+        class="w-full sm:max-w-md block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 sm:text-sm"
+      >
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Left Column -->
+    <div class="space-y-6">
+      
+      <!-- AppId Panel -->
+      <div class="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden flex flex-col h-[400px]">
+        <div class="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 flex items-center gap-2 flex-shrink-0">
+          <div class="w-6 h-6 rounded bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <app-icon name="fas fa-fingerprint" className="text-xs"></app-icon>
+          </div>
+          <h2 class="text-sm font-semibold text-[#293c51] dark:text-gray-200">AppId</h2>
+        </div>
+        
+        <div class="p-4 flex flex-col flex-grow overflow-hidden">
+          <input 
+            type="text"
+            [(ngModel)]="appIdSearch"
+            placeholder="Search AppId..."
+            class="w-full block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 sm:text-sm mb-3"
+          >
+          
+          <div class="flex-grow overflow-y-auto mb-4 border border-gray-200 dark:border-slate-700 rounded-md">
+            @for (item of filteredAppIds; track item) {
+              <div class="flex items-center justify-between p-2 border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300" [ngClass]="{'opacity-50': addedAppIds().includes(item)}">{{ item }}</span>
+                <button (click)="addAppId(item)" [disabled]="addedAppIds().includes(item)" class="w-6 h-6 rounded flex items-center justify-center text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 bg-gray-200 text-gray-600 hover:bg-[#679a41] hover:text-white dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-[#8cc866] dark:hover:text-[#1a2736] disabled:dark:bg-slate-700 disabled:dark:text-slate-500">
+                  <app-icon [name]="addedAppIds().includes(item) ? 'fas fa-check' : 'fas fa-plus'" className="text-[10px]"></app-icon>
+                </button>
+              </div>
+            } @empty {
+              <div class="p-4 text-center text-sm text-gray-500">No matching items found.</div>
+            }
+          </div>
+
+          <div class="flex-shrink-0 min-h-[60px] border border-dashed border-gray-300 dark:border-slate-600 rounded-md p-3 flex flex-wrap gap-2 items-start overflow-y-auto max-h-[100px] bg-gray-50/50 dark:bg-slate-800/50">
+            @if (addedAppIds().length === 0) {
+              <span class="text-sm text-gray-400 italic w-full text-center py-2">No AppIds added</span>
+            } @else {
+              @for (item of addedAppIds(); track item) {
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-semibold">
+                  {{ item }}
+                  <button (click)="removeAppId(item)" class="hover:text-purple-900 dark:hover:text-purple-100 ml-1">
+                    <app-icon name="fas fa-times" className="text-[10px]"></app-icon>
+                  </button>
+                </span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom URL Panel -->
+      <div class="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden flex flex-col h-[400px]">
+        <div class="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+              <app-icon name="fas fa-link" className="text-xs"></app-icon>
+            </div>
+            <h2 class="text-sm font-semibold text-[#293c51] dark:text-gray-200">Custom URL</h2>
+          </div>
+          <button (click)="isAddCustomUrlModalOpen.set(true)" class="bg-[#293c51] text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-[#1a2736] transition-colors flex items-center gap-1.5 shadow-sm">
+            <app-icon name="fas fa-plus" className="text-[10px]"></app-icon> Add New
+          </button>
+        </div>
+        
+        <div class="p-4 flex flex-col flex-grow overflow-hidden relative">
+          <!-- Add Custom URL Popup -->
+          @if (isAddCustomUrlModalOpen()) {
+            <div class="absolute inset-0 bg-white/95 dark:bg-slate-800/95 z-10 flex flex-col p-4 animate-in fade-in duration-200">
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <app-icon name="fas fa-plus-circle" className="text-orange-500"></app-icon>
+                Add New Custom URL
+              </h3>
+              <div class="flex-grow">
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">URL Pattern</label>
+                <input 
+                  type="text"
+                  [(ngModel)]="newCustomUrlValue"
+                  placeholder="e.g. www.example.com"
+                  class="w-full block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-slate-700 sm:text-sm"
+                  (keyup.enter)="saveNewCustomUrl()"
+                >
+              </div>
+              <div class="flex items-center justify-end gap-2 mt-4">
+                <button (click)="isAddCustomUrlModalOpen.set(false); newCustomUrlValue.set('')" class="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700 rounded-md transition-colors">Cancel</button>
+                <button (click)="saveNewCustomUrl()" [disabled]="!newCustomUrlValue().trim()" class="px-3 py-1.5 text-xs font-semibold text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors shadow-sm">Save Form</button>
+              </div>
+            </div>
+          }
+
+          <p class="text-xs italic text-gray-500 mb-3 font-medium">Note: Custom URL is not integrated with Distributed Firewall.</p>
+          <input 
+            type="text"
+            [(ngModel)]="customUrlSearch"
+            placeholder="Search Custom URL..."
+            class="w-full block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 sm:text-sm mb-3"
+          >
+          
+          <div class="flex-grow overflow-y-auto mb-4 border border-gray-200 dark:border-slate-700 rounded-md">
+            @for (item of filteredCustomUrls; track item) {
+              <div class="flex items-center justify-between p-2 border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300" [ngClass]="{'opacity-50': addedCustomUrls().includes(item)}">{{ item }}</span>
+                <button (click)="addCustomUrl(item)" [disabled]="addedCustomUrls().includes(item)" class="w-6 h-6 rounded flex items-center justify-center text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 bg-gray-200 text-gray-600 hover:bg-[#679a41] hover:text-white dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-[#8cc866] dark:hover:text-[#1a2736] disabled:dark:bg-slate-700 disabled:dark:text-slate-500">
+                  <app-icon [name]="addedCustomUrls().includes(item) ? 'fas fa-check' : 'fas fa-plus'" className="text-[10px]"></app-icon>
+                </button>
+              </div>
+            } @empty {
+              <div class="p-4 text-center text-sm text-gray-500">No matching items found.</div>
+            }
+          </div>
+
+          <div class="flex-shrink-0 min-h-[60px] border border-dashed border-gray-300 dark:border-slate-600 rounded-md p-3 flex flex-wrap gap-2 items-start overflow-y-auto max-h-[100px] bg-gray-50/50 dark:bg-slate-800/50">
+             @if (addedCustomUrls().length === 0) {
+              <span class="text-sm text-gray-400 italic w-full text-center py-2">No Custom URLs added</span>
+            } @else {
+              @for (item of addedCustomUrls(); track item) {
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 text-xs font-semibold">
+                  {{ item }}
+                  <button (click)="removeCustomUrl(item)" class="hover:text-orange-900 dark:hover:text-orange-100 ml-1">
+                    <app-icon name="fas fa-times" className="text-[10px]"></app-icon>
+                  </button>
+                </span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <!-- Domain Panel -->
+      <div class="border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden flex flex-col h-[400px]">
+        <div class="px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400">
+              <app-icon name="fas fa-globe" className="text-xs"></app-icon>
+            </div>
+            <h2 class="text-sm font-semibold text-[#293c51] dark:text-gray-200">Domain (FQDN)</h2>
+          </div>
+          <button (click)="isAddDomainModalOpen.set(true)" class="bg-[#293c51] text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-[#1a2736] transition-colors flex items-center gap-1.5 shadow-sm">
+            <app-icon name="fas fa-plus" className="text-[10px]"></app-icon> Add New
+          </button>
+        </div>
+        
+        <div class="p-4 flex flex-col flex-grow overflow-hidden relative">
+          <!-- Add Domain Popup -->
+          @if (isAddDomainModalOpen()) {
+            <div class="absolute inset-0 bg-white/95 dark:bg-slate-800/95 z-10 flex flex-col p-4 animate-in fade-in duration-200 border-b border-gray-200 dark:border-slate-700">
+              <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <app-icon name="fas fa-plus-circle" className="text-teal-500"></app-icon>
+                Add New Domain (FQDN)
+              </h3>
+              <div class="flex-grow">
+                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Domain Name</label>
+                <input 
+                  type="text"
+                  [(ngModel)]="newDomainValue"
+                  placeholder="e.g. *.example.com"
+                  class="w-full block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:bg-slate-700 sm:text-sm"
+                  (keyup.enter)="saveNewDomain()"
+                >
+              </div>
+              <div class="flex items-center justify-end gap-2 mt-4">
+                <button (click)="isAddDomainModalOpen.set(false); newDomainValue.set('')" class="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700 rounded-md transition-colors">Cancel</button>
+                <button (click)="saveNewDomain()" [disabled]="!newDomainValue().trim()" class="px-3 py-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors shadow-sm">Save Domain</button>
+              </div>
+            </div>
+          }
+
+          <input 
+            type="text"
+            [(ngModel)]="domainSearch"
+            placeholder="Search Domain..."
+            class="w-full block border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 sm:text-sm mb-3"
+          >
+          
+          <div class="flex-grow overflow-y-auto mb-4 border border-gray-200 dark:border-slate-700 rounded-md">
+            @for (item of filteredDomains; track item) {
+              <div class="flex items-center justify-between p-2 border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300" [ngClass]="{'opacity-50': addedDomains().includes(item)}">{{ item }}</span>
+                <button (click)="addDomain(item)" [disabled]="addedDomains().includes(item)" class="w-6 h-6 rounded flex items-center justify-center text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 bg-gray-200 text-gray-600 hover:bg-[#679a41] hover:text-white dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-[#8cc866] dark:hover:text-[#1a2736] disabled:dark:bg-slate-700 disabled:dark:text-slate-500">
+                  <app-icon [name]="addedDomains().includes(item) ? 'fas fa-check' : 'fas fa-plus'" className="text-[10px]"></app-icon>
+                </button>
+              </div>
+            } @empty {
+              <div class="p-4 text-center text-sm text-gray-500">No matching items found.</div>
+            }
+          </div>
+
+          <div class="flex-shrink-0 min-h-[60px] border border-dashed border-gray-300 dark:border-slate-600 rounded-md p-3 flex flex-wrap gap-2 items-start overflow-y-auto max-h-[100px] bg-gray-50/50 dark:bg-slate-800/50">
+             @if (addedDomains().length === 0) {
+              <span class="text-sm text-gray-400 italic w-full text-center py-2">No Domains added</span>
+            } @else {
+              @for (item of addedDomains(); track item) {
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 text-xs font-semibold">
+                  {{ item }}
+                  <button (click)="removeDomain(item)" class="hover:text-teal-900 dark:hover:text-teal-100 ml-1">
+                    <app-icon name="fas fa-times" className="text-[10px]"></app-icon>
+                  </button>
+                </span>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="pt-6 border-t border-gray-200 dark:border-slate-700 flex justify-end gap-3">
+    <button (click)="cancel()" class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 px-6 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors">
+      Cancel
+    </button>
+    <button (click)="save()" [disabled]="!profileName().trim()" class="bg-[#8ec270] bg-opacity-80 text-white px-6 py-2 rounded-md text-sm font-semibold hover:bg-[#679a41] disabled:opacity-50 disabled:cursor-not-allowed hover:disabled:bg-[#8ec270] transition-colors shadow-sm">
+      Save
+    </button>
+  </div>
+</div>

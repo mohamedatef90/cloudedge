@@ -27,24 +27,57 @@
         <ul class="space-y-1">
           @for (item of section.items; track item.name) {
             <li>
-              <a [routerLink]="item.path" routerLinkActive="active-link"
-                 [routerLinkActiveOptions]="{exact: item.path === '/app/cloud-edge'}"
-                 [title]="isCollapsed() ? item.name : undefined"
-                 class="flex items-center py-3 rounded-md text-sm font-bold transition-all duration-150 ease-in-out group"
-                 [class.px-4]="!isCollapsed()"
-                 [class.justify-center]="isCollapsed()"
-                 [class.text-gray-600]="true" [class.dark:text-gray-300]="true"
-                 [class.hover:bg-gray-50]="true" [class.dark:hover:bg-slate-700]="true"
-                 [class.hover:text-[#679a41]]="true" [class.dark:hover:text-[#8cc866]]="true">
+              @if (item.children) {
+                <div>
+                  <button (click)="toggleExpand(item.name)"
+                          class="w-full flex items-center py-3 rounded-md text-sm font-bold transition-all duration-150 ease-in-out group"
+                          [class.px-4]="!isCollapsed()"
+                          [class.justify-center]="isCollapsed()"
+                          [class.text-gray-600]="!expandedItems()[item.name]" [class.dark:text-gray-300]="!expandedItems()[item.name]"
+                          [class.text-[#679a41]]="expandedItems()[item.name]" [class.dark:text-[#8cc866]]="expandedItems()[item.name]"
+                          [class.hover:bg-gray-50]="true" [class.dark:hover:bg-slate-700]="true"
+                          [class.hover:text-[#679a41]]="true" [class.dark:hover:text-[#8cc866]]="true">
+                    <app-icon [name]="item.icon || 'fas fa-circle'" [fixedWidth]="true"
+                              className="text-lg transition-colors duration-150 ease-in-out"
+                              [class.mr-3]="!isCollapsed()" />
+                    @if (!isCollapsed()) {
+                      <span class="text-sm flex-grow text-left">{{ item.name }}</span>
+                      <app-icon [name]="expandedItems()[item.name] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" className="text-xs ml-2" />
+                    }
+                  </button>
+                  @if (expandedItems()[item.name] && !isCollapsed()) {
+                    <ul class="pl-11 pr-4 space-y-1 mt-1 mb-2">
+                       @for (child of item.children; track child.name) {
+                         <li>
+                           <a [routerLink]="child.path" routerLinkActive="text-[#679a41] dark:text-[#8cc866] font-bold"
+                              class="flex items-center py-2 px-3 rounded-md text-sm text-gray-500 dark:text-gray-400 hover:text-[#679a41] dark:hover:text-[#8cc866] hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+                              {{ child.name }}
+                           </a>
+                         </li>
+                       }
+                     </ul>
+                  }
+                </div>
+              } @else {
+                <a [routerLink]="item.path" routerLinkActive="active-link"
+                   [routerLinkActiveOptions]="{exact: item.path === '/app/cloud-edge'}"
+                   [title]="isCollapsed() ? item.name : undefined"
+                   class="flex items-center py-3 rounded-md text-sm font-bold transition-all duration-150 ease-in-out group"
+                   [class.px-4]="!isCollapsed()"
+                   [class.justify-center]="isCollapsed()"
+                   [class.text-gray-600]="true" [class.dark:text-gray-300]="true"
+                   [class.hover:bg-gray-50]="true" [class.dark:hover:bg-slate-700]="true"
+                   [class.hover:text-[#679a41]]="true" [class.dark:hover:text-[#8cc866]]="true">
 
-                <app-icon [name]="item.icon" [fixedWidth]="true"
-                          className="text-lg transition-colors duration-150 ease-in-out"
-                          [class.mr-3]="!isCollapsed()" />
+                  <app-icon [name]="item.icon || 'fas fa-circle'" [fixedWidth]="true"
+                            className="text-lg transition-colors duration-150 ease-in-out"
+                            [class.mr-3]="!isCollapsed()" />
 
-                @if (!isCollapsed()) {
-                  <span class="text-sm">{{ item.name }}</span>
-                }
-              </a>
+                  @if (!isCollapsed()) {
+                    <span class="text-sm">{{ item.name }}</span>
+                  }
+                </a>
+              }
             </li>
           }
         </ul>

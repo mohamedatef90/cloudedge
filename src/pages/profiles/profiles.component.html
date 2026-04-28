@@ -1,0 +1,85 @@
+<div class="rounded-xl p-6 bg-white dark:bg-slate-800 shadow">
+  <!-- Header -->
+  <div class="flex flex-wrap justify-between items-center gap-4 pb-4 mb-4 border-b border-gray-200 dark:border-slate-700">
+    <div>
+      <h1 class="text-2xl font-bold text-[#293c51] dark:text-gray-200">
+        Profiles
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Manage your system profiles and configuration settings.
+      </p>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between mb-6">
+    <div class="relative add-profile-container">
+      <button (click)="toggleAddProfileMenu($event)" class="bg-[#679a41] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-[#537d34] transition-all duration-200 ease-in-out flex items-center shadow-sm">
+        <app-icon name="fas fa-plus" className="mr-2 text-xs"></app-icon>
+        Add Profile
+        <app-icon name="fas fa-chevron-down" className="ml-2 text-xs"></app-icon>
+      </button>
+
+      <!-- Dropdown Menu -->
+      @if (isAddProfileMenuOpen()) {
+        <div class="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-slate-700 ring-1 ring-black ring-opacity-5 z-[50]">
+          <div class="py-1">
+            <button (click)="addContextProfile()" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 flex items-center gap-2">
+              <app-icon name="fas fa-id-card-alt" className="text-gray-400 w-4"></app-icon>
+              Add context profile
+            </button>
+            <button (click)="addLayer7Profile()" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 flex items-center gap-2">
+                <app-icon name="fas fa-layer-group" className="text-gray-400 w-4"></app-icon>
+              Add layer 7
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="shadow-sm sm:rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="px-6 py-3">Name</th>
+          <th scope="col" class="px-6 py-3">Type</th>
+          <th scope="col" class="px-6 py-3 text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (profile of profilesService.profiles(); track profile.id) {
+          <tr class="bg-white border-b dark:bg-slate-800 dark:border-slate-700">
+            <td class="px-6 py-4">{{ profile.name }}</td>
+            <td class="px-6 py-4">{{ profile.type }}</td>
+            <td class="px-6 py-4 text-right">
+              <div class="relative inline-block action-menu-container">
+                <button (click)="toggleActionMenu(profile.id)" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" aria-haspopup="true" [attr.aria-expanded]="openActionMenuId() === profile.id">
+                  <app-icon name="fas fa-ellipsis-v"></app-icon>
+                </button>
+                @if (openActionMenuId() === profile.id) {
+                  <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none z-10 text-left">
+                    <a href="#" (click)="$event.preventDefault(); closeActionMenu()" class="flex items-center px-4 py-2 text-sm text-[#293c51] dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-600 hover:text-[#679a41] dark:hover:text-[#8cc866] transition-colors">
+                      <app-icon name="fas fa-pencil-alt" className="w-4 h-4 mr-3" />
+                      <span>Edit Profile</span>
+                    </a>
+                    <div class="border-t border-gray-200 dark:border-slate-700 my-1"></div>
+                    <a href="#" (click)="$event.preventDefault(); deleteProfile(profile.id)" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                      <app-icon name="fas fa-trash-alt" className="w-4 h-4 mr-3" />
+                      <span>delete</span>
+                    </a>
+                  </div>
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr class="bg-white dark:bg-slate-800">
+            <td colspan="3" class="text-center py-6 text-gray-500 dark:text-gray-400">
+              No profiles found.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

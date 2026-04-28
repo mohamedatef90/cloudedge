@@ -11,6 +11,8 @@ import { GatewayFirewallComponent } from './pages/gateway-firewall/gateway-firew
 import { IdsIpsMalwarePreventionComponent } from './pages/ids-ips-malware-prevention/ids-ips-malware-prevention.component';
 import { ActionLogsComponent } from './pages/action-logs/action-logs.component';
 import { TicketsComponent } from './pages/tickets/tickets.component';
+import { ProfilesComponent } from './pages/profiles/profiles.component';
+import { AddContextProfileComponent } from './pages/profiles/pages/add-context-profile/add-context-profile.component';
 import { VirtualMachinesComponent } from './pages/virtual-machines/virtual-machines.component';
 import { CreateVmComponent } from './pages/virtual-machines/pages/create-vm/create-vm.component';
 import { StorageComponent } from './pages/storage/storage.component';
@@ -19,6 +21,7 @@ import { GatewaysComponent } from './pages/gateways/gateways.component';
 import { NatsComponent } from './pages/nats/nats.component';
 import { RoutesComponent } from './pages/routes/routes.component';
 import { ScheduledTasksComponent } from './pages/scheduled-tasks/scheduled-tasks.component';
+import { ScheduledGroupsComponent } from './pages/scheduled-groups/scheduled-groups.component';
 import { RunningTasksComponent } from './pages/running-tasks/running-tasks.component';
 import { FirewallGroupsComponent } from './pages/firewall-groups/firewall-groups.component';
 import { ManageGroupComponent } from './pages/firewall-groups/pages/manage-group/manage-group.component';
@@ -49,6 +52,8 @@ export const APP_ROUTES: Routes = [
       { path: '', component: DashboardComponent, title: 'CloudEdge Dashboard' },
       // Administration
       { path: 'administration/organizations', component: OrganizationsComponent, title: 'Organizations' },
+      { path: 'administration/profiles', component: ProfilesComponent, title: 'Profiles' },
+      { path: 'administration/profiles/add-context-profile', component: AddContextProfileComponent, title: 'Add Context Profile' },
       { path: 'administration/organizations/:id', component: OrganizationProfileComponent, title: 'Organization Profile' },
       { path: 'administration/action-logs', component: ActionLogsComponent, title: 'Action Logs' },
       { path: 'administration/tickets', component: TicketsComponent, title: 'Tickets' },
@@ -97,6 +102,7 @@ export const APP_ROUTES: Routes = [
       { path: 'security/hub-malware-prevention', component: IdsIpsMalwarePreventionComponent, title: 'IDS/IPS & Malware Prevention' },
       // Operations
       { path: 'operations/scheduled-tasks', component: ScheduledTasksComponent, title: 'Scheduled Tasks' },
+      { path: 'operations/scheduled-groups', component: ScheduledGroupsComponent, title: 'Scheduled Groups' },
       { path: 'operations/running-tasks', component: RunningTasksComponent, title: 'Running Tasks' },
     ],
   },

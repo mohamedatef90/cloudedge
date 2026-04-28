@@ -1,8 +1,8 @@
 
 
-import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { CreateOrganizationModalComponent } from './components/create-organization-modal/create-organization-modal.component';
@@ -28,7 +28,8 @@ type SortColumn = keyof Omit<Organization, 'id'>;
     '(document:click)': 'onGlobalClick($event.target)',
   },
 })
-export class OrganizationsComponent {
+export class OrganizationsComponent implements OnInit {
+  private route = inject(ActivatedRoute);
   openActionMenuId = signal<string | null>(null);
   isModalOpen = signal(false);
   organizationToEdit = signal<Organization | null>(null);
@@ -37,6 +38,10 @@ export class OrganizationsComponent {
   sortDirection = signal<'asc' | 'desc'>('asc');
   isDeleteModalOpen = signal(false);
   organizationToDelete = signal<Organization | null>(null);
+
+  ngOnInit(): void {
+    // Keep ngOnInit for now, or just leave it empty.
+  }
 
   organizations = signal<Organization[]>([
     { id: 'org-1', name: 'WorldPosta', creationDate: '2023-01-15', description: 'Primary corporate organization for all services.' },

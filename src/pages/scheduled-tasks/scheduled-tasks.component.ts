@@ -5,21 +5,27 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../components/icon/icon.component';
 import { ToggleSwitchComponent } from '../distributed-firewall/components/toggle-switch/toggle-switch.component';
-import { CreateEditTaskModalComponent } from './components/create-edit-task-modal/create-edit-task-modal.component';
 import { AdvancedDeleteConfirmationModalComponent } from '../../components/advanced-delete-confirmation-modal/advanced-delete-confirmation-modal.component';
 
 export interface ScheduledTask {
   id: string;
-  name: string;
-  targetResource: string;
-  action: 'Start VM' | 'Stop VM' | 'Create Snapshot' | 'Run Script';
-  schedule: string;
-  lastRun: string | null;
-  nextRun: string;
   status: 'Enabled' | 'Disabled';
+  action: string;
+  recurring: string;
+  objectName: string;
+  type: string;
+  startEndDate: string;
+  recurringTime: string;
+  maxCount: number | string;
 }
 
-type SortColumn = keyof ScheduledTask;
+export interface ScheduledGroup {
+  id: string;
+  name: string;
+  isExpanded: boolean;
+  status: 'Enabled' | 'Disabled';
+  tasks: ScheduledTask[];
+}
 
 @Component({
   selector: 'app-scheduled-tasks',
@@ -27,55 +33,78 @@ type SortColumn = keyof ScheduledTask;
   styleUrls: ['./scheduled-tasks.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, ToggleSwitchComponent, CreateEditTaskModalComponent, AdvancedDeleteConfirmationModalComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ToggleSwitchComponent, AdvancedDeleteConfirmationModalComponent],
   host: {
     '(document:click)': 'onGlobalClick($event.target)',
   },
 })
 export class ScheduledTasksComponent {
-  tasks = signal<ScheduledTask[]>([
-    { id: 'task-1', name: 'Nightly VM Shutdown', targetResource: 'All Dev VMs', action: 'Stop VM', schedule: 'Daily at 2:00 AM UTC', lastRun: '2024-07-30 02:00 UTC', nextRun: '2024-07-31 02:00 UTC', status: 'Enabled' },
-    { id: 'task-2', name: 'Weekly DB Snapshot', targetResource: 'sql-database-main', action: 'Create Snapshot', schedule: 'Every Sunday at 4:00 AM UTC', lastRun: '2024-07-28 04:00 UTC', nextRun: '2024-08-04 04:00 UTC', status: 'Enabled' },
-    { id: 'task-3', name: 'Prod Web Server Restart', targetResource: 'prod-web-server-01', action: 'Start VM', schedule: 'First day of month', lastRun: '2024-07-01 01:00 UTC', nextRun: '2024-08-01 01:00 UTC', status: 'Disabled' },
-    { id: 'task-4', name: 'Cleanup Script', targetResource: 'Storage Account', action: 'Run Script', schedule: 'Every Friday at 11:00 PM UTC', lastRun: '2024-07-26 23:00 UTC', nextRun: '2024-08-02 23:00 UTC', status: 'Enabled' },
+  groups = signal<ScheduledGroup[]>([
+    {
+      id: 'group-1',
+      name: 'Nightly Operations',
+      isExpanded: true,
+      status: 'Enabled',
+      tasks: [
+        { id: 'task-1', status: 'Enabled', action: 'Stop VM', recurring: 'Yes', objectName: 'All Dev VMs', type: 'Virtual Machine', startEndDate: '2024-07-01 / Never', recurringTime: '02:00 UTC', maxCount: 'Unlimited' },
+        { id: 'task-2', status: 'Enabled', action: 'Create Snapshot', recurring: 'Yes', objectName: 'sql-database-main', type: 'Database', startEndDate: '2024-07-01 / Never', recurringTime: '04:00 UTC', maxCount: 5 }
+      ]
+    },
+    {
+      id: 'group-2',
+      name: 'Maintenance Scripts',
+      isExpanded: false,
+      status: 'Disabled',
+      tasks: [
+        { id: 'task-3', status: 'Disabled', action: 'Run Script', recurring: 'No', objectName: 'Storage Cleanup', type: 'Script', startEndDate: '2024-08-01 / 2024-08-01', recurringTime: 'N/A', maxCount: 1 }
+      ]
+    }
   ]);
 
-  isModalOpen = signal(false);
-  taskToEdit = signal<ScheduledTask | null>(null);
   openActionMenuId = signal<string | null>(null);
   searchTerm = signal('');
-  sortColumn = signal<SortColumn>('nextRun');
-  sortDirection = signal<'asc' | 'desc'>('asc');
+
   isDeleteModalOpen = signal(false);
-  taskToDelete = signal<ScheduledTask | null>(null);
+  taskToDelete = signal<{groupId: string, taskId: string} | null>(null);
 
-  filteredTasks = computed(() => {
+  isCreateModalOpen = signal(false);
+  newTaskName = signal('');
+  newTaskReservation = signal('');
+  newTaskDescription = signal('');
+  newTaskStatus = signal<'Enabled' | 'Disabled'>('Enabled');
+
+  isTaskDetailModalOpen = signal(false);
+  detailObjectType = signal('VirtualMachine');
+  detailObject = signal('');
+  detailActionType = signal<'One Action' | 'Group of actions'>('One Action');
+  detailAction = signal('Snapshot');
+  detailMaxCount = signal('10');
+  detailRecurring = signal('Daily');
+  detailRecurringValue = signal('1');
+  detailStartDate = signal('');
+  detailEndDate = signal('');
+  detailRecurringTime = signal('');
+  detailActive = signal(true);
+
+  filteredGroups = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const column = this.sortColumn();
-    const direction = this.sortDirection();
+    
+    if (!term) return this.groups();
 
-    const filtered = this.tasks().filter(task =>
-      task.name.toLowerCase().includes(term) ||
-      task.targetResource.toLowerCase().includes(term) ||
-      task.action.toLowerCase().includes(term) ||
-      task.schedule.toLowerCase().includes(term)
-    );
-
-    return [...filtered].sort((a, b) => {
-      const aValue = a[column];
-      const bValue = b[column];
-      let comparison = 0;
-
-      if (aValue === null || bValue === null) {
-        comparison = aValue === bValue ? 0 : aValue === null ? 1 : -1;
-      } else if (column === 'lastRun' || column === 'nextRun') {
-        comparison = new Date(aValue).getTime() - new Date(bValue).getTime();
-      } else {
-        comparison = String(aValue).localeCompare(String(bValue));
+    return this.groups().map(group => {
+      // check if group matches
+      if (group.name.toLowerCase().includes(term)) {
+        return group;
       }
-
-      return direction === 'asc' ? comparison : -comparison;
-    });
+      // filter tasks
+      const filteredTasks = group.tasks.filter(t => 
+        t.action.toLowerCase().includes(term) || t.objectName.toLowerCase().includes(term)
+      );
+      if (filteredTasks.length > 0) {
+        return { ...group, tasks: filteredTasks, isExpanded: true };
+      }
+      return null;
+    }).filter(g => g !== null) as ScheduledGroup[];
   });
 
   onGlobalClick(target: HTMLElement): void {
@@ -84,13 +113,10 @@ export class ScheduledTasksComponent {
     }
   }
 
-  setSort(column: SortColumn): void {
-    if (this.sortColumn() === column) {
-      this.sortDirection.update(dir => (dir === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.sortColumn.set(column);
-      this.sortDirection.set('asc');
-    }
+  toggleGroup(groupId: string): void {
+    this.groups.update(groups => 
+      groups.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g)
+    );
   }
 
   toggleActionMenu(id: string): void {
@@ -100,61 +126,88 @@ export class ScheduledTasksComponent {
   closeActionMenu(): void {
     this.openActionMenuId.set(null);
   }
-  
+
   openCreateModal(): void {
-    this.taskToEdit.set(null);
-    this.isModalOpen.set(true);
-  }
-  
-  openEditModal(task: ScheduledTask): void {
-    this.taskToEdit.set(task);
-    this.isModalOpen.set(true);
-    this.closeActionMenu();
-  }
-  
-  closeModal(): void {
-    this.isModalOpen.set(false);
-    this.taskToEdit.set(null);
+    this.newTaskName.set('');
+    this.newTaskReservation.set('');
+    this.newTaskDescription.set('');
+    this.newTaskStatus.set('Enabled');
+    this.isCreateModalOpen.set(true);
   }
 
-  handleSaveTask(taskData: Omit<ScheduledTask, 'id' | 'lastRun' | 'nextRun'>): void {
-    const taskToEdit = this.taskToEdit();
-    if (taskToEdit) {
-      // Update
-      this.tasks.update(tasks =>
-        tasks.map(t => t.id === taskToEdit.id ? { ...taskToEdit, ...taskData } : t)
-      );
-    } else {
-      // Create
+  closeCreateModal(): void {
+    this.isCreateModalOpen.set(false);
+  }
+
+  openTaskDetailModal(): void {
+    this.isTaskDetailModalOpen.set(true);
+  }
+
+  closeTaskDetailModal(): void {
+    this.isTaskDetailModalOpen.set(false);
+  }
+
+  saveTaskDetail(): void {
+    // Add logic here to save task details if needed
+    this.closeTaskDetailModal();
+  }
+
+  saveNewTask(): void {
+    if (!this.newTaskName().trim()) return;
+    
+    // Add to the first group for demonstration
+    this.groups.update(groups => {
+      if (groups.length === 0) return groups;
+      const firstGroup = groups[0];
       const newTask: ScheduledTask = {
         id: `task-${Date.now()}`,
-        ...taskData,
-        lastRun: null, // New tasks haven't run yet
-        nextRun: 'Pending calculation', // This would be calculated by a backend in a real app
+        status: this.newTaskStatus(),
+        action: this.newTaskName(), // using name as action for demo
+        recurring: 'No',
+        objectName: this.newTaskReservation() || 'N/A',
+        type: 'Custom',
+        startEndDate: 'Pending',
+        recurringTime: 'N/A',
+        maxCount: 1
       };
-      this.tasks.update(tasks => [newTask, ...tasks]);
-    }
-    this.closeModal();
+      return [
+        { ...firstGroup, tasks: [newTask, ...firstGroup.tasks] },
+        ...groups.slice(1)
+      ];
+    });
+
+    this.closeCreateModal();
   }
-  
-  handleDeleteTask(task: ScheduledTask): void {
-    this.taskToDelete.set(task);
+
+  handleDeleteTask(groupId: string, taskId: string): void {
+    this.taskToDelete.set({groupId, taskId});
     this.isDeleteModalOpen.set(true);
     this.closeActionMenu();
   }
 
   handleConfirmDelete(): void {
-    const task = this.taskToDelete();
-    if (task) {
-        this.tasks.update(tasks => tasks.filter(t => t.id !== task.id));
+    const target = this.taskToDelete();
+    if (target) {
+        this.groups.update(groups => groups.map(g => {
+          if (g.id === target.groupId) {
+            return { ...g, tasks: g.tasks.filter(t => t.id !== target.taskId) };
+          }
+          return g;
+        }));
     }
     this.isDeleteModalOpen.set(false);
     this.taskToDelete.set(null);
   }
 
-  toggleTaskStatus(task: ScheduledTask, event: boolean): void {
-    this.tasks.update(tasks => tasks.map(t =>
-      t.id === task.id ? { ...t, status: event ? 'Enabled' : 'Disabled' } : t
-    ));
+  toggleTaskStatus(groupId: string, taskId: string, event: boolean): void {
+    this.groups.update(groups => groups.map(g => {
+      if (g.id === groupId) {
+        return {
+          ...g,
+          tasks: g.tasks.map(t => t.id === taskId ? { ...t, status: event ? 'Enabled' : 'Disabled' } : t)
+        };
+      }
+      return g;
+    }));
   }
 }
