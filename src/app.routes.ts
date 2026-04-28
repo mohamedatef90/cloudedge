@@ -104,6 +104,8 @@ export const APP_ROUTES: Routes = [
       { path: 'operations/scheduled-tasks', component: ScheduledTasksComponent, title: 'Scheduled Tasks' },
       { path: 'operations/scheduled-groups', component: ScheduledGroupsComponent, title: 'Scheduled Groups' },
       { path: 'operations/running-tasks', component: RunningTasksComponent, title: 'Running Tasks' },
+      { path: 'operations/backup/jobs', loadComponent: () => import('./pages/backup/jobs/jobs.component').then(m => m.JobsComponent), title: 'Backup Jobs' },
+      { path: 'operations/backup/restore-requests', loadComponent: () => import('./pages/backup/restore-requests/restore-requests.component').then(m => m.RestoreRequestsComponent), title: 'Restore Requests' },
     ],
   },
   { path: '**', redirectTo: 'app/cloud-edge' } // Wildcard route

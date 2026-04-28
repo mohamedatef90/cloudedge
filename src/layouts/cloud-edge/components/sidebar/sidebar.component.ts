@@ -31,7 +31,8 @@ export class CloudEdgeSidebarComponent {
   private router: Router = inject(Router);
 
   expandedItems = signal<{ [key: string]: boolean }>({
-    'Scheduled Tasks': false
+    'Scheduled Tasks': false,
+    'Backup': false
   });
 
   toggleExpand(itemName: string) {
@@ -135,6 +136,14 @@ export class CloudEdgeSidebarComponent {
                 children: [
                   { name: 'Tasks', path: '/app/cloud-edge/operations/scheduled-tasks' },
                   { name: 'Scheduled Groups', path: '/app/cloud-edge/operations/scheduled-groups' }
+                ]
+              },
+              { 
+                name: 'Backup', 
+                icon: 'fas fa-database', 
+                children: [
+                  { name: 'Jobs', path: '/app/cloud-edge/operations/backup/jobs' },
+                  { name: 'Restore Requests', path: '/app/cloud-edge/operations/backup/restore-requests' }
                 ]
               },
               { name: 'Running Tasks', icon: 'fas fa-tasks', path: '/app/cloud-edge/operations/running-tasks' },
