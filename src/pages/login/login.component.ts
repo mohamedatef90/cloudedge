@@ -1,7 +1,8 @@
 
-import { ChangeDetectionStrategy, Component, output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { IconComponent } from '../../components/icon/icon.component';
 
@@ -14,30 +15,29 @@ import { IconComponent } from '../../components/icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
-  loginSuccess = output<void>();
-  
   private authService = inject(AuthService);
+  private router = inject(Router);
 
-  username = signal('');
-  password = signal('');
+  username = '';
+  password = '';
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
 
   async onLogin(): Promise<void> {
-    if (!this.username() || !this.password()) {
-        this.errorMessage.set('Please enter both username and password.');
-        return;
+    if (!this.username || !this.password) {
+      this.errorMessage.set('Please enter both username and password.');
+      return;
     }
     this.isLoading.set(true);
     this.errorMessage.set(null);
     try {
-      const success = await this.authService.login(this.username(), this.password());
+      const success = await this.authService.login(this.username, this.password);
       if (success) {
-        this.loginSuccess.emit();
+        this.router.navigate(['/app/cloud-edge']);
       } else {
         this.errorMessage.set('Invalid username or password.');
       }
-    } catch (error) {
+    } catch {
       this.errorMessage.set('An unexpected error occurred.');
     } finally {
       this.isLoading.set(false);

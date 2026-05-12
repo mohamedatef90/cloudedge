@@ -13,12 +13,24 @@ export class AuthService {
       'micro': { id: 'user-004', role: 'micro', displayName: 'Micro', avatarUrl: 'https://i.pravatar.cc/150?u=micro' },
   };
 
-  user = signal<User | null>(this.mockUsers['admin']);
-  isLoggedIn = signal<boolean>(true);
+  user = signal<User | null>(null);
+  isLoggedIn = signal<boolean>(false);
 
   constructor() {
-    // Store only non-sensitive identifiers in sessionStorage for the mock session.
-    sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers['admin'].id }));
+    // Restore session from sessionStorage on startup.
+    try {
+      const stored = sessionStorage.getItem('currentUser');
+      if (stored) {
+        const { id } = JSON.parse(stored);
+        const restoredUser = Object.values(this.mockUsers).find(u => u.id === id) ?? null;
+        if (restoredUser) {
+          this.user.set(restoredUser);
+          this.isLoggedIn.set(true);
+        }
+      }
+    } catch {
+      sessionStorage.removeItem('currentUser');
+    }
   }
 
   async login(username: string, password: string): Promise<boolean> {

@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { CloudEdgeLayoutComponent } from './layouts/cloud-edge/cloud-edge-layout.component';
+import { LoginComponent } from './pages/login/login.component';
+import { authGuard } from './guards/auth.guard';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrganizationsComponent } from './pages/organizations/organizations.component';
 import { FirewallPoliciesComponent } from './pages/firewall-policies/firewall-policies.component';
@@ -45,9 +47,11 @@ import { AddDfwOldPolicyComponent } from './pages/distributed-firewall-old/pages
 
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'app/cloud-edge', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent, title: 'Sign In' },
   {
     path: 'app/cloud-edge',
     component: CloudEdgeLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', component: DashboardComponent, title: 'CloudEdge Dashboard' },
       // Administration
