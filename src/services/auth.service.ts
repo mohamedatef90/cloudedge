@@ -43,7 +43,7 @@ export class AuthService {
     if (validCredentials[username] === password && this.mockUsers[username]) {
       this.user.set(this.mockUsers[username]);
       this.isLoggedIn.set(true);
-      sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers[username].id, role: this.mockUsers[username].role }));
+      sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers[username].id }));
       return true;
     }
     return false;
