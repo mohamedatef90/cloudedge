@@ -28,10 +28,11 @@
           <label for="org-name" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
             Name <span class="text-red-500">*</span>
           </label>
-          <input 
-            type="text" 
-            id="org-name" 
+          <input
+            type="text"
+            id="org-name"
             [(ngModel)]="name"
+            maxlength="255"
             placeholder="e.g., WorldPosta Inc."
             class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
           >
@@ -40,10 +41,11 @@
           <label for="org-description" class="block text-sm font-medium text-[#293c51] dark:text-gray-300 mb-1">
             Description
           </label>
-          <textarea 
-            id="org-description" 
+          <textarea
+            id="org-description"
             [(ngModel)]="description"
             rows="4"
+            maxlength="2000"
             placeholder="Provide a brief description of the organization..."
             class="block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] focus:border-[#679a41] dark:bg-slate-700 dark:text-gray-200 sm:text-sm"
           ></textarea>

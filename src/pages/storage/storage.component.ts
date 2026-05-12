@@ -275,6 +275,10 @@ export class StorageComponent {
   handleCreateSnapshot(disk: Disk): void {
     const snapshotName = prompt(`Enter a name for the snapshot of "${disk.name}":`, `${disk.name}-snapshot-${new Date().toISOString().slice(0, 10)}`);
     if (!snapshotName) return;
+    if (snapshotName.length > 128 || !/^[a-zA-Z0-9][a-zA-Z0-9\-_.]*$/.test(snapshotName)) {
+      alert('Snapshot name must be 1–128 characters and contain only letters, digits, hyphens, underscores, or dots.');
+      return;
+    }
 
     const newSnapshot: Snapshot = {
       id: `snap-${Date.now()}`,

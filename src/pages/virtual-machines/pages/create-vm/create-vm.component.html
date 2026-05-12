@@ -7,9 +7,10 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       <div class="md:col-span-2">
         <label for="vmName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Virtual Machine Name <span class="text-red-500">*</span></label>
-        <input type="text" id="vmName" name="vmName" 
+        <input type="text" id="vmName" name="vmName"
                [ngModel]="vmCreationService.vmName()" (ngModelChange)="vmCreationService.vmName.set($event)"
-               required placeholder="Placeholder text"
+               required maxlength="64" pattern="^[a-zA-Z0-9][a-zA-Z0-9\-_]{0,62}[a-zA-Z0-9]?$"
+               placeholder="Placeholder text"
                class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
       </div>
       <div>
@@ -51,9 +52,10 @@
       </div>
       <div class="md:col-span-2">
         <label for="hostName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Host Name <span class="text-red-500">*</span></label>
-        <input type="text" id="hostName" name="hostName" 
+        <input type="text" id="hostName" name="hostName"
                [ngModel]="vmCreationService.hostName()" (ngModelChange)="vmCreationService.hostName.set($event)"
-               required placeholder="Enter virtual machine host name"
+               required maxlength="253" pattern="^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
+               placeholder="Enter virtual machine host name"
                class="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#679a41] dark:bg-slate-700 sm:text-sm">
       </div>
       <div class="md:col-span-2">
