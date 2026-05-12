@@ -17,15 +17,30 @@ export class AuthService {
   isLoggedIn = signal<boolean>(true);
 
   constructor() {
-    // Set admin user as the default logged in user.
-    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
+    // Store only non-sensitive identifiers in sessionStorage for the mock session.
+    sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers['admin'].id }));
+  }
+
+  async login(username: string, password: string): Promise<boolean> {
+    const validCredentials: Record<string, string> = {
+      admin: '123456',
+      micro: '123456',
+      customer: '123456',
+      reseller: '123456',
+    };
+    if (validCredentials[username] === password && this.mockUsers[username]) {
+      this.user.set(this.mockUsers[username]);
+      this.isLoggedIn.set(true);
+      sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers[username].id, role: this.mockUsers[username].role }));
+      return true;
+    }
+    return false;
   }
 
   logout(): void {
-    // Logout is disabled in this context, but if called, it will just re-log as admin.
-    this.user.set(this.mockUsers['admin']);
-    this.isLoggedIn.set(true);
-    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
+    this.user.set(null);
+    this.isLoggedIn.set(false);
+    sessionStorage.removeItem('currentUser');
   }
 
   getAppLauncherItems(role: User['role'] | undefined): AppLauncherData {

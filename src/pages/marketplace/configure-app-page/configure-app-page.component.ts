@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, SecurityContext, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { MarketplaceService } from '../services/marketplace.service';
 import { AuthService } from '../../../services/auth.service';
@@ -143,7 +143,7 @@ export class ConfigureAppPageComponent implements OnInit {
     this.router.navigate(['/app/cloud-edge/resources/virtual-machines']);
   }
   
-  sanitizeIcon(svgContent: string | undefined): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(svgContent || '');
+  sanitizeIcon(svgContent: string | undefined): string {
+    return this.sanitizer.sanitize(SecurityContext.HTML, svgContent ?? '') ?? '';
   }
 }
