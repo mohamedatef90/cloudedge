@@ -88,8 +88,6 @@ export class CreateEditNatComponent implements OnInit {
 
   onSave(): void {
     if (this.natForm.valid) {
-      // In a real app, this would call the natService to save the data
-      console.log('Saving NAT Rule:', this.natForm.value);
       this.router.navigate(['/app/cloud-edge/network/nats']);
     } else {
       this.natForm.markAllAsTouched();

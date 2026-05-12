@@ -54,7 +54,6 @@ export class ProfilesComponent {
   }
 
   addLayer7Profile(): void {
-    console.log('Adding Layer 7 Profile');
     this.isAddProfileMenuOpen.set(false);
   }
 }
