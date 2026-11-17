@@ -1,16 +1,17 @@
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, SecurityContext, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DomSanitizer } from '@angular/platform-browser';
 import { MarketplaceService } from '../services/marketplace.service';
 import { Category, MarketplaceItem } from '../models/marketplace.model';
+
+import { MarkupIconComponent } from '../../../components/markup-icon/markup-icon.component';
 
 @Component({
   selector: 'app-marketplace-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [MarkupIconComponent, CommonModule, RouterModule],
   templateUrl: './marketplace-page.component.html',
   styleUrls: ['./marketplace-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +19,6 @@ import { Category, MarketplaceItem } from '../models/marketplace.model';
 export class MarketplacePageComponent implements OnInit {
   private marketplaceService = inject(MarketplaceService);
   // FIX: Explicitly type injected services to avoid `unknown` type inference.
-  private sanitizer: DomSanitizer = inject(DomSanitizer);
   // FIX: Explicitly type injected services to avoid `unknown` type inference.
   private route: ActivatedRoute = inject(ActivatedRoute);
 
@@ -110,9 +110,6 @@ export class MarketplacePageComponent implements OnInit {
     this.marketplaceService.getCategories().subscribe(categories => this.categories.set(categories));
   }
 
-  sanitizeIcon(svgContent: string): string {
-    return this.sanitizer.sanitize(SecurityContext.HTML, svgContent) ?? '';
-  }
 
   formatDownloads(downloads: number | undefined): string {
     if (!downloads) return '';

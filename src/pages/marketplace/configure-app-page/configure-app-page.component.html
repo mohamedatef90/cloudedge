@@ -164,7 +164,7 @@
         <aside class="mt-8 lg:mt-0 lg:col-span-4 xl:col-span-3">
           <div class="sticky top-24 space-y-6">
             <div class="border border-gray-200 dark:border-slate-700 rounded-lg flex items-center justify-center p-6 bg-white dark:bg-slate-800/50">
-                <div class="h-28 w-28 text-[#679a41] dark:text-[#8cc866]" [innerHTML]="sanitizeIcon(currentItem.icon)"></div>
+                <app-markup-icon [markup]="currentItem.icon" [alt]="currentItem.name" class="h-28 w-28 text-[#679a41] dark:text-[#8cc866]" />
             </div>
 
             <div class="space-y-4">

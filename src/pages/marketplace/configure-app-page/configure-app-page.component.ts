@@ -1,17 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, SecurityContext, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
 
 import { MarketplaceService } from '../services/marketplace.service';
 import { AuthService } from '../../../services/auth.service';
 import { Category, MarketplaceItem } from '../models/marketplace.model';
 import { VirtualMachineService } from '../../virtual-machines/services/virtual-machine.service';
 
+import { MarkupIconComponent } from '../../../components/markup-icon/markup-icon.component';
+
 @Component({
   selector: 'app-configure-app-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [MarkupIconComponent, CommonModule, RouterModule],
   templateUrl: './configure-app-page.component.html',
   styleUrls: ['./configure-app-page.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +22,6 @@ export class ConfigureAppPageComponent implements OnInit {
   private router: Router = inject(Router);
   private marketplaceService = inject(MarketplaceService);
   private authService = inject(AuthService);
-  private sanitizer: DomSanitizer = inject(DomSanitizer);
   private virtualMachineService = inject(VirtualMachineService);
 
   item = signal<MarketplaceItem | undefined>(undefined);
@@ -143,7 +143,4 @@ export class ConfigureAppPageComponent implements OnInit {
     this.router.navigate(['/app/cloud-edge/resources/virtual-machines']);
   }
   
-  sanitizeIcon(svgContent: string | undefined): string {
-    return this.sanitizer.sanitize(SecurityContext.HTML, svgContent ?? '') ?? '';
-  }
 }

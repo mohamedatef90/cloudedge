@@ -2,7 +2,7 @@
 
 
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../../services/auth.service';
 import { AppLauncherData } from '../../../../types';
@@ -26,6 +26,7 @@ export class CloudEdgeTopBarComponent {
   toggleSidebar = output<void>();
 
   private authService = inject(AuthService);
+  private router = inject(Router);
   user = this.authService.user;
 
   userMenuOpen = signal(false);
@@ -71,5 +72,7 @@ export class CloudEdgeTopBarComponent {
 
   logout(): void {
     this.authService.logout();
+    this.userMenuOpen.set(false);
+    void this.router.navigate(['/login']);
   }
 }
