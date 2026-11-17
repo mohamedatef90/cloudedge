@@ -53,6 +53,8 @@ export const APP_ROUTES: Routes = [
     path: 'app/cloud-edge',
     component: CloudEdgeLayoutComponent,
     canActivate: [authGuard],
+    // Re-check on every child navigation, not only when entering the layout.
+    canActivateChild: [authGuard],
     children: [
       { path: '', component: DashboardComponent, title: 'CloudEdge Dashboard' },
       // Administration — micro role has no access

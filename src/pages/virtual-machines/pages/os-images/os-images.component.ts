@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, inject, OnInit, SecurityContext, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -7,7 +7,6 @@ import { IconComponent } from '../../../../components/icon/icon.component';
 import { VmCreationService } from '../../services/vm-creation.service';
 import { MarketplaceService } from '../../../marketplace/services/marketplace.service';
 import { MarketplaceItem, Category } from '../../../marketplace/models/marketplace.model';
-import { DomSanitizer } from '@angular/platform-browser';
 
 interface OsImage {
   id: string;
@@ -18,12 +17,14 @@ interface OsImage {
   selectedVersion: string;
 }
 
+import { MarkupIconComponent } from '../../../../components/markup-icon/markup-icon.component';
+
 @Component({
   selector: 'app-os-images',
   templateUrl: './os-images.component.html',
   styleUrls: ['./os-images.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent, RouterModule],
+  imports: [MarkupIconComponent, CommonModule, FormsModule, IconComponent, RouterModule],
 })
 export class OsImagesComponent implements OnInit {
   // FIX: Explicitly type injected services to avoid `unknown` type inference.
@@ -31,7 +32,6 @@ export class OsImagesComponent implements OnInit {
   private vmCreationService = inject(VmCreationService);
   private marketplaceService = inject(MarketplaceService);
   // FIX: Explicitly type injected services to avoid `unknown` type inference.
-  private sanitizer: DomSanitizer = inject(DomSanitizer);
 
   activeTab = signal<'os' | 'marketplace'>('os');
 
@@ -145,9 +145,6 @@ export class OsImagesComponent implements OnInit {
     this.activeTab.set(tab);
   }
 
-  sanitizeIcon(svgContent: string): string {
-    return this.sanitizer.sanitize(SecurityContext.HTML, svgContent) ?? '';
-  }
 
   selectImage(image: OsImage): void {
     const selectedBlueprint = `${image.name} ${image.selectedVersion}`;
