@@ -70,21 +70,6 @@ export class CreateVmComponent {
   }
 
   createVm(): void {
-    // In a real app, this would submit the form data to a service
-    console.log('Creating VM with the following data:', {
-      vmName: this.vmCreationService.vmName(),
-      reservation: this.vmCreationService.reservation(),
-      group: this.vmCreationService.group(),
-      osBlueprint: this.vmCreationService.osBlueprint(),
-      hostName: this.vmCreationService.hostName(),
-      password: '****', // Don't log passwords
-      gateway: this.vmCreationService.gateway(),
-      cpu: this.vmCreationService.cpu(),
-      memory: this.vmCreationService.memory(),
-      disks: this.vmCreationService.disks(),
-      description: this.vmCreationService.description(),
-    });
-    
     this.vmCreationService.reset();
     // For demo purposes, navigate back to the list
     this.router.navigate(['/app/cloud-edge/resources/virtual-machines']);

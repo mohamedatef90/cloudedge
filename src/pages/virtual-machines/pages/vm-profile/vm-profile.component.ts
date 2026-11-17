@@ -267,7 +267,6 @@ export class VmProfileComponent implements OnInit {
       const vmAction = this.vmActionToConfirm();
 
       if (vm && vmAction) {
-          console.log(`Action '${vmAction}' confirmed for VM: ${vm.name}`);
           // Here you would call a service to perform the action.
           // For now, just logging it.
       }

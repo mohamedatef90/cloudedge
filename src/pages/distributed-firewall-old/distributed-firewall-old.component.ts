@@ -367,8 +367,6 @@ export class DistributedFirewallOldComponent {
   }
 
   handleAddRuleClick(): void {
-    // Logic to add a rule to the selected policy
-    console.log('Adding rule to selected policy');
   }
 
   handleEditPolicy(policy: FirewallPolicy): void {

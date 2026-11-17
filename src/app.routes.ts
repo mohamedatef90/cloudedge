@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 import { CloudEdgeLayoutComponent } from './layouts/cloud-edge/cloud-edge-layout.component';
+import { LoginComponent } from './pages/login/login.component';
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrganizationsComponent } from './pages/organizations/organizations.component';
 import { FirewallPoliciesComponent } from './pages/firewall-policies/firewall-policies.component';
@@ -45,43 +48,45 @@ import { AddDfwOldPolicyComponent } from './pages/distributed-firewall-old/pages
 
 export const APP_ROUTES: Routes = [
   { path: '', redirectTo: 'app/cloud-edge', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent, title: 'Sign In' },
   {
     path: 'app/cloud-edge',
     component: CloudEdgeLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', component: DashboardComponent, title: 'CloudEdge Dashboard' },
-      // Administration
-      { path: 'administration/organizations', component: OrganizationsComponent, title: 'Organizations' },
-      { path: 'administration/profiles', component: ProfilesComponent, title: 'Profiles' },
-      { path: 'administration/profiles/add-context-profile', component: AddContextProfileComponent, title: 'Add Context Profile' },
-      { path: 'administration/organizations/:id', component: OrganizationProfileComponent, title: 'Organization Profile' },
-      { path: 'administration/action-logs', component: ActionLogsComponent, title: 'Action Logs' },
-      { path: 'administration/tickets', component: TicketsComponent, title: 'Tickets' },
-      // Resources
-      { path: 'resources/virtual-machines', component: VirtualMachinesComponent, title: 'Virtual Machines' },
-      { path: 'resources/virtual-machines/create', component: CreateVmComponent, title: 'Create Virtual Machine' },
-      { path: 'resources/virtual-machines/images', component: OsImagesComponent, title: 'Select OS Image' },
-      { path: 'resources/virtual-machines/:id', component: VmProfileComponent, title: 'Virtual Machine Profile' },
-      { path: 'resources/recycle-bin', component: RecycleBinComponent, title: 'Recycle Bin' },
+      // Administration — micro role has no access
+      { path: 'administration/organizations', component: OrganizationsComponent, title: 'Organizations', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'administration/profiles', component: ProfilesComponent, title: 'Profiles', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'administration/profiles/add-context-profile', component: AddContextProfileComponent, title: 'Add Context Profile', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'administration/organizations/:id', component: OrganizationProfileComponent, title: 'Organization Profile', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'administration/action-logs', component: ActionLogsComponent, title: 'Action Logs', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'administration/tickets', component: TicketsComponent, title: 'Tickets', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      // Resources — micro role has no access
+      { path: 'resources/virtual-machines', component: VirtualMachinesComponent, title: 'Virtual Machines', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/virtual-machines/create', component: CreateVmComponent, title: 'Create Virtual Machine', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/virtual-machines/images', component: OsImagesComponent, title: 'Select OS Image', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/virtual-machines/:id', component: VmProfileComponent, title: 'Virtual Machine Profile', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/recycle-bin', component: RecycleBinComponent, title: 'Recycle Bin', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
       { path: 'resources/marketplace', redirectTo: 'resources/marketplace/category/cms-publishing', pathMatch: 'full' },
-      { path: 'resources/marketplace/category/:id', component: MarketplacePageComponent, title: 'Marketplace' },
-      { path: 'resources/marketplace/configure/:id', component: ConfigureAppPageComponent, title: 'Configure Marketplace App' },
-      { path: 'resources/storage', component: StorageComponent, title: 'Storage' },
-      { path: 'resources/reservations', component: ReservationsComponent, title: 'Reservations' },
-      { path: 'resources/reservations/add', component: AddReservationComponent, title: 'Add Reservation' },
-      { path: 'resources/reservations/:id', component: ReservationDetailsComponent, title: 'Reservation Details' },
+      { path: 'resources/marketplace/category/:id', component: MarketplacePageComponent, title: 'Marketplace', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/marketplace/configure/:id', component: ConfigureAppPageComponent, title: 'Configure Marketplace App', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/storage', component: StorageComponent, title: 'Storage', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/reservations', component: ReservationsComponent, title: 'Reservations', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/reservations/add', component: AddReservationComponent, title: 'Add Reservation', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'resources/reservations/:id', component: ReservationDetailsComponent, title: 'Reservation Details', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
       { path: 'resources/getting-started', component: GettingStartedComponent, title: 'Getting Started Guide' },
       { path: 'resources/community-forum', component: CommunityForumComponent, title: 'Community Forum' },
       { path: 'resources/community-forum/topic/:id', component: TopicPageComponent, title: 'Community Forum Topic' },
-      // Network
-      { path: 'network/gateways', component: GatewaysComponent, title: 'Gateways' },
-      { path: 'network/gateways/create', component: CreateEditGatewayComponent, title: 'Create Gateway' },
-      { path: 'network/gateways/edit/:id', component: CreateEditGatewayComponent, title: 'Edit Gateway' },
-      { path: 'network/nats', component: NatsComponent, title: 'NATs' },
-      { path: 'network/nats/create', component: CreateEditNatComponent, title: 'Create NAT Rule' },
-      { path: 'network/nats/edit/:id', component: CreateEditNatComponent, title: 'Edit NAT Rule' },
-      { path: 'network/reserved-ip', component: ReservedIpComponent, title: 'Reserved IP' },
-      { path: 'network/routes', component: RoutesComponent, title: 'Routes' },
+      // Network — micro role has no access
+      { path: 'network/gateways', component: GatewaysComponent, title: 'Gateways', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/gateways/create', component: CreateEditGatewayComponent, title: 'Create Gateway', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/gateways/edit/:id', component: CreateEditGatewayComponent, title: 'Edit Gateway', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/nats', component: NatsComponent, title: 'NATs', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/nats/create', component: CreateEditNatComponent, title: 'Create NAT Rule', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/nats/edit/:id', component: CreateEditNatComponent, title: 'Edit NAT Rule', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/reserved-ip', component: ReservedIpComponent, title: 'Reserved IP', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'network/routes', component: RoutesComponent, title: 'Routes', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
       // Inventory
       { path: 'inventory/applications', component: FirewallPoliciesComponent, title: 'Applications' },
       { path: 'inventory/firewall-groups', component: FirewallGroupsComponent, title: 'Groups' },
@@ -100,12 +105,12 @@ export const APP_ROUTES: Routes = [
       { path: 'security/gateway-firewall/add-policy', loadComponent: () => import('./pages/gateway-firewall/pages/add-gateway-policy/add-gateway-policy.component').then(m => m.AddGatewayPolicyComponent), title: 'Add Gateway Firewall Policy' },
       { path: 'security/gateway-firewall/edit-policy/:id', loadComponent: () => import('./pages/gateway-firewall/pages/add-gateway-policy/add-gateway-policy.component').then(m => m.AddGatewayPolicyComponent), title: 'Edit Gateway Firewall Policy' },
       { path: 'security/hub-malware-prevention', component: IdsIpsMalwarePreventionComponent, title: 'IDS/IPS & Malware Prevention' },
-      // Operations
-      { path: 'operations/scheduled-tasks', component: ScheduledTasksComponent, title: 'Scheduled Tasks' },
-      { path: 'operations/scheduled-groups', component: ScheduledGroupsComponent, title: 'Scheduled Groups' },
-      { path: 'operations/running-tasks', component: RunningTasksComponent, title: 'Running Tasks' },
-      { path: 'operations/backup/jobs', loadComponent: () => import('./pages/backup/jobs/jobs.component').then(m => m.JobsComponent), title: 'Backup Jobs' },
-      { path: 'operations/backup/restore-requests', loadComponent: () => import('./pages/backup/restore-requests/restore-requests.component').then(m => m.RestoreRequestsComponent), title: 'Restore Requests' },
+      // Operations — micro role has no access
+      { path: 'operations/scheduled-tasks', component: ScheduledTasksComponent, title: 'Scheduled Tasks', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'operations/scheduled-groups', component: ScheduledGroupsComponent, title: 'Scheduled Groups', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'operations/running-tasks', component: RunningTasksComponent, title: 'Running Tasks', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'operations/backup/jobs', loadComponent: () => import('./pages/backup/jobs/jobs.component').then(m => m.JobsComponent), title: 'Backup Jobs', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
+      { path: 'operations/backup/restore-requests', loadComponent: () => import('./pages/backup/restore-requests/restore-requests.component').then(m => m.RestoreRequestsComponent), title: 'Restore Requests', canActivate: [roleGuard(['admin', 'reseller', 'customer'])] },
     ],
   },
   { path: '**', redirectTo: 'app/cloud-edge' } // Wildcard route

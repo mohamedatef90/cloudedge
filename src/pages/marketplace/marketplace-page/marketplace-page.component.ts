@@ -1,9 +1,9 @@
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, SecurityContext, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { MarketplaceService } from '../services/marketplace.service';
 import { Category, MarketplaceItem } from '../models/marketplace.model';
 
@@ -110,8 +110,8 @@ export class MarketplacePageComponent implements OnInit {
     this.marketplaceService.getCategories().subscribe(categories => this.categories.set(categories));
   }
 
-  sanitizeIcon(svgContent: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(svgContent);
+  sanitizeIcon(svgContent: string): string {
+    return this.sanitizer.sanitize(SecurityContext.HTML, svgContent) ?? '';
   }
 
   formatDownloads(downloads: number | undefined): string {

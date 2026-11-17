@@ -49,7 +49,7 @@ export class CreateEditNatComponent implements OnInit {
         cidr: [{ value: 24, disabled: true }]
       }),
       elasticIp: ['', Validators.required],
-      port: [''],
+      port: ['', [Validators.min(1), Validators.max(65535), Validators.pattern('^[0-9]*$')]],
       description: ['']
     });
 
@@ -88,8 +88,6 @@ export class CreateEditNatComponent implements OnInit {
 
   onSave(): void {
     if (this.natForm.valid) {
-      // In a real app, this would call the natService to save the data
-      console.log('Saving NAT Rule:', this.natForm.value);
       this.router.navigate(['/app/cloud-edge/network/nats']);
     } else {
       this.natForm.markAllAsTouched();

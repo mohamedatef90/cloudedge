@@ -65,23 +65,32 @@ export class CreateEditGatewayComponent implements OnInit {
       this.gatewayForm.get('dhcpAddress.cidr')?.setValue(value);
     });
 
+    const ipv4Pattern = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
+    const dhcpFieldValidators: Record<string, import('@angular/forms').ValidatorFn[]> = {
+      rangeFrom:  [Validators.required, Validators.pattern(ipv4Pattern)],
+      rangeTo:    [Validators.required, Validators.pattern(ipv4Pattern)],
+      dnsAddress: [Validators.required, Validators.pattern(ipv4Pattern)],
+      leaseTime:  [Validators.required, Validators.min(1), Validators.pattern('^[1-9][0-9]*$')],
+    };
+
     // FIX: Replaced incorrect `group()` method with `get()` to access form controls.
     this.gatewayForm.get('createDhcp')?.valueChanges.subscribe(enabled => {
-      const dhcpControls = ['rangeFrom', 'rangeTo', 'dnsAddress', 'leaseTime'];
       const dhcpAddressGroup = this.gatewayForm.get('dhcpAddress') as FormGroup;
 
       if (enabled) {
-        dhcpControls.forEach(controlName => this.gatewayForm.get(controlName)?.setValidators(Validators.required));
+        Object.entries(dhcpFieldValidators).forEach(([controlName, validators]) => {
+          this.gatewayForm.get(controlName)?.setValidators(validators);
+        });
         Object.keys(dhcpAddressGroup.controls).forEach(key => {
             if(key !== 'cidr') {
                 dhcpAddressGroup.get(key)?.setValidators([Validators.required, Validators.min(0), Validators.max(255), Validators.pattern('^[0-9]*$')]);
             }
         });
       } else {
-        dhcpControls.forEach(controlName => this.gatewayForm.get(controlName)?.clearValidators());
+        Object.keys(dhcpFieldValidators).forEach(controlName => this.gatewayForm.get(controlName)?.clearValidators());
         Object.keys(dhcpAddressGroup.controls).forEach(key => dhcpAddressGroup.get(key)?.clearValidators());
       }
-      dhcpControls.forEach(controlName => this.gatewayForm.get(controlName)?.updateValueAndValidity());
+      Object.keys(dhcpFieldValidators).forEach(controlName => this.gatewayForm.get(controlName)?.updateValueAndValidity());
       dhcpAddressGroup.updateValueAndValidity();
     });
 

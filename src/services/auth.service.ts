@@ -13,19 +13,46 @@ export class AuthService {
       'micro': { id: 'user-004', role: 'micro', displayName: 'Micro', avatarUrl: 'https://i.pravatar.cc/150?u=micro' },
   };
 
-  user = signal<User | null>(this.mockUsers['admin']);
-  isLoggedIn = signal<boolean>(true);
+  user = signal<User | null>(null);
+  isLoggedIn = signal<boolean>(false);
 
   constructor() {
-    // Set admin user as the default logged in user.
-    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
+    // Restore session from sessionStorage on startup.
+    try {
+      const stored = sessionStorage.getItem('currentUser');
+      if (stored) {
+        const { id } = JSON.parse(stored);
+        const restoredUser = Object.values(this.mockUsers).find(u => u.id === id) ?? null;
+        if (restoredUser) {
+          this.user.set(restoredUser);
+          this.isLoggedIn.set(true);
+        }
+      }
+    } catch {
+      sessionStorage.removeItem('currentUser');
+    }
+  }
+
+  async login(username: string, password: string): Promise<boolean> {
+    const validCredentials: Record<string, string> = {
+      admin: '123456',
+      micro: '123456',
+      customer: '123456',
+      reseller: '123456',
+    };
+    if (validCredentials[username] === password && this.mockUsers[username]) {
+      this.user.set(this.mockUsers[username]);
+      this.isLoggedIn.set(true);
+      sessionStorage.setItem('currentUser', JSON.stringify({ id: this.mockUsers[username].id }));
+      return true;
+    }
+    return false;
   }
 
   logout(): void {
-    // Logout is disabled in this context, but if called, it will just re-log as admin.
-    this.user.set(this.mockUsers['admin']);
-    this.isLoggedIn.set(true);
-    localStorage.setItem('currentUser', JSON.stringify(this.mockUsers['admin']));
+    this.user.set(null);
+    this.isLoggedIn.set(false);
+    sessionStorage.removeItem('currentUser');
   }
 
   getAppLauncherItems(role: User['role'] | undefined): AppLauncherData {

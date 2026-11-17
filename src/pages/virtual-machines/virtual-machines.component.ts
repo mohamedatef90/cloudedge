@@ -257,7 +257,6 @@ export class VirtualMachinesComponent {
       const vm = this.selectedVmForAction();
       const action = this.actionToConfirm();
       if (vm && action) {
-          console.log(`Action '${action}' confirmed for VM: ${vm.name}`);
           if (action === 'powerOff') {
             this.virtualMachineService.updateVmStatus(vm.id, 'stopped');
           } else if (action === 'restart') {
